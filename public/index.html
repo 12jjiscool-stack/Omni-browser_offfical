@@ -1,89 +1,282 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Omni-demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Omni-browser</title>
 <style>
-  :root { --bg:#071229; --card:#0b1220; --accent:#6ee7b7; --muted:#94a3b8; }
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#071229 0%, #071a2a 100%); font-family:Inter,system-ui; color:#e6eef8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;}
-  .app{width:100%; max-width:980px; border-radius:16px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:32px; box-shadow:0 10px 40px rgba(2,6,23,0.6);}
-  h1{margin:0 0 6px 0; font-size:20px}
-  .subtitle{color:var(--muted); font-size:13px; margin-bottom:18px}
-  .search-row{display:flex; gap:12px; align-items:center}
-  .input { flex:1; padding:14px 16px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,0.03); color:inherit; font-size:15px; outline:none; }
-  .btn { background:linear-gradient(90deg,var(--accent),#38bdf8); color:#042024; padding:12px 16px; border-radius:12px; border:none; cursor:pointer; font-weight:700; }
-  .hint{margin-top:12px; color:var(--muted); font-size:13px}
-  .examples{display:flex; gap:8px; margin-top:12px}
-  .chip{background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:10px; color:var(--muted); cursor:pointer}
-  .footer{margin-top:18px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center}
-  .card{margin-top:22px; padding:14px; border-radius:12px; background:rgba(255,255,255,0.02)}
-  @media (max-width:640px){ .app{padding:18px} .search-row{flex-direction:column; align-items:stretch} .btn{width:100%} }
+  /* --- TOPBAR STYLES --- */
+  #sleekproxy-topbar {
+    position: fixed;
+    left: 0; right: 0; top: 0;
+    z-index: 9999999;
+    height: 56px;
+    backdrop-filter: blur(6px);
+    background: linear-gradient(180deg, rgba(12,18,26,0.92), rgba(12,18,26,0.7));
+    color: #e6eef8;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.5);
+  }
+  #sleekproxy-topbar .origin {
+    opacity: .9;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+  }
+  #sleekproxy-topbar .controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  #sleekproxy-cloak-btn {
+    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    color: #042024;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* --- CLOAKER OVERLAY --- */
+  #sleekproxy-cloak-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999998;
+    background: linear-gradient(180deg,#f8fafc, #eef2ff);
+    color: #0b1220;
+    font-family: Inter, system-ui;
+    padding: 28px;
+    box-sizing: border-box;
+  }
+  #sleekproxy-cloak-overlay .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  #sleekproxy-cloak-overlay h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  #sleekproxy-cloak-overlay .clock {
+    color: #475569;
+    font-size: 13px;
+  }
+  #sleekproxy-cloak-overlay .note-area {
+    margin-top: 18px;
+    width: 100%;
+    height: calc(100vh - 140px);
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.08);
+    overflow: auto;
+    color: #0b1220;
+    outline: none;
+  }
+
+  /* --- TIME + WEATHER WIDGET --- */
+  #sleekproxy-widget {
+    position: fixed;
+    top: 10px;
+    left: 12px;
+    background: rgba(12,18,26,0.85);
+    color: #e2e8f0;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    z-index: 99999999;
+    min-width: 180px;
+  }
+  #sleekproxy-widget .time {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  #sleekproxy-widget .weather {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* Some reset for body */
+  body {
+    margin: 0;
+    padding-top: 56px; /* to avoid topbar overlap */
+    background: #f0f2f5;
+    min-height: 100vh;
+  }
 </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Sleek proxy browser">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" style="border-radius:8px;background:linear-gradient(135deg,#1f2937,#081126);padding:6px">
-        <path d="M12 2l3.5 7h7.5l-6 4.5L19 23 12 18.5 5 23l1-9.5L0 9h7.5L12 2z" fill="#6ee7b7"/>
-      </svg>
-      <div>
-        <h1>Omni</h1>
-        <div class="subtitle">Private search + proxied browsing (Netlify demo). Type a URL or search query.</div>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="search-row">
-        <input id="q" class="input" placeholder="Search or paste a URL (https://...)">
-        <button id="go" class="btn">Go</button>
-      </div>
-      <div class="hint">Tip: paste a full URL or type a query. Searches use DuckDuckGo (no trackers).</div>
-
-      <div class="examples">
-        <div class="chip" data-q="https://example.com">https://example.com</div>
-        <div class="chip" data-q="openai.com">openai.com</div>
-        <div class="chip" data-q="privacy-focused search engines">privacy-focused search engines</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      <div>Hosted on Netlify — demo only.</div>
-      <div>Do not use for illegal or abusive activity.</div>
+<div id="sleekproxy-topbar" role="navigation" aria-label="SleekProxy topbar">
+  <div style="display:flex;gap:12px;align-items:center;">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="border-radius:6px;background:linear-gradient(135deg,#1f2937,#081126);padding:5px">
+      <path d="M12 2l3.5 7h7.5l-6 4.5L19 23 12 18.5 5 23l1-9.5L0 9h7.5L12 2z" fill="#6ee7b7"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;min-width:0;">
+      <div style="font-weight:700; font-size:14px;">Omni</div>
+      <div class="origin" contenteditable="true" aria-label="Origin URL or name" title="Edit origin">example.com</div>
     </div>
   </div>
 
+  <div class="controls">
+    <a href="#" onclick="location.reload();" style="color:#cfe8ff; text-decoration:none; padding:6px 10px; background:rgba(255,255,255,0.02); border-radius:8px;">Refresh</a>
+    <button id="sleekproxy-cloak-btn" title="Toggle tab cloaker (Ctrl/Cmd+Shift+C)">Cloak</button>
+  </div>
+</div>
+
+<div id="sleekproxy-cloak-overlay" role="dialog" aria-hidden="true">
+  <div class="top">
+    <h2>Notes</h2>
+    <div class="clock" id="sleekproxy-clock">--:--:--</div>
+  </div>
+  <div class="note-area" contenteditable="true" aria-label="Quick notes" spellcheck="false">Quick notes — press Cloak to hide/unhide. Tip: Ctrl/Cmd+Shift+C</div>
+</div>
+
+<div id="sleekproxy-widget" aria-live="polite" aria-atomic="true" aria-relevant="text">
+  <div class="time">Loading time…</div>
+  <div class="weather">Detecting location…</div>
+</div>
+
 <script>
-  const FUNC_PATH = '/.netlify/functions/proxy';
-  const q = document.getElementById('q');
-  const go = document.getElementById('go');
+(function(){
+  // --- Tab Cloaker Logic ---
+  const cloakBtn = document.getElementById('sleekproxy-cloak-btn');
+  const overlay = document.getElementById('sleekproxy-cloak-overlay');
+  const clockEl = document.getElementById('sleekproxy-clock');
+  let cloaked = false;
+  let origTitle = document.title;
+  let origFavicon = null;
 
-  function buildTarget(input) {
-    input = input.trim();
-    if (!input) return null;
-    const looksLikeDomain = /^[a-z0-9.-]+\.[a-z]{2,}([\/\?].*)?$/i;
-    if (/^https?:\/\//i.test(input)) {
-      return input;
-    } else if (looksLikeDomain.test(input)) {
-      return 'https://' + input;
-    } else {
-      const query = encodeURIComponent(input);
-      return `https://duckduckgo.com/?q=${query}`;
+  // small neutral favicon (gray dot)
+  const cloakFavicon = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#f8fafc"/><circle cx="32" cy="32" r="16" fill="#94a3b8"/></svg>');
+
+  function setFavicon(url) {
+    try {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = url;
+    } catch(e) { }
+  }
+
+  // Save original favicon (if any)
+  (function(){
+    const l = document.querySelector("link[rel~='icon']");
+    if (l) origFavicon = l.href;
+  })();
+
+  function updateClock(){
+    const d = new Date();
+    clockEl.textContent = d.toLocaleTimeString();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function enterCloak(){
+    if (cloaked) return;
+    cloaked = true;
+    overlay.style.display = 'block';
+    overlay.setAttribute('aria-hidden','false');
+    origTitle = document.title;
+    document.title = 'Notes — Busy';
+    setFavicon(cloakFavicon);
+    cloakBtn.textContent = 'Uncloak';
+  }
+
+  function exitCloak(){
+    if (!cloaked) return;
+    cloaked = false;
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden','true');
+    document.title = origTitle || '';
+    if (origFavicon) setFavicon(origFavicon);
+    else {
+      const l = document.querySelector("link[rel~='icon']");
+      if (l && l.href === cloakFavicon) l.remove();
     }
+    cloakBtn.textContent = 'Cloak';
   }
 
-  function goTo(input) {
-    const target = buildTarget(input);
-    if (!target) return;
-    location.href = `${FUNC_PATH}?url=${encodeURIComponent(target)}`;
+  cloakBtn.addEventListener('click', ()=> {
+    if (cloaked) exitCloak(); else enterCloak();
+  });
+
+  // keyboard shortcut: Ctrl/Cmd + Shift + C
+  document.addEventListener('keydown', (e) => {
+    const mod = navigator.platform.includes('Mac') ? e.metaKey : e.ctrlKey;
+    if (mod && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+      e.preventDefault();
+      if (cloaked) exitCloak(); else enterCloak();
+    }
+  });
+
+  // --- Time + Weather Widget Logic ---
+  const timeEl = document.querySelector('#sleekproxy-widget .time');
+  const weatherEl = document.querySelector('#sleekproxy-widget .weather');
+
+  function updateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    timeEl.textContent = timeStr;
   }
 
-  go.addEventListener('click', () => goTo(q.value));
-  q.addEventListener('keydown', (e) => { if (e.key === 'Enter') goTo(q.value); });
+  setInterval(updateTime, 1000);
+  updateTime();
 
-  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { q.value = c.dataset.q; q.focus(); }));
+  // Weather fetch from Open-Meteo API (no key needed)
+  function fetchWeather(lat, lon) {
+    const url = \`https://api.open-meteo.com/v1/forecast?latitude=\${lat}&longitude=\${lon}&current_weather=true\`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const w = data.current_weather;
+        if (!w) return;
+        const temp = Math.round(w.temperature);
+        const codeMap = {
+          0: "Clear", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+          45: "Fog", 48: "Freezing fog",
+          51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+          61: "Light rain", 63: "Rain", 65: "Heavy rain",
+          71: "Light snow", 73: "Snow", 75: "Heavy snow",
+          95: "Thunderstorm"
+        };
+        const desc = codeMap[w.weathercode] || "Weather";
+        weatherEl.textContent = \`\${temp}°C — \${desc}\`;
+      })
+      .catch(() => {
+        weatherEl.textContent = "Weather unavailable";
+      });
+  }
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      fetchWeather(pos.coords.latitude, pos.coords.longitude);
+    }, () => {
+      weatherEl.textContent = "Location blocked";
+    });
+  } else {
+    weatherEl.textContent = "Geolocation unsupported";
+  }
+})();
 </script>
+
 </body>
 </html>
+
