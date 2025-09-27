@@ -1,0 +1,48 @@
+<!-- place somewhere in the header area of public/index.html -->
+<button id="index-cloak-btn" style="position:fixed; top:14px; right:18px; z-index:99999;
+  background:linear-gradient(90deg,#7c3aed,#06b6d4); color:#042024; border:none; padding:8px 10px; border-radius:8px; cursor:pointer;">
+  Cloak
+</button>
+
+<script>
+(function(){
+  const btn = document.getElementById('index-cloak-btn');
+  let active = false;
+  let overlay = null;
+  function makeOverlay(){
+    overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '99998';
+    overlay.style.background = 'linear-gradient(180deg,#f8fafc,#eef2ff)';
+    overlay.style.color = '#0b1220';
+    overlay.style.padding = '28px';
+    overlay.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center;"><h2 style="margin:0">Notes</h2><div id="idx-clock"></div></div><div contenteditable style="margin-top:18px; background:white; border-radius:8px; padding:12px; height:calc(100vh - 140px); box-shadow:0 6px 20px rgba(2,6,23,0.06)">Quick notes</div>';
+    document.body.appendChild(overlay);
+    const clk = document.getElementById('idx-clock');
+    function update(){ clk.textContent = new Date().toLocaleTimeString(); }
+    update(); setInterval(update,1000);
+  }
+  function enter(){
+    if (!overlay) makeOverlay();
+    overlay.style.display = 'block';
+    document.title = 'Notes — Busy';
+    btn.textContent = 'Uncloak';
+    active = true;
+  }
+  function exit(){
+    if (overlay) overlay.style.display = 'none';
+    document.title = 'SleekProxy';
+    btn.textContent = 'Cloak';
+    active = false;
+  }
+  btn.addEventListener('click', ()=> active ? exit() : enter());
+  document.addEventListener('keydown', (e)=> {
+    const mod = navigator.platform.includes('Mac') ? e.metaKey : e.ctrlKey;
+    if (mod && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+      e.preventDefault();
+      active ? exit() : enter();
+    }
+  });
+})();
+</script>
