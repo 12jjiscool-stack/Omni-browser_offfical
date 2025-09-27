@@ -3,29 +3,23 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Omni_browser</title>
+<title>Omni-demo</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#071229; --card:#0b1220; --accent:#6ee7b7; --muted:#94a3b8; --glass: rgba(255,255,255,0.03); }
+  :root { --bg:#071229; --card:#0b1220; --accent:#6ee7b7; --muted:#94a3b8; }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#071229 0%, #071a2a 100%); font-family:Inter,system-ui,Segoe UI,Roboto,Arial; color:#e6eef8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;}
+  body{margin:0;background:linear-gradient(180deg,#071229 0%, #071a2a 100%); font-family:Inter,system-ui; color:#e6eef8; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;}
   .app{width:100%; max-width:980px; border-radius:16px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:32px; box-shadow:0 10px 40px rgba(2,6,23,0.6);}
   h1{margin:0 0 6px 0; font-size:20px}
   .subtitle{color:var(--muted); font-size:13px; margin-bottom:18px}
   .search-row{display:flex; gap:12px; align-items:center}
-  .input {
-    flex:1; padding:14px 16px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,0.03);
-    color:inherit; font-size:15px; outline:none;
-  }
-  .btn {
-    background:linear-gradient(90deg,var(--accent),#38bdf8); color:#042024; padding:12px 16px; border-radius:12px; border:none; cursor:pointer; font-weight:700;
-  }
+  .input { flex:1; padding:14px 16px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,0.03); color:inherit; font-size:15px; outline:none; }
+  .btn { background:linear-gradient(90deg,var(--accent),#38bdf8); color:#042024; padding:12px 16px; border-radius:12px; border:none; cursor:pointer; font-weight:700; }
   .hint{margin-top:12px; color:var(--muted); font-size:13px}
   .examples{display:flex; gap:8px; margin-top:12px}
   .chip{background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:10px; color:var(--muted); cursor:pointer}
   .footer{margin-top:18px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center}
   .card{margin-top:22px; padding:14px; border-radius:12px; background:rgba(255,255,255,0.02)}
-  .small{font-size:13px; color:var(--muted)}
   @media (max-width:640px){ .app{padding:18px} .search-row{flex-direction:column; align-items:stretch} .btn{width:100%} }
 </style>
 </head>
@@ -37,16 +31,16 @@
       </svg>
       <div>
         <h1>Omni</h1>
-        <div class="subtitle">Private search + proxied browsing (demo). Type a URL or search query.</div>
+        <div class="subtitle">Private search + proxied browsing (Netlify demo). Type a URL or search query.</div>
       </div>
     </div>
 
     <div class="card">
       <div class="search-row">
-        <input id="q" class="input" placeholder="Search (e.g. 'who wrote Dune') or paste a URL (https://...)">
+        <input id="q" class="input" placeholder="Search or paste a URL (https://...)">
         <button id="go" class="btn">Go</button>
       </div>
-      <div class="hint">Tip: type a full URL (https://example.com) or a search term. Searches use DuckDuckGo (no trackers).</div>
+      <div class="hint">Tip: paste a full URL or type a query. Searches use DuckDuckGo (no trackers).</div>
 
       <div class="examples">
         <div class="chip" data-q="https://example.com">https://example.com</div>
@@ -56,48 +50,40 @@
     </div>
 
     <div class="footer">
-      <div class="small">Hosted locally — no external analytics.</div>
-      <div class="small">Do not use for illegal activity.</div>
+      <div>Hosted on Netlify — demo only.</div>
+      <div>Do not use for illegal or abusive activity.</div>
     </div>
   </div>
 
 <script>
+  const FUNC_PATH = '/.netlify/functions/proxy';
   const q = document.getElementById('q');
   const go = document.getElementById('go');
 
-  // If user typed an HTTP(S) URL, go there. Otherwise treat as search and use DuckDuckGo query.
-  function buildProxyTarget(input) {
+  function buildTarget(input) {
     input = input.trim();
     if (!input) return null;
-    // if looks like url without scheme, add https
     const looksLikeDomain = /^[a-z0-9.-]+\.[a-z]{2,}([\/\?].*)?$/i;
     if (/^https?:\/\//i.test(input)) {
       return input;
     } else if (looksLikeDomain.test(input)) {
       return 'https://' + input;
     } else {
-      // treat as search - use DuckDuckGo
       const query = encodeURIComponent(input);
       return `https://duckduckgo.com/?q=${query}`;
     }
   }
 
   function goTo(input) {
-    const target = buildProxyTarget(input);
+    const target = buildTarget(input);
     if (!target) return;
-    // navigate to proxy endpoint which will fetch and rewrite page
-    window.location.href = `/proxy?url=${encodeURIComponent(target)}`;
+    location.href = `${FUNC_PATH}?url=${encodeURIComponent(target)}`;
   }
 
   go.addEventListener('click', () => goTo(q.value));
   q.addEventListener('keydown', (e) => { if (e.key === 'Enter') goTo(q.value); });
 
-  document.querySelectorAll('.chip').forEach(c => {
-    c.addEventListener('click', () => {
-      q.value = c.dataset.q;
-      q.focus();
-    });
-  });
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { q.value = c.dataset.q; q.focus(); }));
 </script>
 </body>
 </html>
