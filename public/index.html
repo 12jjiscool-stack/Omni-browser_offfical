@@ -64,48 +64,22 @@
       border: none; border-radius: 8px; color: white; cursor: pointer;
     }
     .edit-bg:hover { background: rgba(51,65,85,0.9); }
-    /* Music Player */
+    /* Music Player (embedded) */
     .music-player {
       position: fixed;
       top: 10px;
       left: 10px;
       z-index: 1000;
       background: rgba(0,0,0,0.6);
-      padding: 8px;
+      padding: 6px;
       border-radius: 10px;
-      width: 260px;
-    }
-    .music-player input {
-      width: 180px;
-      padding: 4px;
-      border-radius: 6px;
-      border: none;
-      margin-bottom: 5px;
-    }
-    .music-player button {
-      background:#ff5500; color:white;
-      border:none; border-radius:6px;
-      padding:4px 8px; cursor:pointer;
-    }
-    .music-result {
-      cursor:pointer;
-      padding:4px;
-      border-bottom:1px solid rgba(255,255,255,0.2);
-    }
-    .music-result:hover {
-      background:rgba(255,255,255,0.1);
     }
   </style>
 </head>
 <body>
-  <!-- Music Player (SoundCloud Embed with Dropdown Search) -->
+  <!-- Embedded SoundCloud Player -->
   <div class="music-player">
-    <input id="scSearch" type="text" placeholder="Search SoundCloud...">
-    <button onclick="searchSC()">Search</button>
-    <div id="scResults" style="max-height:150px; overflow-y:auto; margin-top:5px;"></div>
-    <iframe id="scPlayer" 
-      width="250" height="120"
-      scrolling="no" frameborder="no" allow="autoplay"
+    <iframe width="250" height="120" scrolling="no" frameborder="no" allow="autoplay"
       src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/forss/flickermood">
     </iframe>
   </div>
@@ -176,25 +150,7 @@
         shortcutsDiv.appendChild(el);
       }
     }
-
-    // SoundCloud Search (No API Key)
-    function searchSC(){
-      const q=document.getElementById("scSearch").value.trim();
-      const resultsDiv=document.getElementById("scResults");
-      resultsDiv.innerHTML=""; 
-      if(!q) return;
-
-      const searchUrl = `https://soundcloud.com/search?q=${encodeURIComponent(q)}`;
-
-      const btn=document.createElement("div");
-      btn.className="music-result";
-      btn.textContent=`Search "${q}" on SoundCloud`;
-      btn.onclick=()=>{
-        document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(searchUrl)}`;
-        resultsDiv.innerHTML="";
-      };
-      resultsDiv.appendChild(btn);
-    }
   </script>
 </body>
 </html>
+
