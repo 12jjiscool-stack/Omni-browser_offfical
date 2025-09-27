@@ -50,7 +50,6 @@
       padding: 0.6rem 1rem;
       cursor: pointer;
     }
-    /* 3-dot menu button */
     .menu-btn {
       width: 38px;
       height: 38px;
@@ -68,7 +67,6 @@
     .menu-btn:hover {
       background: rgba(255,255,255,0.25);
     }
-    /* Dropdown */
     .dropdown {
       display: flex;
       flex-direction: column;
@@ -103,17 +101,11 @@
     .dropdown a:hover {
       background: rgba(71,85,105,0.9);
     }
-    .dropdown svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
     .status {
       margin-left: auto;
       display: flex;
       gap: 0.7rem;
     }
-    /* Shortcuts (clean pill design + favicons) */
     .shortcuts {
       display: flex;
       flex-wrap: wrap;
@@ -144,17 +136,56 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
+    .remove-btn {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      color: #ff6b6b;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .remove-btn:hover {
+      transform: scale(1.2);
+    }
+    .add-shortcut-btn {
+      margin-top: 1.5rem;
+      background: rgba(37,99,235,0.9);
+      padding: 0.7rem 1.4rem;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .add-shortcut-btn:hover {
+      background: rgba(59,130,246,1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
     .bubble {
-      position: fixed; bottom: 10px; left: 10px; font-style: italic;
-      background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 8px;
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      font-style: italic;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 8px;
     }
     .edit-bg {
-      position: fixed; bottom: 10px; right: 10px;
-      padding: 6px 12px; background: rgba(30,41,59,0.8);
-      border: none; border-radius: 8px; color: white; cursor: pointer;
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      background: rgba(30,41,59,0.8);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
     }
     .edit-bg:hover { background: rgba(51,65,85,0.9); }
-    /* Music Player */
     .music-player {
       position: fixed;
       top: 10px;
@@ -194,24 +225,11 @@
     <h1>Omni</h1>
 
     <div class="search-row">
-      <!-- Menu Button -->
       <button class="menu-btn" onclick="toggleDropdown()">⋮</button>
       <div class="dropdown" id="dropdownMenu">
-        <a href="https://mail.google.com/" target="_blank">
-          <!-- Gmail SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#e75a4d" d="M6 14v20c0 2.2 1.8 4 4 4h4V22L6 14z"/><path fill="#43a047" d="M34 38h4c2.2 0 4-1.8 4-4V14l-8 8v16z"/><path fill="#1e88e5" d="M34 10H14l10 9 10-9z"/><path fill="#fbc02d" d="M6 14l18 16L42 14V10c0-2.2-1.8-4-4-4H10C7.8 6 6 7.8 6 10v4z"/></svg>
-          Gmail
-        </a>
-        <a href="https://youtube.com/" target="_blank">
-          <!-- YouTube SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FF0000" d="M44 14.5c-.5-2-2-3.6-4-4.1C36.6 9.5 24 9.5 24 9.5s-12.6 0-16 .9c-2 .5-3.5 2.1-4 4.1-.9 3.4-.9 10.5-.9 10.5s0 7.1.9 10.5c.5 2 2 3.6 4 4.1 3.4.9 16 .9 16 .9s12.6 0 16-.9c2-.5 3.5-2.1 4-4.1.9-3.4.9-10.5.9-10.5s0-7.1-.9-10.5z"/><path fill="#FFF" d="M20 31.5V16.5l12 7.5z"/></svg>
-          YouTube
-        </a>
-        <a href="https://chat.openai.com/" target="_blank">
-          <!-- ChatGPT SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path fill="#10a37f" d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88z"/><path fill="#10a37f" d="M172 116a44 44 0 1 1-44-44a44.1 44.1 0 0 1 44 44z"/></svg>
-          ChatGPT
-        </a>
+        <a href="https://mail.google.com/" target="_blank">📧 Gmail</a>
+        <a href="https://youtube.com/" target="_blank">▶️ YouTube</a>
+        <a href="https://chat.openai.com/" target="_blank">🤖 ChatGPT</a>
       </div>
 
       <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
@@ -223,7 +241,7 @@
     </div>
 
     <div class="shortcuts" id="shortcuts"></div>
-    <button onclick="addShortcut()">➕ Add Shortcut</button>
+    <button class="add-shortcut-btn" onclick="addShortcut()">➕ Add Shortcut</button>
   </div>
 
   <div class="bubble">Made by Jacob Maddox</div>
@@ -275,18 +293,55 @@
       }
     }
 
-    // Shortcuts with favicons
+    // Shortcuts with persistence + remove
     const shortcutsDiv=document.getElementById("shortcuts");
-    function addShortcut(){
-      const name=prompt("Shortcut name:"), url=prompt("Shortcut URL:");
-      if(name&&url){
-        const el=document.createElement("div");
-        el.className="shortcut";
-        const domain=(new URL(url)).hostname;
-        el.innerHTML=`<img src="https://www.google.com/s2/favicons?domain=${domain}" alt=""> ${name}`;
-        el.onclick=()=>window.open(url,"_blank");
-        shortcutsDiv.appendChild(el);
+
+    window.onload = function() {
+      const saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
+      saved.forEach(sc => renderShortcut(sc.name, sc.url));
+    };
+
+    function renderShortcut(name, url) {
+      const el = document.createElement("div");
+      el.className = "shortcut";
+
+      const domain = (new URL(url)).hostname;
+      el.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}" alt=""> ${name}`;
+
+      el.onclick = (e) => {
+        if (!e.target.classList.contains("remove-btn")) {
+          window.open(url, "_blank");
+        }
+      };
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "✖";
+      removeBtn.className = "remove-btn";
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        el.remove();
+        removeShortcut(name, url);
+      };
+
+      el.appendChild(removeBtn);
+      shortcutsDiv.appendChild(el);
+    }
+
+    function addShortcut() {
+      const name = prompt("Shortcut name:");
+      const url = prompt("Shortcut URL:");
+      if (name && url) {
+        renderShortcut(name, url);
+        const saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
+        saved.push({ name, url });
+        localStorage.setItem("shortcuts", JSON.stringify(saved));
       }
+    }
+
+    function removeShortcut(name, url) {
+      let saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
+      saved = saved.filter(sc => !(sc.name === name && sc.url === url));
+      localStorage.setItem("shortcuts", JSON.stringify(saved));
     }
 
     // Change Song
