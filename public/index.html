@@ -5,262 +5,76 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Omni Portal</title>
 
-  <!-- Default Favicon -->
-  <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon" />
+  <!-- Custom Omni Favicon -->
+  <link id="favicon" rel="icon" type="image/png" 
+  href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iI2VhNDMzNSIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgZm9udC1zaXplPSIxMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGwiPk9tbmk8L3RleHQ+PC9zdmc+" />
 
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      color: #f1f5f9;
-    }
+    html, body { margin:0; padding:0; height:100%; font-family:system-ui,sans-serif; overflow:hidden; color:#f1f5f9; }
+    body { background:linear-gradient(270deg,#0f172a,#1e293b,#0f172a); background-size:600% 600%; animation:gradientShift 30s ease infinite; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
-    body {
-      background: linear-gradient(270deg, #0f172a, #1e293b, #0f172a);
-      background-size: 600% 600%;
-      animation: gradientShift 30s ease infinite;
-    }
+    .stars { position:fixed; width:100%; height:100%; z-index:-1; overflow:hidden; }
+    .star { position:absolute; background:white; border-radius:50%; opacity:0.8; animation:twinkle 6s infinite ease-in-out; }
+    @keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+    .card { background:rgba(15,23,42,0.85); padding:2rem; border-radius:1rem; text-align:center; max-width:600px; margin:3rem auto; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
+    .card h1 { margin-bottom:0.5rem; }
 
-    .stars {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-    .star {
-      position: absolute;
-      border-radius: 50%;
-      background: white;
-      opacity: 0.8;
-      animation: twinkle 6s infinite ease-in-out;
-    }
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.2); }
-    }
+    .time-bar { margin:0.5rem 0 1rem; font-weight:bold; font-size:1.1rem; }
 
-    .card {
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
-      margin: 6vh auto;
-      background: rgba(30, 41, 59, 0.7);
-      padding: 2rem;
-      border-radius: 1rem;
-      backdrop-filter: blur(10px);
-      text-align: center;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    }
+    .search-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem; }
+    .search-row input { flex:1; padding:0.6rem; border:none; border-radius:0.5rem; font-size:1rem; }
+    .search-row button { padding:0.6rem 1rem; border:none; border-radius:0.5rem; cursor:pointer; font-weight:bold; }
 
-    h1 { margin-bottom: 0.5rem; }
-    p { margin: 0.25rem 0; }
+    .search-row button:nth-child(1) { background:#ea4335; color:white; } /* Gmail button red */
+    .search-row button:nth-child(3) { background:#2563eb; color:white; } /* Search button blue */
+    .search-row button:hover { opacity:0.9; }
 
-    .time-bar {
-      margin: 1rem 0;
-      padding: 0.6rem;
-      border-radius: 0.5rem;
-      background: rgba(15, 23, 42, 0.8);
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
+    .status { display:flex; gap:1rem; font-size:0.9rem; margin-left:0.5rem; }
 
-    .search-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-    .search-row input[type="text"] {
-      flex: 1 1 200px;
-      padding: 0.6rem 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #475569;
-      background: #1e293b;
-      color: white;
-    }
-    .search-row button {
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.6rem 1rem;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .search-row button:hover {
-      transform: translateY(-2px);
-    }
+    .shortcuts { display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-bottom:1rem; }
+    .shortcut { background:#334155; padding:0.5rem 0.8rem; border-radius:0.5rem; color:white; text-decoration:none; font-size:0.9rem; }
+    .shortcut:hover { background:#475569; }
 
-    /* Gmail button */
-    .gmail-btn {
-      background: #ea4335;
-      color: white;
-      font-weight: 600;
-    }
-    .gmail-btn:hover { background: #c53030; }
+    .shortcut-form { display:flex; gap:0.5rem; justify-content:center; margin-bottom:1rem; }
+    .shortcut-form input { padding:0.4rem; border-radius:0.4rem; border:none; }
+    .shortcut-form button { padding:0.4rem 0.8rem; background:#16a34a; color:white; border:none; border-radius:0.4rem; cursor:pointer; }
 
-    /* Search button */
-    .search-btn {
-      background: #3b82f6;
-      color: white;
-    }
-    .search-btn:hover { background: #2563eb; }
+    .cloak-section { margin-top:1.5rem; }
+    .cloak-form { display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem; }
+    .cloak-form input { padding:0.4rem; border-radius:0.4rem; border:none; }
+    .cloak-form button { padding:0.4rem 0.8rem; background:#6b21a8; color:white; border:none; border-radius:0.4rem; cursor:pointer; }
 
-    .status {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-    }
+    .bubble { position:fixed; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.8rem; font-style:italic; }
 
-    .shortcuts {
-      margin-top: 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.6rem;
-    }
-    .shortcut {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      background: rgba(59,130,246,0.15);
-      color: #f1f5f9;
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .shortcut:hover {
-      background: rgba(59,130,246,0.35);
-      transform: translateY(-2px);
-    }
-    .shortcut-form {
-      margin-top: 1rem;
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .shortcut-form input {
-      padding: 0.5rem 0.8rem;
-      border-radius: 0.5rem;
-      border: 1px solid #475569;
-      background: #1e293b;
-      color: white;
-      font-size: 0.9rem;
-      flex: 1 1 120px;
-      min-width: 140px;
-    }
-    .shortcut-form button {
-      background: #3b82f6;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-      color: white;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .shortcut-form button:hover { background: #2563eb; }
-
-    .cloak-section {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      background: rgba(15,23,42,0.6);
-      text-align: left;
-    }
-    .cloak-section h2 {
-      margin: 0 0 0.8rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #93c5fd;
-    }
-    .cloak-form {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .cloak-form input {
-      flex: 1 1 140px;
-      min-width: 140px;
-      padding: 0.5rem 0.8rem;
-      border-radius: 0.5rem;
-      border: 1px solid #475569;
-      background: #1e293b;
-      color: white;
-      font-size: 0.9rem;
-    }
-    .cloak-form button {
-      background: #3b82f6;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-      color: white;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .cloak-form button:hover { background: #2563eb; }
-
-    .bubble {
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      background: rgba(30, 41, 59, 0.85);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-style: italic;
-      font-size: 0.9rem;
-      color: #f1f5f9;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 5;
-    }
-
-    .edit-bg {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: rgba(30, 41, 59, 0.9);
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: background 0.2s;
-    }
-    .edit-bg:hover { background: rgba(59,130,246,0.8); }
+    .edit-bg { position:fixed; bottom:10px; right:10px; background:#475569; padding:0.4rem 0.8rem; border-radius:0.5rem; font-size:0.8rem; cursor:pointer; }
   </style>
 </head>
 <body>
+  <!-- Stars -->
   <div class="stars" id="stars"></div>
 
+  <!-- Main Card -->
   <div class="card">
     <h1>Omni Portal</h1>
     <p id="location">📍 Detecting location...</p>
 
+    <!-- Time bar -->
     <div class="time-bar" id="timeBar">--:--:--</div>
 
+    <!-- Search + Status -->
     <div class="search-row">
-      <button class="gmail-btn" onclick="openGmail()">📧 Gmail</button>
+      <button onclick="openGmail()">📧 Gmail</button>
       <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
-      <button class="search-btn" onclick="searchQuery()">Search</button>
+      <button onclick="searchQuery()">Search</button>
       <div class="status">
         <span id="battery">🔋 --%</span>
         <span id="temperature">🌡️ --°C</span>
       </div>
     </div>
 
+    <!-- Shortcuts -->
     <div class="shortcuts" id="shortcuts"></div>
     <form id="shortcutForm" class="shortcut-form">
       <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
@@ -268,6 +82,7 @@
       <button type="submit">＋ Add</button>
     </form>
 
+    <!-- Cloak -->
     <div class="cloak-section">
       <h2>🕶️ Tab Cloaker</h2>
       <div class="cloak-form">
@@ -278,10 +93,14 @@
     </div>
   </div>
 
+  <!-- Signature Bubble -->
   <div class="bubble">made by Jacob Maddox</div>
+
+  <!-- Edit Background -->
   <div class="edit-bg" onclick="editBackground()">🎨 Edit Background</div>
 
   <script>
+    // Time updater
     function updateTime() {
       const now = new Date();
       document.getElementById("timeBar").textContent = now.toLocaleTimeString();
@@ -289,15 +108,18 @@
     setInterval(updateTime, 1000);
     updateTime();
 
+    // Gmail button
+    function openGmail() {
+      window.open("https://mail.google.com/", "_blank");
+    }
+
+    // DuckDuckGo Search
     function searchQuery() {
       const query = encodeURIComponent(document.getElementById("searchBox").value.trim());
       if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
     }
 
-    function openGmail() {
-      window.open("https://mail.google.com/", "_blank");
-    }
-
+    // Battery API
     if (navigator.getBattery) {
       navigator.getBattery().then(battery => {
         function updateBattery() {
@@ -308,6 +130,7 @@
       });
     }
 
+    // Location + Weather
     async function fetchWeather(lat, lon) {
       try {
         const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
@@ -346,6 +169,7 @@
       });
     }
 
+    // Shortcuts system
     const shortcutsContainer = document.getElementById("shortcuts");
     const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
 
@@ -374,6 +198,7 @@
       }
     });
 
+    // Tab Cloaker
     function cloakTab() {
       const title = document.getElementById("cloakTitle").value.trim();
       const iconUrl = document.getElementById("cloakIcon").value.trim();
@@ -381,6 +206,7 @@
       if (iconUrl) document.getElementById("favicon").href = iconUrl;
     }
 
+    // Edit Background
     function editBackground() {
       const url = prompt("Enter background image URL (leave empty for default):");
       if (url) {
@@ -392,6 +218,7 @@
       }
     }
 
+    // Generate starfield
     const starsContainer = document.getElementById("stars");
     for (let i = 0; i < 80; i++) {
       const star = document.createElement("div");
@@ -407,4 +234,3 @@
   </script>
 </body>
 </html>
-
