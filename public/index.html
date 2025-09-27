@@ -4,8 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Omni Portal</title>
-
-  <!-- Default Favicon -->
   <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon" />
 
   <style>
@@ -18,7 +16,6 @@
       color: #f1f5f9;
     }
 
-    /* Omni background */
     body {
       background: linear-gradient(270deg, #0f172a, #1e293b, #0f172a);
       background-size: 600% 600%;
@@ -31,7 +28,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Stars */
     .stars {
       position: fixed;
       width: 100%;
@@ -46,11 +42,10 @@
       animation: twinkle 6s infinite ease-in-out;
     }
     @keyframes twinkle {
-      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      0%,100% { opacity: 0.2; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* Card */
     .card {
       position: relative;
       z-index: 1;
@@ -67,7 +62,6 @@
     h1 { margin-bottom: 0.5rem; }
     p { margin: 0.25rem 0; }
 
-    /* Time bar */
     .time-bar {
       margin: 1rem 0;
       padding: 0.6rem;
@@ -77,7 +71,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Search Row */
     .search-row {
       display: flex;
       align-items: center;
@@ -105,7 +98,6 @@
     }
     .search-row button:hover { background: #2563eb; }
 
-    /* Status indicators */
     .status {
       display: flex;
       gap: 0.8rem;
@@ -114,7 +106,6 @@
       color: #cbd5e1;
     }
 
-    /* Shortcuts UI */
     .shortcuts {
       margin-top: 1.5rem;
       display: flex;
@@ -166,7 +157,6 @@
     }
     .shortcut-form button:hover { background: #2563eb; }
 
-    /* Cloak UI */
     .cloak-section {
       margin-top: 1.5rem;
       padding: 1rem;
@@ -206,7 +196,6 @@
     }
     .cloak-form button:hover { background: #2563eb; }
 
-    /* Bubble bottom-left */
     .bubble {
       position: fixed;
       bottom: 15px;
@@ -221,7 +210,6 @@
       z-index: 5;
     }
 
-    /* Edit background button */
     .edit-bg {
       position: fixed;
       bottom: 15px;
@@ -238,18 +226,14 @@
   </style>
 </head>
 <body>
-  <!-- Stars -->
   <div class="stars" id="stars"></div>
 
-  <!-- Main Card -->
   <div class="card">
     <h1>Omni Portal</h1>
-    <p id="location">📍 New York, NY</p>
+    <p id="location">📍 Locating...</p>
 
-    <!-- Time bar -->
     <div class="time-bar" id="timeBar">--:--:--</div>
 
-    <!-- Search + Status -->
     <div class="search-row">
       <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
       <button onclick="searchQuery()">Search</button>
@@ -259,7 +243,6 @@
       </div>
     </div>
 
-    <!-- Shortcuts -->
     <div class="shortcuts" id="shortcuts"></div>
     <form id="shortcutForm" class="shortcut-form">
       <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
@@ -267,7 +250,6 @@
       <button type="submit">＋ Add</button>
     </form>
 
-    <!-- Cloak -->
     <div class="cloak-section">
       <h2>🕶️ Tab Cloaker</h2>
       <div class="cloak-form">
@@ -278,50 +260,89 @@
     </div>
   </div>
 
-  <!-- Signature Bubble -->
   <div class="bubble">made by Jacob Maddox</div>
-
-  <!-- Edit Background -->
   <div class="edit-bg" onclick="editBackground()">🎨 Edit Background</div>
 
   <script>
-    // Time updater
     function updateTime() {
-      const now = new Date();
-      document.getElementById("timeBar").textContent = now.toLocaleTimeString();
+      document.getElementById("timeBar").textContent = new Date().toLocaleTimeString();
     }
     setInterval(updateTime, 1000);
     updateTime();
 
-    // DuckDuckGo Search
     function searchQuery() {
-      const query = encodeURIComponent(document.getElementById("searchBox").value.trim());
-      if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
+      const q = encodeURIComponent(document.getElementById("searchBox").value.trim());
+      if (q) window.open(`https://duckduckgo.com/?q=${q}`, "_blank");
     }
 
-    // Battery API
     if (navigator.getBattery) {
-      navigator.getBattery().then(battery => {
-        function updateBattery() {
-          document.getElementById("battery").textContent = `🔋 ${Math.round(battery.level * 100)}%`;
+      navigator.getBattery().then(b => {
+        function upd() {
+          document.getElementById("battery").textContent = `🔋 ${Math.round(b.level * 100)}%`;
         }
-        updateBattery();
-        battery.addEventListener("levelchange", updateBattery);
+        upd();
+        b.addEventListener("levelchange", upd);
       });
     }
 
-    // Temperature (simulated for now)
-    function updateTemperature() {
-      const temp = (Math.random() * 10 + 20).toFixed(1);
-      document.getElementById("temperature").textContent = `🌡️ ${temp}°C`;
+    // Fetch weather & reverse geocode
+    async function fetchWeather(lat, lon) {
+      try {
+        const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const data = await resp.json();
+        if (data.current_weather && typeof data.current_weather.temperature_2m !== "undefined") {
+          document.getElementById("temperature").textContent = `🌡️ ${data.current_weather.temperature_2m.toFixed(1)}°C`;
+        }
+      } catch (err) {
+        console.error("Weather fetch error:", err);
+      }
     }
-    setInterval(updateTemperature, 10000);
-    updateTemperature();
 
-    // Shortcuts system
+    async function fetchLocation(lat, lon) {
+      try {
+        // Use Nominatim reverse geocoding
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+        const resp = await fetch(url, {
+          headers: {
+            "Accept": "application/json",
+            // optionally set a user-agent or referer
+          }
+        });
+        const data = await resp.json();
+        if (data && data.address) {
+          const city = data.address.city || data.address.town || data.address.village || "";
+          const state = data.address.state || "";
+          document.getElementById("location").textContent = `📍 ${city}${state ? ", " + state : ""}`;
+        }
+      } catch (err) {
+        console.error("Reverse geocode error:", err);
+      }
+    }
+
+    function initLocationAndWeather() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude, longitude } = pos.coords;
+          fetchWeather(latitude, longitude);
+          fetchLocation(latitude, longitude);
+        }, err => {
+          console.warn("Geolocation error, fallback to default");
+          // fallback coords
+          const fallbackLat = 40.7128, fallbackLon = -74.0060;
+          fetchWeather(fallbackLat, fallbackLon);
+          fetchLocation(fallbackLat, fallbackLon);
+        });
+      } else {
+        const fallbackLat = 40.7128, fallbackLon = -74.0060;
+        fetchWeather(fallbackLat, fallbackLon);
+        fetchLocation(fallbackLat, fallbackLon);
+      }
+    }
+    initLocationAndWeather();
+
+    // Shortcuts
     const shortcutsContainer = document.getElementById("shortcuts");
     const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
-
     function renderShortcuts() {
       shortcutsContainer.innerHTML = "";
       shortcuts.forEach(s => {
@@ -334,7 +355,6 @@
       });
     }
     renderShortcuts();
-
     document.getElementById("shortcutForm").addEventListener("submit", e => {
       e.preventDefault();
       const name = document.getElementById("shortcutName").value.trim();
@@ -347,19 +367,15 @@
       }
     });
 
-    // Tab Cloaker
     function cloakTab() {
-      const title = document.getElementById("cloakTitle").value.trim();
-      const iconUrl = document.getElementById("cloakIcon").value.trim();
-      if (title) document.title = title;
-      if (iconUrl) {
-        document.getElementById("favicon").href = iconUrl;
-      }
+      const t = document.getElementById("cloakTitle").value.trim();
+      const i = document.getElementById("cloakIcon").value.trim();
+      if (t) document.title = t;
+      if (i) document.getElementById("favicon").href = i;
     }
 
-    // Edit Background
     function editBackground() {
-      const url = prompt("Enter background image URL (leave empty for default):");
+      const url = prompt("Enter background image URL (leave empty = default gradient):");
       if (url) {
         document.body.style.background = `url('${url}') center/cover no-repeat fixed`;
       } else {
@@ -369,7 +385,6 @@
       }
     }
 
-    // Generate starfield
     const starsContainer = document.getElementById("stars");
     for (let i = 0; i < 80; i++) {
       const star = document.createElement("div");
@@ -385,4 +400,3 @@
   </script>
 </body>
 </html>
-
