@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Omni</title>
+  <title>Omni Portal</title>
 
   <!-- Default Favicon -->
   <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon" />
@@ -55,7 +55,7 @@
       position: relative;
       z-index: 1;
       max-width: 500px;
-      margin: 10vh auto;
+      margin: 8vh auto;
       background: rgba(30, 41, 59, 0.7);
       padding: 2rem;
       border-radius: 1rem;
@@ -79,7 +79,7 @@
 
     /* Buttons and input */
     button, input[type="text"] {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       padding: 0.6rem 1rem;
       border-radius: 0.5rem;
       border: none;
@@ -92,10 +92,28 @@
     }
     button:hover { background: #2563eb; }
     input[type="text"] {
-      width: 70%;
       border: 1px solid #475569;
       background: #1e293b;
       color: white;
+    }
+
+    /* Shortcuts section */
+    .shortcuts {
+      margin-top: 1rem;
+    }
+    .shortcut {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: rgba(59, 130, 246, 0.2);
+      color: #f1f5f9;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .shortcut:hover {
+      background: rgba(59, 130, 246, 0.4);
     }
 
     /* Bubble bottom-left */
@@ -128,8 +146,17 @@
 
     <!-- DuckDuckGo Search -->
     <form id="searchForm" target="_blank">
-      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
+      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required style="width:70%;" />
       <button type="submit">Search</button>
+    </form>
+
+    <!-- Shortcuts Section -->
+    <div class="shortcuts" id="shortcuts"></div>
+
+    <form id="shortcutForm">
+      <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
+      <input id="shortcutUrl" type="text" placeholder="https://example.com" required />
+      <button type="submit">Add</button>
     </form>
 
     <!-- Tab Cloaker -->
@@ -174,6 +201,38 @@
         favicon.href = iconUrl;
       }
     }
+
+    // Shortcuts
+    const shortcutsEl = document.getElementById("shortcuts");
+    const shortcutForm = document.getElementById("shortcutForm");
+
+    function loadShortcuts() {
+      shortcutsEl.innerHTML = "";
+      const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+      shortcuts.forEach(sc => {
+        const link = document.createElement("a");
+        link.href = sc.url;
+        link.target = "_blank";
+        link.className = "shortcut";
+        link.textContent = sc.name;
+        shortcutsEl.appendChild(link);
+      });
+    }
+
+    shortcutForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("shortcutName").value.trim();
+      const url = document.getElementById("shortcutUrl").value.trim();
+      if (name && url) {
+        const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+        shortcuts.push({ name, url });
+        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+        loadShortcuts();
+        shortcutForm.reset();
+      }
+    });
+
+    loadShortcuts();
 
     // Generate starfield
     const starsContainer = document.getElementById("stars");
