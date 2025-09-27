@@ -50,6 +50,7 @@
       padding: 0.6rem 1rem;
       cursor: pointer;
     }
+    /* 3-dot menu button */
     .menu-btn {
       width: 38px;
       height: 38px;
@@ -67,8 +68,10 @@
     .menu-btn:hover {
       background: rgba(255,255,255,0.25);
     }
+    /* Dropdown with animation */
     .dropdown {
-      display: none;
+      display: flex;
+      flex-direction: column;
       position: absolute;
       top: 50px;
       left: 0;
@@ -76,8 +79,16 @@
       border-radius: 8px;
       min-width: 160px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
       z-index: 1000;
-      flex-direction: column;
+    }
+    .dropdown.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
     .dropdown a {
       padding: 10px 14px;
@@ -188,13 +199,13 @@
     // Dropdown
     function toggleDropdown(){
       const menu = document.getElementById("dropdownMenu");
-      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+      menu.classList.toggle("show");
     }
     window.onclick = function(e){
       if (!e.target.matches('.menu-btn')) {
         const menu = document.getElementById("dropdownMenu");
-        if (menu && menu.style.display === "flex") {
-          menu.style.display = "none";
+        if (menu.classList.contains("show")) {
+          menu.classList.remove("show");
         }
       }
     };
