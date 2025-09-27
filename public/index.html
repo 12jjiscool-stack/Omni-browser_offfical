@@ -54,31 +54,6 @@
     .shortcuts { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.8rem; justify-content: center; }
     .shortcut { background: rgba(51,65,85,0.8); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
     .shortcut:hover { background: rgba(71,85,105,0.9); }
-    .ai-section { margin:1rem 0; width:100%; max-width:500px; }
-    .ai-toggle {
-      display:block; width:100%; background:#7e22ce; color:white;
-      padding:0.9rem 1rem; border:none; border-radius:0.6rem;
-      font-size:1rem; font-weight:600; cursor:pointer;
-      transition:background 0.2s ease; text-align:center;
-    }
-    .ai-toggle:hover { background:#9333ea; }
-    .ai-container {
-      margin-top:0.5rem; background:rgba(51,65,85,0.8);
-      padding:1rem; border-radius:0.5rem;
-    }
-    .ai-container textarea {
-      width:100%; padding:0.6rem; border-radius:0.4rem;
-      border:none; resize:vertical; margin-bottom:0.5rem;
-    }
-    .ai-container button {
-      background:#2563eb; color:white; padding:0.5rem 0.9rem;
-      border:none; border-radius:0.4rem; cursor:pointer;
-    }
-    .ai-container button:hover { opacity:0.9; }
-    .ai-response {
-      margin-top:0.5rem; background:#1e293b; padding:0.6rem;
-      border-radius:0.4rem; font-size:0.9rem; text-align:left;
-    }
     .bubble {
       position: fixed; bottom: 10px; left: 10px; font-style: italic;
       background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 8px;
@@ -98,6 +73,7 @@
       background: rgba(0,0,0,0.6);
       padding: 8px;
       border-radius: 10px;
+      width: 260px;
     }
     .music-player input {
       width: 180px;
@@ -111,13 +87,22 @@
       border:none; border-radius:6px;
       padding:4px 8px; cursor:pointer;
     }
+    .music-result {
+      cursor:pointer;
+      padding:4px;
+      border-bottom:1px solid rgba(255,255,255,0.2);
+    }
+    .music-result:hover {
+      background:rgba(255,255,255,0.1);
+    }
   </style>
 </head>
 <body>
-  <!-- Music Player (SoundCloud Embed with Search) -->
+  <!-- Music Player (SoundCloud Embed with Search + Results) -->
   <div class="music-player">
     <input id="scSearch" type="text" placeholder="Search SoundCloud...">
     <button onclick="searchSC()">Search</button>
+    <div id="scResults" style="max-height:150px; overflow-y:auto; margin-top:5px;"></div>
     <iframe id="scPlayer" 
       width="250" height="120"
       scrolling="no" frameborder="no" allow="autoplay"
@@ -140,15 +125,6 @@
 
     <div class="shortcuts" id="shortcuts"></div>
     <button onclick="addShortcut()">➕ Add Shortcut</button>
-
-    <div class="ai-section">
-      <button class="ai-toggle" onclick="toggleAI()">🤖 Open AI Assistant</button>
-      <div class="ai-container" id="aiContainer" style="display:none;">
-        <textarea id="aiInput" placeholder="Ask me anything..." rows="3"></textarea>
-        <button onclick="askAI()">Ask</button>
-        <div class="ai-response" id="aiResponse">💬 Response will appear here...</div>
-      </div>
-    </div>
   </div>
 
   <div class="bubble">Made by Jacob Maddox</div>
@@ -201,52 +177,35 @@
       }
     }
 
-    // AI Assistant
-    function toggleAI(){
-      const ai=document.getElementById("aiContainer");
-      ai.style.display=ai.style.display==="none"?"block":"none";
-    }
-    async function askAI(){
-      const input=document.getElementById("aiInput").value.trim();
-      const out=document.getElementById("aiResponse");
-      if(!input) return; out.textContent="🤔 Thinking...";
-      try{
-        const res=await fetch("https://api.openai.com/v1/chat/completions",{
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
-            "Authorization":"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"
-          },
-          body:JSON.stringify({
-            model:"gpt-4o-mini",
-            messages:[{role:"user",content:input}]
-          })
-        });
-        const data=await res.json();
-        out.textContent=data.choices?.[0]?.message?.content||"⚠️ No response.";
-      }catch(err){
-        out.textContent="⚠️ Error fetching AI response.";
-        console.error(err);
-      }
-    }
-
-    // SoundCloud Search
+    // SoundCloud Search with Results
     async function searchSC(){
       const q=document.getElementById("scSearch").value.trim();
+      const resultsDiv=document.getElementById("scResults");
+      resultsDiv.innerHTML=""; // clear old results
       if(!q) return;
+
       try{
         const res=await fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&client_id=YOUR_CLIENT_ID_HERE`);
         const data=await res.json();
-        if(data.collection&&data.collection.length>0){
-          const track=data.collection[0];
-          document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}`;
-        }else alert("No results found.");
+        if(data.collection && data.collection.length>0){
+          data.collection.slice(0,5).forEach(track=>{
+            const btn=document.createElement("div");
+            btn.className="music-result";
+            btn.textContent=track.title;
+            btn.onclick=()=>{
+              document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}`;
+              resultsDiv.innerHTML="";
+            };
+            resultsDiv.appendChild(btn);
+          });
+        }else{
+          resultsDiv.innerHTML="<em>No results found.</em>";
+        }
       }catch(e){
-        console.error(e); alert("SoundCloud search failed.");
+        console.error(e);
+        resultsDiv.innerHTML="<em>⚠️ SoundCloud search failed.</em>";
       }
     }
   </script>
 </body>
 </html>
-
-
