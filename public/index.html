@@ -98,7 +98,7 @@
   </style>
 </head>
 <body>
-  <!-- Music Player (SoundCloud Embed with Search + Results) -->
+  <!-- Music Player (SoundCloud Embed with Dropdown Search) -->
   <div class="music-player">
     <input id="scSearch" type="text" placeholder="Search SoundCloud...">
     <button onclick="searchSC()">Search</button>
@@ -177,34 +177,23 @@
       }
     }
 
-    // SoundCloud Search with Results
-    async function searchSC(){
+    // SoundCloud Search (No API Key)
+    function searchSC(){
       const q=document.getElementById("scSearch").value.trim();
       const resultsDiv=document.getElementById("scResults");
-      resultsDiv.innerHTML=""; // clear old results
+      resultsDiv.innerHTML=""; 
       if(!q) return;
 
-      try{
-        const res=await fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&client_id=YOUR_CLIENT_ID_HERE`);
-        const data=await res.json();
-        if(data.collection && data.collection.length>0){
-          data.collection.slice(0,5).forEach(track=>{
-            const btn=document.createElement("div");
-            btn.className="music-result";
-            btn.textContent=track.title;
-            btn.onclick=()=>{
-              document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}`;
-              resultsDiv.innerHTML="";
-            };
-            resultsDiv.appendChild(btn);
-          });
-        }else{
-          resultsDiv.innerHTML="<em>No results found.</em>";
-        }
-      }catch(e){
-        console.error(e);
-        resultsDiv.innerHTML="<em>⚠️ SoundCloud search failed.</em>";
-      }
+      const searchUrl = `https://soundcloud.com/search?q=${encodeURIComponent(q)}`;
+
+      const btn=document.createElement("div");
+      btn.className="music-result";
+      btn.textContent=`Search "${q}" on SoundCloud`;
+      btn.onclick=()=>{
+        document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(searchUrl)}`;
+        resultsDiv.innerHTML="";
+      };
+      resultsDiv.appendChild(btn);
     }
   </script>
 </body>
