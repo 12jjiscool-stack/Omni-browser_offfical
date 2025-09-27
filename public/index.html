@@ -1,112 +1,388 @@
-<style>
-  /* --- Shortcuts UI --- */
-  .shortcuts {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.6rem;
-  }
-  .shortcut {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    background: rgba(59,130,246,0.15);
-    color: #f1f5f9;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .shortcut:hover {
-    background: rgba(59,130,246,0.35);
-    transform: translateY(-2px);
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Omni Portal</title>
 
-  .shortcut-form {
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .shortcut-form input {
-    padding: 0.5rem 0.8rem;
-    border-radius: 0.5rem;
-    border: 1px solid #475569;
-    background: #1e293b;
-    color: white;
-    font-size: 0.9rem;
-    flex: 1 1 120px;
-    min-width: 140px;
-  }
-  .shortcut-form button {
-    background: #3b82f6;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .shortcut-form button:hover { background: #2563eb; }
+  <!-- Default Favicon -->
+  <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon" />
 
-  /* --- Cloak UI --- */
-  .cloak-section {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    background: rgba(15,23,42,0.6);
-    text-align: left;
-  }
-  .cloak-section h2 {
-    margin: 0 0 0.8rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #93c5fd;
-  }
-  .cloak-form {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-  .cloak-form input {
-    flex: 1 1 140px;
-    min-width: 140px;
-    padding: 0.5rem 0.8rem;
-    border-radius: 0.5rem;
-    border: 1px solid #475569;
-    background: #1e293b;
-    color: white;
-    font-size: 0.9rem;
-  }
-  .cloak-form button {
-    background: #3b82f6;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .cloak-form button:hover { background: #2563eb; }
-</style>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      color: #f1f5f9;
+    }
 
-<!-- Shortcuts -->
-<div class="shortcuts" id="shortcuts"></div>
-<form id="shortcutForm" class="shortcut-form">
-  <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
-  <input id="shortcutUrl" type="text" placeholder="https://example.com" required />
-  <button type="submit">＋ Add</button>
-</form>
+    /* Omni background */
+    body {
+      background: linear-gradient(270deg, #0f172a, #1e293b, #0f172a);
+      background-size: 600% 600%;
+      animation: gradientShift 30s ease infinite;
+    }
 
-<!-- Cloak -->
-<div class="cloak-section">
-  <h2>🕶️ Tab Cloaker</h2>
-  <div class="cloak-form">
-    <input id="cloakTitle" type="text" placeholder="Fake Tab Title" />
-    <input id="cloakIcon" type="text" placeholder="Favicon URL" />
-    <button onclick="cloakTab()">Apply</button>
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Stars */
+    .stars {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      opacity: 0.8;
+      animation: twinkle 6s infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 6vh auto;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 2rem;
+      border-radius: 1rem;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    h1 { margin-bottom: 0.5rem; }
+    p { margin: 0.25rem 0; }
+
+    /* Time bar */
+    .time-bar {
+      margin: 1rem 0;
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      background: rgba(15, 23, 42, 0.8);
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    /* Search Row */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .search-row input[type="text"] {
+      flex: 1 1 200px;
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: white;
+    }
+    .search-row button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .search-row button:hover { background: #2563eb; }
+
+    /* Status indicators */
+    .status {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    /* Shortcuts UI */
+    .shortcuts {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+    .shortcut {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      background: rgba(59,130,246,0.15);
+      color: #f1f5f9;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .shortcut:hover {
+      background: rgba(59,130,246,0.35);
+      transform: translateY(-2px);
+    }
+    .shortcut-form {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .shortcut-form input {
+      padding: 0.5rem 0.8rem;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: white;
+      font-size: 0.9rem;
+      flex: 1 1 120px;
+      min-width: 140px;
+    }
+    .shortcut-form button {
+      background: #3b82f6;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .shortcut-form button:hover { background: #2563eb; }
+
+    /* Cloak UI */
+    .cloak-section {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.6);
+      text-align: left;
+    }
+    .cloak-section h2 {
+      margin: 0 0 0.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #93c5fd;
+    }
+    .cloak-form {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .cloak-form input {
+      flex: 1 1 140px;
+      min-width: 140px;
+      padding: 0.5rem 0.8rem;
+      border-radius: 0.5rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: white;
+      font-size: 0.9rem;
+    }
+    .cloak-form button {
+      background: #3b82f6;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cloak-form button:hover { background: #2563eb; }
+
+    /* Bubble bottom-left */
+    .bubble {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(30, 41, 59, 0.85);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #f1f5f9;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 5;
+    }
+
+    /* Edit background button */
+    .edit-bg {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: rgba(30, 41, 59, 0.9);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: background 0.2s;
+    }
+    .edit-bg:hover { background: rgba(59,130,246,0.8); }
+  </style>
+</head>
+<body>
+  <!-- Stars -->
+  <div class="stars" id="stars"></div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <h1>Omni Portal</h1>
+    <p id="location">📍 New York, NY</p>
+
+    <!-- Time bar -->
+    <div class="time-bar" id="timeBar">--:--:--</div>
+
+    <!-- Search + Status -->
+    <div class="search-row">
+      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
+      <button onclick="searchQuery()">Search</button>
+      <div class="status">
+        <span id="battery">🔋 --%</span>
+        <span id="temperature">🌡️ --°C</span>
+      </div>
+    </div>
+
+    <!-- Shortcuts -->
+    <div class="shortcuts" id="shortcuts"></div>
+    <form id="shortcutForm" class="shortcut-form">
+      <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
+      <input id="shortcutUrl" type="text" placeholder="https://example.com" required />
+      <button type="submit">＋ Add</button>
+    </form>
+
+    <!-- Cloak -->
+    <div class="cloak-section">
+      <h2>🕶️ Tab Cloaker</h2>
+      <div class="cloak-form">
+        <input id="cloakTitle" type="text" placeholder="Fake Tab Title" />
+        <input id="cloakIcon" type="text" placeholder="Favicon URL" />
+        <button onclick="cloakTab()">Apply</button>
+      </div>
+    </div>
   </div>
-</div>
+
+  <!-- Signature Bubble -->
+  <div class="bubble">made by Jacob Maddox</div>
+
+  <!-- Edit Background -->
+  <div class="edit-bg" onclick="editBackground()">🎨 Edit Background</div>
+
+  <script>
+    // Time updater
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("timeBar").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // DuckDuckGo Search
+    function searchQuery() {
+      const query = encodeURIComponent(document.getElementById("searchBox").value.trim());
+      if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
+    }
+
+    // Battery API
+    if (navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        function updateBattery() {
+          document.getElementById("battery").textContent = `🔋 ${Math.round(battery.level * 100)}%`;
+        }
+        updateBattery();
+        battery.addEventListener("levelchange", updateBattery);
+      });
+    }
+
+    // Temperature (simulated for now)
+    function updateTemperature() {
+      const temp = (Math.random() * 10 + 20).toFixed(1);
+      document.getElementById("temperature").textContent = `🌡️ ${temp}°C`;
+    }
+    setInterval(updateTemperature, 10000);
+    updateTemperature();
+
+    // Shortcuts system
+    const shortcutsContainer = document.getElementById("shortcuts");
+    const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+
+    function renderShortcuts() {
+      shortcutsContainer.innerHTML = "";
+      shortcuts.forEach(s => {
+        const a = document.createElement("a");
+        a.href = s.url;
+        a.textContent = s.name;
+        a.className = "shortcut";
+        a.target = "_blank";
+        shortcutsContainer.appendChild(a);
+      });
+    }
+    renderShortcuts();
+
+    document.getElementById("shortcutForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const name = document.getElementById("shortcutName").value.trim();
+      const url = document.getElementById("shortcutUrl").value.trim();
+      if (name && url) {
+        shortcuts.push({ name, url });
+        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+        renderShortcuts();
+        e.target.reset();
+      }
+    });
+
+    // Tab Cloaker
+    function cloakTab() {
+      const title = document.getElementById("cloakTitle").value.trim();
+      const iconUrl = document.getElementById("cloakIcon").value.trim();
+      if (title) document.title = title;
+      if (iconUrl) {
+        document.getElementById("favicon").href = iconUrl;
+      }
+    }
+
+    // Edit Background
+    function editBackground() {
+      const url = prompt("Enter background image URL (leave empty for default):");
+      if (url) {
+        document.body.style.background = `url('${url}') center/cover no-repeat fixed`;
+      } else {
+        document.body.style.background = "linear-gradient(270deg, #0f172a, #1e293b, #0f172a)";
+        document.body.style.backgroundSize = "600% 600%";
+        document.body.style.animation = "gradientShift 30s ease infinite";
+      }
+    }
+
+    // Generate starfield
+    const starsContainer = document.getElementById("stars");
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement("div");
+      const size = Math.random() * 3 + 1;
+      star.classList.add("star");
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.animationDelay = `${Math.random() * 6}s`;
+      starsContainer.appendChild(star);
+    }
+  </script>
+</body>
+</html>
+
