@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Omni Portal</title>
+
+  <!-- Default Favicon -->
   <link id="favicon" rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon" />
 
   <style>
@@ -42,7 +44,7 @@
       animation: twinkle 6s infinite ease-in-out;
     }
     @keyframes twinkle {
-      0%,100% { opacity: 0.2; transform: scale(0.8); }
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.2); }
     }
 
@@ -88,15 +90,30 @@
       color: white;
     }
     .search-row button {
-      background: #3b82f6;
-      color: white;
       border: none;
       border-radius: 0.5rem;
       padding: 0.6rem 1rem;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.15s;
     }
-    .search-row button:hover { background: #2563eb; }
+    .search-row button:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Gmail button */
+    .gmail-btn {
+      background: #ea4335;
+      color: white;
+      font-weight: 600;
+    }
+    .gmail-btn:hover { background: #c53030; }
+
+    /* Search button */
+    .search-btn {
+      background: #3b82f6;
+      color: white;
+    }
+    .search-btn:hover { background: #2563eb; }
 
     .status {
       display: flex;
@@ -230,13 +247,14 @@
 
   <div class="card">
     <h1>Omni Portal</h1>
-    <p id="location">📍 Locating...</p>
+    <p id="location">📍 Detecting location...</p>
 
     <div class="time-bar" id="timeBar">--:--:--</div>
 
     <div class="search-row">
+      <button class="gmail-btn" onclick="openGmail()">📧 Gmail</button>
       <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
-      <button onclick="searchQuery()">Search</button>
+      <button class="search-btn" onclick="searchQuery()">Search</button>
       <div class="status">
         <span id="battery">🔋 --%</span>
         <span id="temperature">🌡️ --°C</span>
@@ -265,33 +283,38 @@
 
   <script>
     function updateTime() {
-      document.getElementById("timeBar").textContent = new Date().toLocaleTimeString();
+      const now = new Date();
+      document.getElementById("timeBar").textContent = now.toLocaleTimeString();
     }
     setInterval(updateTime, 1000);
     updateTime();
 
     function searchQuery() {
-      const q = encodeURIComponent(document.getElementById("searchBox").value.trim());
-      if (q) window.open(`https://duckduckgo.com/?q=${q}`, "_blank");
+      const query = encodeURIComponent(document.getElementById("searchBox").value.trim());
+      if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
+    }
+
+    function openGmail() {
+      window.open("https://mail.google.com/", "_blank");
     }
 
     if (navigator.getBattery) {
-      navigator.getBattery().then(b => {
-        function upd() {
-          document.getElementById("battery").textContent = `🔋 ${Math.round(b.level * 100)}%`;
+      navigator.getBattery().then(battery => {
+        function updateBattery() {
+          document.getElementById("battery").textContent = `🔋 ${Math.round(battery.level * 100)}%`;
         }
-        upd();
-        b.addEventListener("levelchange", upd);
+        updateBattery();
+        battery.addEventListener("levelchange", updateBattery);
       });
     }
 
-    // Fetch weather & reverse geocode
     async function fetchWeather(lat, lon) {
       try {
         const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
         const data = await resp.json();
-        if (data.current_weather && typeof data.current_weather.temperature_2m !== "undefined") {
-          document.getElementById("temperature").textContent = `🌡️ ${data.current_weather.temperature_2m.toFixed(1)}°C`;
+        if (data.current_weather && typeof data.current_weather.temperature !== "undefined") {
+          document.getElementById("temperature").textContent =
+            `🌡️ ${data.current_weather.temperature.toFixed(1)}°C`;
         }
       } catch (err) {
         console.error("Weather fetch error:", err);
@@ -300,49 +323,32 @@
 
     async function fetchLocation(lat, lon) {
       try {
-        // Use Nominatim reverse geocoding
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-        const resp = await fetch(url, {
-          headers: {
-            "Accept": "application/json",
-            // optionally set a user-agent or referer
-          }
-        });
+        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
         const data = await resp.json();
-        if (data && data.address) {
-          const city = data.address.city || data.address.town || data.address.village || "";
+        if (data.address) {
+          const city = data.address.city || data.address.town || data.address.village || "Unknown";
           const state = data.address.state || "";
-          document.getElementById("location").textContent = `📍 ${city}${state ? ", " + state : ""}`;
+          document.getElementById("location").textContent = `📍 ${city}, ${state}`;
         }
       } catch (err) {
-        console.error("Reverse geocode error:", err);
+        console.error("Location fetch error:", err);
       }
     }
 
-    function initLocationAndWeather() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          const { latitude, longitude } = pos.coords;
-          fetchWeather(latitude, longitude);
-          fetchLocation(latitude, longitude);
-        }, err => {
-          console.warn("Geolocation error, fallback to default");
-          // fallback coords
-          const fallbackLat = 40.7128, fallbackLon = -74.0060;
-          fetchWeather(fallbackLat, fallbackLon);
-          fetchLocation(fallbackLat, fallbackLon);
-        });
-      } else {
-        const fallbackLat = 40.7128, fallbackLon = -74.0060;
-        fetchWeather(fallbackLat, fallbackLon);
-        fetchLocation(fallbackLat, fallbackLon);
-      }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        fetchWeather(lat, lon);
+        fetchLocation(lat, lon);
+      }, err => {
+        document.getElementById("location").textContent = "📍 Location unavailable";
+      });
     }
-    initLocationAndWeather();
 
-    // Shortcuts
     const shortcutsContainer = document.getElementById("shortcuts");
     const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+
     function renderShortcuts() {
       shortcutsContainer.innerHTML = "";
       shortcuts.forEach(s => {
@@ -355,6 +361,7 @@
       });
     }
     renderShortcuts();
+
     document.getElementById("shortcutForm").addEventListener("submit", e => {
       e.preventDefault();
       const name = document.getElementById("shortcutName").value.trim();
@@ -368,14 +375,14 @@
     });
 
     function cloakTab() {
-      const t = document.getElementById("cloakTitle").value.trim();
-      const i = document.getElementById("cloakIcon").value.trim();
-      if (t) document.title = t;
-      if (i) document.getElementById("favicon").href = i;
+      const title = document.getElementById("cloakTitle").value.trim();
+      const iconUrl = document.getElementById("cloakIcon").value.trim();
+      if (title) document.title = title;
+      if (iconUrl) document.getElementById("favicon").href = iconUrl;
     }
 
     function editBackground() {
-      const url = prompt("Enter background image URL (leave empty = default gradient):");
+      const url = prompt("Enter background image URL (leave empty for default):");
       if (url) {
         document.body.style.background = `url('${url}') center/cover no-repeat fixed`;
       } else {
@@ -400,3 +407,4 @@
   </script>
 </body>
 </html>
+
