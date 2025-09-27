@@ -1,0 +1,15 @@
+{
+  "name": "sleek-proxy-netlify",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'no build step required for demo'",
+    "start": "netlify dev" 
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
