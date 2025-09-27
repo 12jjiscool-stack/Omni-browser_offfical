@@ -5,295 +5,298 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Omni Portal</title>
 
-  <!-- Custom Omni Favicon -->
-  <link id="favicon" rel="icon" type="image/png" 
-  href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iI2VhNDMzNSIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgZm9udC1zaXplPSIxMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGwiPk9tbmk8L3RleHQ+PC9zdmc+" />
+  <!-- Custom Omni Favicon (inline) -->
+  <link id="favicon" rel="icon" type="image/png"
+    href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iI2VhNDMzNSIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgZm9udC1zaXplPSIxMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGwiPk9tbmk8L3RleHQ+PC9zdmc+" />
 
   <style>
-    html, body { margin:0; padding:0; height:100%; font-family:system-ui,sans-serif; overflow:hidden; color:#f1f5f9; }
-    body { background:linear-gradient(270deg,#0f172a,#1e293b,#0f172a); background-size:600% 600%; animation:gradientShift 30s ease infinite; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    html, body { margin:0; padding:0; height:100%; font-family:system-ui, sans-serif; color:#f1f5f9; background:linear-gradient(270deg,#0f172a,#1e293b,#0f172a); background-size:600% 600%; animation:gradientShift 30s ease infinite;}
+    @keyframes gradientShift {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .stars{ position:fixed; inset:0; z-index:-1; }
+    .star{ position:absolute; background:white; border-radius:50%; opacity:0.8; animation:twinkle 6s infinite ease-in-out; }
+    @keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
 
-    .stars { position:fixed; width:100%; height:100%; z-index:-1; overflow:hidden; }
-    .star { position:absolute; background:white; border-radius:50%; opacity:0.8; animation:twinkle 6s infinite ease-in-out; }
-    @keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
+    .card{ max-width:760px; margin:3rem auto; background:rgba(15,23,42,0.85); padding:1.6rem; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.45); }
+    h1{ margin:0 0 6px 0; font-size:1.35rem; }
+    #location{ color:#cbd5e1; margin-bottom:8px; }
 
-    .card { background:rgba(15,23,42,0.85); padding:2rem; border-radius:1rem; text-align:center; max-width:600px; margin:3rem auto; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
-    .card h1 { margin-bottom:0.5rem; }
+    .time-bar{ font-weight:600; margin-bottom:12px; }
 
-    .time-bar { margin:0.5rem 0 1rem; font-weight:bold; font-size:1.1rem; }
+    .search-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .gmail-btn{ background:#ea4335; color:white; border:none; padding:10px 14px; border-radius:8px; font-weight:700; cursor:pointer; }
+    .search-input{ flex:1 1 360px; padding:10px 14px; border-radius:8px; border:none; background:#0f1724; color:white; }
+    .search-btn{ background:#2563eb; color:white; padding:10px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+    .status{ display:flex; gap:12px; align-items:center; color:#cbd5e1; margin-left:6px; }
 
-    .search-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
-    .search-row input { flex:1; padding:0.6rem; border:none; border-radius:0.5rem; font-size:1rem; }
-    .search-row button { padding:0.6rem 1rem; border:none; border-radius:0.5rem; cursor:pointer; font-weight:bold; }
-    .search-row button.gmail-btn { background:#ea4335; color:white; }
-    .search-row button.search-btn { background:#2563eb; color:white; }
-    .search-row button:hover { opacity:0.9; }
+    .ai-section{ margin:12px 0; }
+    .ai-toggle{ display:block; width:100%; background:#7e22ce; color:white; padding:12px; border:none; border-radius:10px; font-weight:700; cursor:pointer; text-align:center; }
+    .ai-container{ margin-top:8px; background:rgba(34,41,55,0.7); padding:12px; border-radius:10px; display:none; }
+    .ai-container textarea{ width:100%; min-height:80px; padding:8px; border-radius:8px; border:none; background:#0f1724; color:white; resize:vertical; }
+    .ai-container .ask-btn{ margin-top:8px; background:#2563eb; color:white; padding:8px 12px; border:none; border-radius:8px; cursor:pointer; }
+    .ai-response{ margin-top:10px; background:#0b1220; padding:10px; border-radius:8px; color:#e6eef8; min-height:40px; white-space:pre-wrap; }
 
-    .status { display:flex; gap:1rem; font-size:0.9rem; margin-left:0.5rem; }
+    .shortcuts{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .shortcut{ background:#334155; padding:8px 12px; border-radius:999px; color:white; text-decoration:none; font-weight:600; }
+    .shortcut-form{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+    .shortcut-form input{ padding:8px; border-radius:8px; border:none; background:#0f1724; color:white; }
 
-    .shortcuts { display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-bottom:1rem; }
-    .shortcut { background:#334155; padding:0.5rem 0.8rem; border-radius:0.5rem; color:white; text-decoration:none; font-size:0.9rem; }
-    .shortcut:hover { background:#475569; }
+    .cloak-section{ margin-top:10px; background:rgba(0,0,0,0.05); padding:10px; border-radius:8px; }
+    .cloak-form{ display:flex; gap:8px; flex-wrap:wrap; }
+    .cloak-form input{ padding:8px; border-radius:8px; border:none; background:#0f1724; color:white; }
+    .cloak-form button{ background:#6b21a8; color:white; padding:8px 12px; border:none; border-radius:8px; cursor:pointer; }
 
-    .shortcut-form { display:flex; gap:0.5rem; justify-content:center; margin-bottom:1rem; flex-wrap:wrap; }
-    .shortcut-form input { padding:0.4rem; border-radius:0.4rem; border:none; }
-    .shortcut-form button { padding:0.4rem 0.8rem; background:#16a34a; color:white; border:none; border-radius:0.4rem; cursor:pointer; }
+    .bubble{ position:fixed; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:8px 12px; border-radius:999px; font-style:italic; font-size:0.85rem; }
+    .edit-bg{ position:fixed; bottom:10px; right:10px; background:#475569; padding:8px 12px; border-radius:8px; cursor:pointer; color:white; }
 
-    .cloak-section { margin-top:1.5rem; }
-    .cloak-form { display:flex; gap:0.5rem; justify-content:center; margin-top:0.5rem; flex-wrap:wrap; }
-    .cloak-form input { padding:0.4rem; border-radius:0.4rem; border:none; }
-    .cloak-form button { padding:0.4rem 0.8rem; background:#6b21a8; color:white; border:none; border-radius:0.4rem; cursor:pointer; }
-
-    /* AI Assistant */
-    .ai-section { margin:1rem 0; }
-    .ai-toggle {
-      display:block;
-      width:100%;
-      background:#7e22ce;
-      color:white;
-      padding:0.9rem 1rem;
-      border:none;
-      border-radius:0.6rem;
-      font-size:1rem;
-      font-weight:600;
-      cursor:pointer;
-      transition:background 0.2s ease;
-      text-align:center;
+    /* small screens */
+    @media (max-width:520px){
+      .card{ margin:1.6rem 10px; padding:12px; }
     }
-    .ai-toggle:hover { background:#9333ea; }
-
-    .ai-container { margin-top:0.5rem; background:rgba(51,65,85,0.8); padding:1rem; border-radius:0.5rem; }
-    .ai-container textarea { width:100%; padding:0.6rem; border-radius:0.4rem; border:none; resize:vertical; margin-bottom:0.5rem; }
-    .ai-container button { background:#2563eb; color:white; padding:0.5rem 0.9rem; border:none; border-radius:0.4rem; cursor:pointer; }
-    .ai-container button:hover { opacity:0.9; }
-    .ai-response { margin-top:0.5rem; background:#1e293b; padding:0.6rem; border-radius:0.4rem; font-size:0.9rem; }
-
-    .bubble { position:fixed; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.8rem; font-style:italic; }
-
-    .edit-bg { position:fixed; bottom:10px; right:10px; background:#475569; padding:0.4rem 0.8rem; border-radius:0.5rem; font-size:0.8rem; cursor:pointer; }
   </style>
 </head>
 <body>
-  <!-- Stars -->
   <div class="stars" id="stars"></div>
 
-  <!-- Main Card -->
-  <div class="card">
-    <h1>Omni Portal</h1>
-    <p id="location">📍 Detecting location...</p>
+  <div class="card" role="main">
+    <h1>Omni</h1>
+    <div id="location">📍 Detecting location...</div>
 
-    <!-- Time bar -->
     <div class="time-bar" id="timeBar">--:--:--</div>
 
-    <!-- Search + Status -->
     <div class="search-row">
       <button class="gmail-btn" onclick="openGmail()">📧 Gmail</button>
-      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
+      <input id="searchBox" class="search-input" type="text" placeholder="Search with DuckDuckGo..." />
       <button class="search-btn" onclick="searchQuery()">Search</button>
       <div class="status">
-        <span id="battery">🔋 --%</span>
-        <span id="temperature">🌡️ --°C</span>
+        <div id="battery">🔋 --%</div>
+        <div id="temperature">🌡️ --°C</div>
       </div>
     </div>
 
     <!-- AI Assistant -->
     <div class="ai-section">
-      <button class="ai-toggle" onclick="toggleAI()">🤖 Open AI Assistant</button>
-      <div class="ai-container" id="aiContainer" style="display:none;">
-        <textarea id="aiInput" placeholder="Ask me anything..." rows="3"></textarea>
-        <button onclick="askAI()">Ask</button>
+      <button class="ai-toggle" id="aiToggle">🤖 Open AI Assistant</button>
+      <div class="ai-container" id="aiContainer" aria-hidden="true">
+        <textarea id="aiInput" placeholder="Ask me anything..."></textarea>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+          <button class="ask-btn" onclick="askAI()">Ask</button>
+          <button onclick="clearAI()">Clear</button>
+        </div>
         <div class="ai-response" id="aiResponse">💬 Response will appear here...</div>
       </div>
     </div>
 
     <!-- Shortcuts -->
     <div class="shortcuts" id="shortcuts"></div>
-    <form id="shortcutForm" class="shortcut-form">
-      <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
-      <input id="shortcutUrl" type="text" placeholder="https://example.com" required />
+    <form id="shortcutForm" class="shortcut-form" onsubmit="return addShortcut(event);">
+      <input id="shortcutName" placeholder="Name" required />
+      <input id="shortcutUrl" placeholder="https://example.com" required />
       <button type="submit">＋ Add</button>
     </form>
 
     <!-- Cloak -->
     <div class="cloak-section">
-      <h2>🕶️ Tab Cloaker</h2>
+      <h3 style="margin:0 0 8px 0; color:#cbd5e1;">🕶️ Tab Cloaker</h3>
       <div class="cloak-form">
-        <input id="cloakTitle" type="text" placeholder="Fake Tab Title" />
-        <input id="cloakIcon" type="text" placeholder="Favicon URL" />
+        <input id="cloakTitle" placeholder="Fake Tab Title" />
+        <input id="cloakIcon" placeholder="Favicon URL" />
         <button onclick="cloakTab()">Apply</button>
       </div>
     </div>
   </div>
 
-  <!-- Signature Bubble -->
   <div class="bubble">made by Jacob Maddox</div>
-
-  <!-- Edit Background -->
   <div class="edit-bg" onclick="editBackground()">🎨 Edit Background</div>
 
   <script>
+    /* ---------- IMPORTANT (UNSAFE) ----------
+       This file contains your API key in client-side JS.
+       Only use this for local/private testing. DO NOT deploy to public hosting.
+       ---------------------------------------- */
+
+    // ---------- CONFIG: YOUR API KEY (unsafe) ----------
+    const INSECURE_API_KEY = "vsk-proj-EoVqUgm0o-RF6-Pi-mBKaS3FQsl6ZLc5NjmRfPxws3Ftr13rMNeDA6Vpu69Hhj6PW-f1JnFt5AT3BlbkFJ8Ua3eaGUyTz6TTomyKURemxYLJHEDOF86XxoXyfekmCUFKgucbjfUc_DM4ff0Monq-mWVPrcgA";
+    // ---------------------------------------------------
+
     // Time updater
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("timeBar").textContent = now.toLocaleTimeString();
+    function updateTime(){
+      document.getElementById("timeBar").textContent = new Date().toLocaleTimeString();
     }
-    setInterval(updateTime, 1000);
+    setInterval(updateTime,1000);
     updateTime();
 
-    // Gmail button
-    function openGmail() {
-      window.open("https://mail.google.com/", "_blank");
-    }
-
-    // DuckDuckGo Search
-    function searchQuery() {
-      const query = encodeURIComponent(document.getElementById("searchBox").value.trim());
-      if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
+    // Gmail & Search
+    function openGmail(){ window.open("https://mail.google.com/", "_blank"); }
+    function searchQuery(){
+      const q = encodeURIComponent(document.getElementById("searchBox").value.trim());
+      if(q) window.open(`https://duckduckgo.com/?q=${q}`, "_blank");
     }
 
     // Battery API
-    if (navigator.getBattery) {
-      navigator.getBattery().then(battery => {
-        function updateBattery() {
-          document.getElementById("battery").textContent = `🔋 ${Math.round(battery.level * 100)}%`;
-        }
-        updateBattery();
-        battery.addEventListener("levelchange", updateBattery);
-      });
+    if(navigator.getBattery){
+      navigator.getBattery().then(b => {
+        function upd(){ document.getElementById("battery").textContent = "🔋 "+Math.round(b.level*100)+"%"; }
+        upd();
+        b.addEventListener("levelchange", upd);
+      }).catch(()=>{/*ignore*/});
     }
 
-    // Location + Weather
-    async function fetchWeather(lat, lon) {
-      try {
-        const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-        const data = await resp.json();
-        if (data.current_weather && typeof data.current_weather.temperature !== "undefined") {
-          document.getElementById("temperature").textContent =
-            `🌡️ ${data.current_weather.temperature.toFixed(1)}°C`;
+    // Weather & Reverse Geocode
+    async function fetchWeather(lat, lon){
+      try{
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const d = await r.json();
+        if(d.current_weather && typeof d.current_weather.temperature !== "undefined"){
+          document.getElementById("temperature").textContent = `🌡️ ${d.current_weather.temperature.toFixed(1)}°C`;
         }
-      } catch (err) {
-        console.error("Weather fetch error:", err);
+      }catch(e){ console.error("weather", e); }
+    }
+    async function fetchLocation(lat, lon){
+      try{
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+        const d = await r.json();
+        if(d && d.address){
+          const city = d.address.city||d.address.town||d.address.village||"Unknown";
+          const state = d.address.state||"";
+          document.getElementById("location").textContent = `📍 ${city}${state?(", "+state):""}`;
+        }
+      }catch(e){ console.error("geocode", e); }
+    }
+    function initLocation(){
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(pos=>{
+          const lat = pos.coords.latitude, lon = pos.coords.longitude;
+          fetchWeather(lat, lon);
+          fetchLocation(lat, lon);
+        }, err=>{
+          // fallback to NYC
+          fetchWeather(40.7128, -74.0060);
+          fetchLocation(40.7128, -74.0060);
+          document.getElementById("location").textContent = "📍 Location unavailable";
+        });
+      } else {
+        fetchWeather(40.7128, -74.0060);
+        fetchLocation(40.7128, -74.0060);
+        document.getElementById("location").textContent = "📍 Geolocation unsupported";
       }
     }
+    initLocation();
 
-    async function fetchLocation(lat, lon) {
-      try {
-        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
-        const data = await resp.json();
-        if (data.address) {
-          const city = data.address.city || data.address.town || data.address.village || "Unknown";
-          const state = data.address.state || "";
-          document.getElementById("location").textContent = `📍 ${city}, ${state}`;
-        }
-      } catch (err) {
-        console.error("Location fetch error:", err);
-      }
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        fetchWeather(lat, lon);
-        fetchLocation(lat, lon);
-      }, err => {
-        document.getElementById("location").textContent = "📍 Location unavailable";
-      });
-    }
-
-    // Shortcuts system
-    const shortcutsContainer = document.getElementById("shortcuts");
-    const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
-
-    function renderShortcuts() {
-      shortcutsContainer.innerHTML = "";
-      shortcuts.forEach(s => {
+    // Shortcuts (localStorage)
+    const shortcutsKey = "omni_shortcuts_v1";
+    function loadShortcuts(){
+      const arr = JSON.parse(localStorage.getItem(shortcutsKey)||"[]");
+      const cont = document.getElementById("shortcuts");
+      cont.innerHTML = "";
+      arr.forEach(s=>{
         const a = document.createElement("a");
-        a.href = s.url;
+        a.href = s.url; a.target="_blank"; a.className="shortcut";
         a.textContent = s.name;
-        a.className = "shortcut";
-        a.target = "_blank";
-        shortcutsContainer.appendChild(a);
+        cont.appendChild(a);
       });
     }
-    renderShortcuts();
-
-    document.getElementById("shortcutForm").addEventListener("submit", e => {
+    function addShortcut(e){
       e.preventDefault();
       const name = document.getElementById("shortcutName").value.trim();
       const url = document.getElementById("shortcutUrl").value.trim();
-      if (name && url) {
-        shortcuts.push({ name, url });
-        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
-        renderShortcuts();
-        e.target.reset();
-      }
-    });
+      if(!name||!url) return false;
+      const arr = JSON.parse(localStorage.getItem(shortcutsKey)||"[]");
+      arr.push({name,url});
+      localStorage.setItem(shortcutsKey, JSON.stringify(arr));
+      loadShortcuts();
+      e.target.reset();
+      return false;
+    }
+    loadShortcuts();
 
-    // Tab Cloaker
-    function cloakTab() {
+    // Cloak
+    function cloakTab(){
       const title = document.getElementById("cloakTitle").value.trim();
-      const iconUrl = document.getElementById("cloakIcon").value.trim();
-      if (title) document.title = title;
-      if (iconUrl) document.getElementById("favicon").href = iconUrl;
+      const icon = document.getElementById("cloakIcon").value.trim();
+      if(title) document.title = title;
+      if(icon) document.getElementById("favicon").href = icon;
     }
 
-    // Edit Background
-    function editBackground() {
+    // Background editor
+    function editBackground(){
       const url = prompt("Enter background image URL (leave empty for default):");
-      if (url) {
+      if(url){
         document.body.style.background = `url('${url}') center/cover no-repeat fixed`;
       } else {
-        document.body.style.background = "linear-gradient(270deg, #0f172a, #1e293b, #0f172a)";
+        document.body.style.background = "linear-gradient(270deg,#0f172a,#1e293b,#0f172a)";
         document.body.style.backgroundSize = "600% 600%";
-        document.body.style.animation = "gradientShift 30s ease infinite";
       }
     }
 
-    // AI Assistant
-    function toggleAI() {
-      const aiBox = document.getElementById("aiContainer");
-      aiBox.style.display = aiBox.style.display === "none" ? "block" : "none";
+    // AI Assistant behaviors (UNSAFE: uses client-side API key)
+    document.getElementById("aiToggle").addEventListener("click", ()=>{
+      const box = document.getElementById("aiContainer");
+      if(box.style.display === "block"){ box.style.display = "none"; box.setAttribute("aria-hidden","true"); }
+      else { box.style.display = "block"; box.setAttribute("aria-hidden","false"); document.getElementById("aiInput").focus(); }
+    });
+
+    function clearAI(){
+      document.getElementById("aiInput").value = "";
+      document.getElementById("aiResponse").textContent = "💬 Response will appear here...";
     }
 
-    async function askAI() {
-      const input = document.getElementById("aiInput").value.trim();
-      const responseBox = document.getElementById("aiResponse");
-      if (!input) return;
+    async function askAI(){
+      const prompt = document.getElementById("aiInput").value.trim();
+      const out = document.getElementById("aiResponse");
+      if(!prompt) return;
+      out.textContent = "🤔 Thinking...";
 
-      responseBox.textContent = "🤔 Thinking...";
-
-      try {
-        const res = await fetch("http://localhost:3000/api/ai", {
+      try{
+        // Example: call OpenAI chat completions endpoint with your API key embedded (UNSAFE)
+        const resp = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: input })
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + INSECURE_API_KEY
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini", // change if desired/available
+            messages: [
+              { role: "system", content: "You are Omni Assistant — helpful, concise." },
+              { role: "user", content: prompt }
+            ],
+            max_tokens: 700,
+            temperature: 0.7
+          })
         });
 
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        const data = await res.json();
+        if(!resp.ok){
+          const txt = await resp.text();
+          console.error("AI error", resp.status, txt);
+          out.textContent = "⚠️ AI API error: " + resp.status;
+          return;
+        }
 
-        responseBox.textContent = data.reply || "⚠️ No response.";
-      } catch (err) {
-        responseBox.textContent = "⚠️ Error fetching AI response.";
-        console.error(err);
+        const data = await resp.json();
+        // Try multiple response shapes
+        const content = data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text ?? JSON.stringify(data);
+        out.textContent = content.trim();
+      }catch(err){
+        console.error("askAI error", err);
+        out.textContent = "⚠️ Error contacting AI API (see console).";
       }
     }
 
     // Generate starfield
-    const starsContainer = document.getElementById("stars");
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement("div");
-      const size = Math.random() * 3 + 1;
-      star.classList.add("star");
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.animationDelay = `${Math.random() * 6}s`;
-      starsContainer.appendChild(star);
-    }
+    (function starfield(){
+      const c = document.getElementById("stars");
+      for(let i=0;i<80;i++){
+        const s = document.createElement("div");
+        s.className = "star";
+        const size = Math.random()*3 + 1;
+        s.style.width = s.style.height = size + "px";
+        s.style.top = (Math.random()*100) + "%";
+        s.style.left = (Math.random()*100) + "%";
+        s.style.animationDelay = (Math.random()*6) + "s";
+        c.appendChild(s);
+      }
+    })();
+
   </script>
 </body>
 </html>
