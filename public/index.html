@@ -97,6 +97,21 @@
       background: #1e293b;
       color: white;
     }
+
+    /* Bubble bottom-left */
+    .bubble {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(30, 41, 59, 0.85);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #f1f5f9;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 5;
+    }
   </style>
 </head>
 <body>
@@ -124,6 +139,9 @@
       <button onclick="cloakTab()">Cloak Tab</button>
     </div>
   </div>
+
+  <!-- Signature Bubble -->
+  <div class="bubble">made by Jacob Maddox</div>
 
   <script>
     // Fake location (replace with API if needed)
