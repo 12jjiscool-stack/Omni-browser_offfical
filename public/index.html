@@ -46,6 +46,15 @@
     .cloak-form input { padding:0.4rem; border-radius:0.4rem; border:none; }
     .cloak-form button { padding:0.4rem 0.8rem; background:#6b21a8; color:white; border:none; border-radius:0.4rem; cursor:pointer; }
 
+    .ai-section { margin:1rem 0; text-align:left; }
+    .ai-toggle { background:#9333ea; color:white; padding:0.5rem 1rem; border:none; border-radius:0.5rem; cursor:pointer; font-weight:bold; }
+    .ai-toggle:hover { opacity:0.9; }
+    .ai-container { margin-top:0.5rem; background:rgba(51,65,85,0.8); padding:1rem; border-radius:0.5rem; }
+    .ai-container textarea { width:100%; padding:0.5rem; border-radius:0.4rem; border:none; resize:vertical; margin-bottom:0.5rem; }
+    .ai-container button { background:#2563eb; color:white; padding:0.4rem 0.8rem; border:none; border-radius:0.4rem; cursor:pointer; }
+    .ai-container button:hover { opacity:0.9; }
+    .ai-response { margin-top:0.5rem; background:#1e293b; padding:0.5rem; border-radius:0.4rem; font-size:0.9rem; }
+
     .bubble { position:fixed; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.8rem; font-style:italic; }
 
     .edit-bg { position:fixed; bottom:10px; right:10px; background:#475569; padding:0.4rem 0.8rem; border-radius:0.5rem; font-size:0.8rem; cursor:pointer; }
@@ -71,6 +80,16 @@
       <div class="status">
         <span id="battery">🔋 --%</span>
         <span id="temperature">🌡️ --°C</span>
+      </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-section">
+      <button class="ai-toggle" onclick="toggleAI()">🤖 AI Assistant ▼</button>
+      <div class="ai-container" id="aiContainer" style="display:none;">
+        <textarea id="aiInput" placeholder="Ask me anything..." rows="3"></textarea>
+        <button onclick="askAI()">Ask</button>
+        <div class="ai-response" id="aiResponse">💬 Response will appear here...</div>
       </div>
     </div>
 
@@ -218,6 +237,30 @@
       }
     }
 
+    // AI Assistant
+    function toggleAI() {
+      const aiBox = document.getElementById("aiContainer");
+      aiBox.style.display = aiBox.style.display === "none" ? "block" : "none";
+    }
+
+    async function askAI() {
+      const input = document.getElementById("aiInput").value.trim();
+      const responseBox = document.getElementById("aiResponse");
+      if (!input) return;
+
+      responseBox.textContent = "🤔 Thinking...";
+
+      try {
+        // Placeholder AI response
+        setTimeout(() => {
+          responseBox.textContent = "✨ This is a demo response. Connect to an AI API to get real answers.";
+        }, 1000);
+      } catch (err) {
+        responseBox.textContent = "⚠️ Error fetching AI response.";
+        console.error(err);
+      }
+    }
+
     // Generate starfield
     const starsContainer = document.getElementById("stars");
     for (let i = 0; i < 80; i++) {
@@ -234,3 +277,4 @@
   </script>
 </body>
 </html>
+
