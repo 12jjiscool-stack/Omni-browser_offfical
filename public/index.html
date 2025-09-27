@@ -36,11 +36,13 @@
       border-radius: 0.7rem;
       position: relative;
     }
-    .search-row input {
+    .search-row input, .search-row select {
       padding: 0.6rem;
       border-radius: 0.4rem;
       border: none;
-      width: 260px;
+    }
+    .search-row input {
+      width: 220px;
     }
     .search-row button {
       background: #2563eb;
@@ -186,41 +188,9 @@
       cursor: pointer;
     }
     .edit-bg:hover { background: rgba(51,65,85,0.9); }
-    .music-player {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: rgba(0,0,0,0.6);
-      padding: 6px;
-      border-radius: 10px;
-      width: 260px;
-    }
-    .music-player button {
-      width: 100%;
-      margin-top: 5px;
-      background:#ff5500;
-      border:none;
-      border-radius:6px;
-      padding:6px;
-      cursor:pointer;
-      color:white;
-      font-weight:bold;
-    }
-    .music-player button:hover {
-      background:#e14a00;
-    }
   </style>
 </head>
 <body>
-  <!-- Embedded SoundCloud Player -->
-  <div class="music-player">
-    <iframe id="scPlayer" width="250" height="120" scrolling="no" frameborder="no" allow="autoplay"
-      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/gambino-2/childish-gambino-3005">
-    </iframe>
-    <button onclick="changeSong()">🎶 Change Song</button>
-  </div>
-
   <div class="overlay">
     <h1>Omni</h1>
 
@@ -232,8 +202,15 @@
         <a href="https://chat.openai.com/" target="_blank">🤖 ChatGPT</a>
       </div>
 
-      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
+      <input id="searchBox" type="text" placeholder="Search..." required />
+      <select id="engineSelect">
+        <option value="duckduckgo">DuckDuckGo</option>
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+        <option value="youtube">YouTube</option>
+      </select>
       <button onclick="searchQuery()">Search</button>
+
       <div class="status">
         <span id="battery">🔋 --%</span>
         <span id="temperature">🌡️ --°F</span>
@@ -262,10 +239,34 @@
       }
     };
 
-    // Search
+    // Multi-engine Search with remembered choice
+    const engineSelect = document.getElementById("engineSelect");
+
+    // Load saved engine on page load
+    window.addEventListener("load", () => {
+      const savedEngine = localStorage.getItem("defaultEngine");
+      if (savedEngine) {
+        engineSelect.value = savedEngine;
+      }
+    });
+
+    // Save selected engine
+    engineSelect.addEventListener("change", () => {
+      localStorage.setItem("defaultEngine", engineSelect.value);
+    });
+
     function searchQuery(){
       const q=document.getElementById("searchBox").value;
-      if(q) window.open("https://duckduckgo.com/?q="+encodeURIComponent(q),"_blank");
+      const engine=engineSelect.value;
+      if(!q) return;
+
+      let url="";
+      if(engine==="duckduckgo") url="https://duckduckgo.com/?q="+encodeURIComponent(q);
+      if(engine==="google") url="https://www.google.com/search?q="+encodeURIComponent(q);
+      if(engine==="bing") url="https://www.bing.com/search?q="+encodeURIComponent(q);
+      if(engine==="youtube") url="https://www.youtube.com/results?search_query="+encodeURIComponent(q);
+
+      window.open(url,"_blank");
     }
 
     // Battery
@@ -293,7 +294,7 @@
       }
     }
 
-    // Shortcuts with persistence + remove
+    // Shortcuts with persistence
     const shortcutsDiv=document.getElementById("shortcuts");
 
     window.onload = function() {
@@ -308,22 +309,8 @@
       const domain = (new URL(url)).hostname;
       el.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}" alt=""> ${name}`;
 
-      el.onclick = (e) => {
-        if (!e.target.classList.contains("remove-btn")) {
-          window.open(url, "_blank");
-        }
-      };
+      el.onclick = () => window.open(url, "_blank");
 
-      const removeBtn = document.createElement("button");
-      removeBtn.textContent = "✖";
-      removeBtn.className = "remove-btn";
-      removeBtn.onclick = (e) => {
-        e.stopPropagation();
-        el.remove();
-        removeShortcut(name, url);
-      };
-
-      el.appendChild(removeBtn);
       shortcutsDiv.appendChild(el);
     }
 
@@ -337,21 +324,7 @@
         localStorage.setItem("shortcuts", JSON.stringify(saved));
       }
     }
-
-    function removeShortcut(name, url) {
-      let saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
-      saved = saved.filter(sc => !(sc.name === name && sc.url === url));
-      localStorage.setItem("shortcuts", JSON.stringify(saved));
-    }
-
-    // Change Song
-    function changeSong(){
-      const url=prompt("Paste a SoundCloud track/playlist URL:");
-      if(url){
-        document.getElementById("scPlayer").src=
-          "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url);
-      }
-    }
   </script>
 </body>
 </html>
+
