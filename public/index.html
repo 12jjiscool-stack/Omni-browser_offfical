@@ -18,20 +18,17 @@
       color: #f1f5f9;
     }
 
-    /* Omni background */
     body {
       background: linear-gradient(270deg, #0f172a, #1e293b, #0f172a);
       background-size: 600% 600%;
       animation: gradientShift 30s ease infinite;
     }
-
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    /* Stars */
     .stars {
       position: fixed;
       width: 100%;
@@ -50,7 +47,6 @@
       50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* Card */
     .card {
       position: relative;
       z-index: 1;
@@ -67,7 +63,6 @@
     h1 { margin-bottom: 0.5rem; }
     p { margin: 0.25rem 0; }
 
-    /* Time bar */
     .time-bar {
       margin: 1rem 0;
       padding: 0.6rem;
@@ -77,30 +72,46 @@
       letter-spacing: 0.5px;
     }
 
-    /* Buttons and input */
-    button, input[type="text"] {
-      margin-top: 0.5rem;
+    .search-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .search-container input {
+      flex: 1;
       padding: 0.6rem 1rem;
       border-radius: 0.5rem;
-      border: none;
-      font-size: 1rem;
-    }
-    button {
-      background: #3b82f6;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover { background: #2563eb; }
-    input[type="text"] {
       border: 1px solid #475569;
       background: #1e293b;
       color: white;
     }
-
-    /* Shortcuts section */
-    .shortcuts {
-      margin-top: 1rem;
+    .search-container button {
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
     }
+    .search-container button:hover { background: #2563eb; }
+
+    /* Battery + Temp UI */
+    .status-box {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .badge {
+      background: rgba(59, 130, 246, 0.2);
+      padding: 4px 8px;
+      border-radius: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .shortcuts { margin-top: 1rem; }
     .shortcut {
       display: inline-block;
       margin: 5px;
@@ -112,11 +123,8 @@
       text-decoration: none;
       transition: background 0.2s;
     }
-    .shortcut:hover {
-      background: rgba(59, 130, 246, 0.4);
-    }
+    .shortcut:hover { background: rgba(59, 130, 246, 0.4); }
 
-    /* Bubble bottom-left */
     .bubble {
       position: fixed;
       bottom: 15px;
@@ -130,29 +138,65 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       z-index: 5;
     }
+
+    /* Edit background button */
+    .edit-bg-btn {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .edit-bg-panel {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      right: 15px;
+      background: rgba(30,41,59,0.95);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      z-index: 6;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .edit-bg-panel input {
+      width: 100%;
+      margin: 0.25rem 0;
+      padding: 0.4rem;
+      border-radius: 0.3rem;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <!-- Stars -->
   <div class="stars" id="stars"></div>
 
-  <!-- Main Card -->
   <div class="card">
-    <h1>Omni Portal</h1>
+    <h1>Omni-search</h1>
     <p id="location">📍 City, State</p>
 
-    <!-- Time bar -->
     <div class="time-bar" id="timeBar">--:--:--</div>
 
-    <!-- DuckDuckGo Search -->
-    <form id="searchForm" target="_blank">
-      <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required style="width:70%;" />
-      <button type="submit">Search</button>
-    </form>
+    <!-- Search + Status UI -->
+    <div class="search-container">
+      <form id="searchForm" target="_blank" style="flex:1; display:flex; gap:0.5rem;">
+        <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
+        <button type="submit">Search</button>
+      </form>
+      <div class="status-box">
+        <div class="badge" id="battery">🔋 --%</div>
+        <div class="badge" id="temp">🌡️ --°C</div>
+      </div>
+    </div>
 
-    <!-- Shortcuts Section -->
+    <!-- Shortcuts -->
     <div class="shortcuts" id="shortcuts"></div>
-
     <form id="shortcutForm">
       <input id="shortcutName" type="text" placeholder="Shortcut Name" required />
       <input id="shortcutUrl" type="text" placeholder="https://example.com" required />
@@ -167,14 +211,19 @@
     </div>
   </div>
 
-  <!-- Signature Bubble -->
+  <!-- Signature + Edit Background -->
   <div class="bubble">made by Jacob Maddox</div>
+  <button class="edit-bg-btn" onclick="toggleBgPanel()">Edit Background</button>
+
+  <div class="edit-bg-panel" id="editBgPanel">
+    <input id="bgColor" type="text" placeholder="Color or gradient (e.g. red or linear-gradient(...))" />
+    <input id="bgImage" type="text" placeholder="Image URL (optional)" />
+    <button onclick="applyBackground()">Apply</button>
+  </div>
 
   <script>
-    // Fake location (replace with API if needed)
     document.getElementById("location").textContent = "📍 New York, NY";
 
-    // Live Time Bar
     function updateTime() {
       const now = new Date();
       document.getElementById("timeBar").textContent = now.toLocaleTimeString();
@@ -182,7 +231,6 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // DuckDuckGo Search
     const searchForm = document.getElementById("searchForm");
     const searchBox = document.getElementById("searchBox");
     searchForm.addEventListener("submit", (e) => {
@@ -191,21 +239,16 @@
       if (query) window.open(`https://duckduckgo.com/?q=${query}`, "_blank");
     });
 
-    // Tab Cloaker
     function cloakTab() {
       const title = document.getElementById("cloakTitle").value.trim();
       const iconUrl = document.getElementById("cloakIcon").value.trim();
       if (title) document.title = title;
-      if (iconUrl) {
-        const favicon = document.getElementById("favicon");
-        favicon.href = iconUrl;
-      }
+      if (iconUrl) document.getElementById("favicon").href = iconUrl;
     }
 
     // Shortcuts
     const shortcutsEl = document.getElementById("shortcuts");
     const shortcutForm = document.getElementById("shortcutForm");
-
     function loadShortcuts() {
       shortcutsEl.innerHTML = "";
       const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
@@ -218,7 +261,6 @@
         shortcutsEl.appendChild(link);
       });
     }
-
     shortcutForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const name = document.getElementById("shortcutName").value.trim();
@@ -231,10 +273,45 @@
         shortcutForm.reset();
       }
     });
-
     loadShortcuts();
 
-    // Generate starfield
+    // Battery
+    if (navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        function updateBattery() {
+          document.getElementById("battery").textContent = "🔋 " + Math.round(battery.level * 100) + "%";
+        }
+        updateBattery();
+        battery.addEventListener("levelchange", updateBattery);
+      });
+    }
+
+    // Temperature (placeholder)
+    document.getElementById("temp").textContent = "🌡️ 22°C";
+
+    // Background Editor
+    const editPanel = document.getElementById("editBgPanel");
+    function toggleBgPanel() {
+      editPanel.style.display = editPanel.style.display === "block" ? "none" : "block";
+    }
+    function applyBackground() {
+      const color = document.getElementById("bgColor").value.trim();
+      const image = document.getElementById("bgImage").value.trim();
+      let bgStyle = "";
+      if (image) {
+        bgStyle = `url(${image}) center/cover no-repeat`;
+      } else if (color) {
+        bgStyle = color;
+      }
+      if (bgStyle) {
+        document.body.style.background = bgStyle;
+        localStorage.setItem("customBg", bgStyle);
+      }
+    }
+    const savedBg = localStorage.getItem("customBg");
+    if (savedBg) document.body.style.background = savedBg;
+
+    // Stars
     const starsContainer = document.getElementById("stars");
     for (let i = 0; i < 80; i++) {
       const star = document.createElement("div");
