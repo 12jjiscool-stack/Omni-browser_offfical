@@ -64,7 +64,7 @@
       border: none; border-radius: 8px; color: white; cursor: pointer;
     }
     .edit-bg:hover { background: rgba(51,65,85,0.9); }
-    /* Music Player (embedded) */
+    /* Music Player */
     .music-player {
       position: fixed;
       top: 10px;
@@ -73,15 +73,31 @@
       background: rgba(0,0,0,0.6);
       padding: 6px;
       border-radius: 10px;
+      width: 260px;
+    }
+    .music-player button {
+      width: 100%;
+      margin-top: 5px;
+      background:#ff5500;
+      border:none;
+      border-radius:6px;
+      padding:6px;
+      cursor:pointer;
+      color:white;
+      font-weight:bold;
+    }
+    .music-player button:hover {
+      background:#e14a00;
     }
   </style>
 </head>
 <body>
   <!-- Embedded SoundCloud Player -->
   <div class="music-player">
-    <iframe width="250" height="120" scrolling="no" frameborder="no" allow="autoplay"
-      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/forss/flickermood">
+    <iframe id="scPlayer" width="250" height="120" scrolling="no" frameborder="no" allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/gambino-2/childish-gambino-3005">
     </iframe>
+    <button onclick="changeSong()">🎶 Change Song</button>
   </div>
 
   <div class="overlay">
@@ -150,7 +166,15 @@
         shortcutsDiv.appendChild(el);
       }
     }
+
+    // Change Song
+    function changeSong(){
+      const url=prompt("Paste a SoundCloud track/playlist URL:");
+      if(url){
+        document.getElementById("scPlayer").src=
+          "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url);
+      }
+    }
   </script>
 </body>
 </html>
-
