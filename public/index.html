@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Omni</title>
-  <!-- Custom Omni Favicon -->
-  <link id="favicon" rel="icon" type="image/png" 
-  href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iI2VhNDMzNSIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgZm9udC1zaXplPSIxMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk9tbmk8L3RleHQ+PC9zdmc+" />
   <style>
     body {
       margin: 0;
@@ -24,6 +21,10 @@
       justify-content: center;
       text-align: center;
       padding: 1rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
     }
     .search-row {
       display: flex;
@@ -48,95 +49,44 @@
       padding: 0.6rem 1rem;
       cursor: pointer;
     }
-    .search-row button:hover { opacity: 0.9; }
-    .gmail-btn {
-      background: #ea4335 !important;
-    }
-    .status {
-      margin-left: auto;
-      display: flex;
-      gap: 0.7rem;
-    }
-    .shortcuts {
-      display: flex;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-      margin-top: 0.8rem;
-      justify-content: center;
-    }
-    .shortcut {
-      background: rgba(51,65,85,0.8);
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-    }
+    .gmail-btn { background: #ea4335 !important; }
+    .status { margin-left: auto; display: flex; gap: 0.7rem; }
+    .shortcuts { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.8rem; justify-content: center; }
+    .shortcut { background: rgba(51,65,85,0.8); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
     .shortcut:hover { background: rgba(71,85,105,0.9); }
     .ai-section { margin:1rem 0; width:100%; max-width:500px; }
     .ai-toggle {
-      display:block;
-      width:100%;
-      background:#7e22ce;
-      color:white;
-      padding:0.9rem 1rem;
-      border:none;
-      border-radius:0.6rem;
-      font-size:1rem;
-      font-weight:600;
-      cursor:pointer;
-      transition:background 0.2s ease;
-      text-align:center;
+      display:block; width:100%; background:#7e22ce; color:white;
+      padding:0.9rem 1rem; border:none; border-radius:0.6rem;
+      font-size:1rem; font-weight:600; cursor:pointer;
+      transition:background 0.2s ease; text-align:center;
     }
     .ai-toggle:hover { background:#9333ea; }
     .ai-container {
-      margin-top:0.5rem;
-      background:rgba(51,65,85,0.8);
-      padding:1rem;
-      border-radius:0.5rem;
+      margin-top:0.5rem; background:rgba(51,65,85,0.8);
+      padding:1rem; border-radius:0.5rem;
     }
     .ai-container textarea {
-      width:100%;
-      padding:0.6rem;
-      border-radius:0.4rem;
-      border:none;
-      resize:vertical;
-      margin-bottom:0.5rem;
+      width:100%; padding:0.6rem; border-radius:0.4rem;
+      border:none; resize:vertical; margin-bottom:0.5rem;
     }
     .ai-container button {
-      background:#2563eb;
-      color:white;
-      padding:0.5rem 0.9rem;
-      border:none;
-      border-radius:0.4rem;
-      cursor:pointer;
+      background:#2563eb; color:white; padding:0.5rem 0.9rem;
+      border:none; border-radius:0.4rem; cursor:pointer;
     }
     .ai-container button:hover { opacity:0.9; }
     .ai-response {
-      margin-top:0.5rem;
-      background:#1e293b;
-      padding:0.6rem;
-      border-radius:0.4rem;
-      font-size:0.9rem;
-      text-align:left;
+      margin-top:0.5rem; background:#1e293b; padding:0.6rem;
+      border-radius:0.4rem; font-size:0.9rem; text-align:left;
     }
     .bubble {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      font-style: italic;
-      background: rgba(0,0,0,0.5);
-      padding: 5px 10px;
-      border-radius: 8px;
+      position: fixed; bottom: 10px; left: 10px; font-style: italic;
+      background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 8px;
     }
     .edit-bg {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      padding: 6px 12px;
-      background: rgba(30,41,59,0.8);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
+      position: fixed; bottom: 10px; right: 10px;
+      padding: 6px 12px; background: rgba(30,41,59,0.8);
+      border: none; border-radius: 8px; color: white; cursor: pointer;
     }
     .edit-bg:hover { background: rgba(51,65,85,0.9); }
     /* Music Player */
@@ -145,26 +95,39 @@
       top: 10px;
       left: 10px;
       z-index: 1000;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.6);
+      padding: 8px;
+      border-radius: 10px;
+    }
+    .music-player input {
+      width: 180px;
+      padding: 4px;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 5px;
+    }
+    .music-player button {
+      background:#ff5500; color:white;
+      border:none; border-radius:6px;
+      padding:4px 8px; cursor:pointer;
     }
   </style>
 </head>
 <body>
-  <!-- Music Player (SoundCloud Embed) -->
+  <!-- Music Player (SoundCloud Embed with Search) -->
   <div class="music-player">
-    <iframe 
-      width="250" 
-      height="120" 
-      scrolling="no" 
-      frameborder="no" 
-      allow="autoplay" 
-      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/forss/flickermood&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true">
+    <input id="scSearch" type="text" placeholder="Search SoundCloud...">
+    <button onclick="searchSC()">Search</button>
+    <iframe id="scPlayer" 
+      width="250" height="120"
+      scrolling="no" frameborder="no" allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/forss/flickermood">
     </iframe>
   </div>
 
   <div class="overlay">
+    <h1>Omni</h1>
+
     <div class="search-row">
       <button class="gmail-btn" onclick="openGmail()">📧 Gmail</button>
       <input id="searchBox" type="text" placeholder="Search with DuckDuckGo..." required />
@@ -175,11 +138,9 @@
       </div>
     </div>
 
-    <!-- Shortcuts -->
     <div class="shortcuts" id="shortcuts"></div>
     <button onclick="addShortcut()">➕ Add Shortcut</button>
 
-    <!-- AI Assistant -->
     <div class="ai-section">
       <button class="ai-toggle" onclick="toggleAI()">🤖 Open AI Assistant</button>
       <div class="ai-container" id="aiContainer" style="display:none;">
@@ -194,96 +155,98 @@
   <button class="edit-bg" onclick="editBackground()">Edit Background</button>
 
   <script>
-    // Gmail button
-    function openGmail() {
-      window.open("https://mail.google.com/", "_blank");
-    }
+    // Gmail
+    function openGmail(){ window.open("https://mail.google.com/","_blank"); }
 
     // Search
-    function searchQuery() {
-      const query = document.getElementById("searchBox").value;
-      if(query) window.open("https://duckduckgo.com/?q=" + encodeURIComponent(query), "_blank");
+    function searchQuery(){
+      const q=document.getElementById("searchBox").value;
+      if(q) window.open("https://duckduckgo.com/?q="+encodeURIComponent(q),"_blank");
     }
 
-    // Battery status
-    navigator.getBattery?.().then(battery => {
-      function updateBattery() {
-        document.getElementById("battery").textContent = "🔋 " + Math.round(battery.level * 100) + "%";
-      }
-      updateBattery();
-      battery.addEventListener("levelchange", updateBattery);
+    // Battery
+    navigator.getBattery?.().then(b=>{
+      function update(){ document.getElementById("battery").textContent="🔋 "+Math.round(b.level*100)+"%"; }
+      update(); b.addEventListener("levelchange",update);
     });
 
-    // Weather (temperature & location)
-    async function fetchWeather() {
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const loc = await res.json();
-        const city = loc.city;
-        const region = loc.region;
-        const weatherRes = await fetch(`https://wttr.in/${city}?format=%t`);
-        const temp = await weatherRes.text();
-        document.getElementById("temperature").textContent = `${city}, ${region} 🌡️ ${temp}`;
-      } catch (e) {
-        document.getElementById("temperature").textContent = "🌡️ N/A";
-      }
-    }
-    fetchWeather();
+    // Weather
+    async function fetchWeather(){
+      try{
+        const loc=await fetch("https://ipapi.co/json/").then(r=>r.json());
+        const city=loc.city, region=loc.region;
+        const temp=await fetch(`https://wttr.in/${city}?format=%t`).then(r=>r.text());
+        document.getElementById("temperature").textContent=`${city}, ${region} 🌡️ ${temp}`;
+      }catch{ document.getElementById("temperature").textContent="🌡️ N/A"; }
+    } fetchWeather();
 
     // Background editor
-    function editBackground() {
-      const url = prompt("Enter image URL for background:");
-      if (url) {
-        document.body.style.background = `url('${url}') no-repeat center center fixed`;
-        document.body.style.backgroundSize = "cover";
+    function editBackground(){
+      const url=prompt("Enter image URL for background:");
+      if(url){
+        document.body.style.background=`url('${url}') no-repeat center center fixed`;
+        document.body.style.backgroundSize="cover";
       }
     }
 
     // Shortcuts
-    const shortcutsDiv = document.getElementById("shortcuts");
-    function addShortcut() {
-      const name = prompt("Shortcut name:");
-      const url = prompt("Shortcut URL:");
-      if(name && url) {
-        const el = document.createElement("div");
-        el.className = "shortcut";
-        el.textContent = name;
-        el.onclick = () => window.open(url, "_blank");
+    const shortcutsDiv=document.getElementById("shortcuts");
+    function addShortcut(){
+      const name=prompt("Shortcut name:"), url=prompt("Shortcut URL:");
+      if(name&&url){
+        const el=document.createElement("div");
+        el.className="shortcut"; el.textContent=name;
+        el.onclick=()=>window.open(url,"_blank");
         shortcutsDiv.appendChild(el);
       }
     }
 
     // AI Assistant
-    function toggleAI() {
-      const aiBox = document.getElementById("aiContainer");
-      aiBox.style.display = aiBox.style.display === "none" ? "block" : "none";
+    function toggleAI(){
+      const ai=document.getElementById("aiContainer");
+      ai.style.display=ai.style.display==="none"?"block":"none";
     }
-
-    async function askAI() {
-      const input = document.getElementById("aiInput").value.trim();
-      const responseBox = document.getElementById("aiResponse");
-      if (!input) return;
-      responseBox.textContent = "🤔 Thinking...";
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer YOUR_API_KEY_HERE"
+    async function askAI(){
+      const input=document.getElementById("aiInput").value.trim();
+      const out=document.getElementById("aiResponse");
+      if(!input) return; out.textContent="🤔 Thinking...";
+      try{
+        const res=await fetch("https://api.openai.com/v1/chat/completions",{
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "Authorization":"Bearer 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"
           },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: input }]
+          body:JSON.stringify({
+            model:"gpt-4o-mini",
+            messages:[{role:"user",content:input}]
           })
         });
-        const data = await res.json();
-        responseBox.textContent = data.choices?.[0]?.message?.content || "⚠️ No response.";
-      } catch (err) {
-        responseBox.textContent = "⚠️ Error fetching AI response.";
+        const data=await res.json();
+        out.textContent=data.choices?.[0]?.message?.content||"⚠️ No response.";
+      }catch(err){
+        out.textContent="⚠️ Error fetching AI response.";
         console.error(err);
+      }
+    }
+
+    // SoundCloud Search
+    async function searchSC(){
+      const q=document.getElementById("scSearch").value.trim();
+      if(!q) return;
+      try{
+        const res=await fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&client_id=YOUR_CLIENT_ID_HERE`);
+        const data=await res.json();
+        if(data.collection&&data.collection.length>0){
+          const track=data.collection[0];
+          document.getElementById("scPlayer").src=`https://w.soundcloud.com/player/?url=${encodeURIComponent(track.permalink_url)}`;
+        }else alert("No results found.");
+      }catch(e){
+        console.error(e); alert("SoundCloud search failed.");
       }
     }
   </script>
 </body>
 </html>
+
 
