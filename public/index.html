@@ -13,8 +13,8 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #111, #222);
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
       color: white;
       display: flex;
       flex-direction: column;
@@ -22,48 +22,57 @@
       min-height: 100vh;
     }
     h1 {
-      margin-top: 30px;
+      margin-top: 40px;
       font-size: 3rem;
+      letter-spacing: 2px;
     }
     p.description {
       font-style: italic;
-      margin-top: -10px;
+      margin-top: -8px;
       margin-bottom: 30px;
       opacity: 0.8;
     }
+    /* 🔍 Search bar */
     .search-bar {
       display: flex;
       align-items: center;
-      gap: 8px;
-      width: 600px;
-      max-width: 90%;
-      margin-bottom: 20px;
+      gap: 10px;
+      width: 650px;
+      max-width: 95%;
+      margin-bottom: 25px;
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
-    .search-bar select, .search-bar input, .search-bar button {
-      padding: 10px;
-      border-radius: 6px;
+    .search-bar select, 
+    .search-bar input, 
+    .search-bar button {
+      padding: 12px;
+      border-radius: 8px;
       border: none;
+    }
+    .search-bar select {
+      background: #222;
+      color: white;
     }
     .search-bar input {
       flex: 1;
-    }
-    .shortcuts {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .shortcuts button {
-      padding: 12px 24px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      border: none;
+      font-size: 1rem;
+      background: #111;
       color: white;
+    }
+    .search-bar button {
+      background: #e50914;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: 0.2s;
     }
-    .shortcuts button:hover {
-      background: rgba(255,255,255,0.2);
+    .search-bar button:hover {
+      background: #ff1e28;
     }
+    /* ⏬ Dropdown */
     .dropdown {
       position: relative;
       display: inline-block;
@@ -71,33 +80,33 @@
     .dropbtn {
       padding: 12px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
       border: none;
       color: white;
       cursor: pointer;
       font-size: 20px;
-      transition: background 0.2s;
+      transition: 0.2s;
     }
     .dropbtn:hover {
-      background: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.2);
     }
     .dropdown-content {
       display: none;
       position: absolute;
       top: 50px;
       right: 0;
-      background: #333;
-      border-radius: 8px;
-      min-width: 180px;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
+      background: #222;
+      border-radius: 12px;
+      min-width: 200px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
       z-index: 1;
     }
     .dropdown-content a {
       color: white;
-      padding: 12px 16px;
+      padding: 14px 18px;
       text-decoration: none;
       display: block;
-      transition: background 0.2s;
+      transition: 0.2s;
     }
     .dropdown-content a:hover {
       background: rgba(255,255,255,0.1);
@@ -105,8 +114,31 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
+    /* Shortcuts */
+    .shortcuts {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .shortcuts button {
+      padding: 14px 28px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    }
+    .shortcuts button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    /* Proxy iframe */
     #proxyContainer {
-      width: 90%;
+      width: 92%;
       height: 70vh;
       margin-top: 20px;
       display: none;
@@ -115,27 +147,28 @@
       width: 100%;
       height: 100%;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-    /* Bubble credit */
-    .credit-bubble {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      font-style: italic;
-      font-size: 14px;
-      opacity: 0.7;
-    }
-    /* Music player */
+    /* 🎵 Music player */
     .music-player {
       position: fixed;
-      top: 10px;
-      left: 10px;
+      top: 15px;
+      left: 15px;
       width: 300px;
       height: 180px;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+    /* 👤 Credit bubble */
+    .credit-bubble {
+      position: fixed;
+      bottom: 12px;
+      left: 14px;
+      font-style: italic;
+      font-size: 14px;
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -163,7 +196,7 @@
     </div>
   </div>
 
-  <!-- Shortcuts -->
+  <!-- ⌨️ Shortcuts -->
   <div class="shortcuts">
     <button onclick="openShortcut('https://openai.com')">OpenAI</button>
     <button onclick="openShortcut('https://github.com')">GitHub</button>
@@ -171,12 +204,12 @@
     <button onclick="addShortcut()">+ Add Shortcut</button>
   </div>
 
-  <!-- Proxy iframe -->
+  <!-- 🌐 Proxy iframe -->
   <div id="proxyContainer">
     <iframe id="proxyFrame"></iframe>
   </div>
 
-  <!-- Music Player -->
+  <!-- 🎵 Music Player -->
   <div class="music-player">
     <iframe 
       width="100%" 
@@ -184,11 +217,11 @@
       scrolling="no" 
       frameborder="no" 
       allow="autoplay" 
-      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/childish-gambino/3005&color=%23ff5500&inverse=false&auto_play=false&show_user=true">
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/childish-gambino/3005&color=%23e50914&inverse=false&auto_play=false&show_user=true">
     </iframe>
   </div>
 
-  <!-- Credit -->
+  <!-- 👤 Credit -->
   <div class="credit-bubble">made by Jacob Maddox</div>
 
   <script>
@@ -198,7 +231,7 @@
       if (!query) return;
       const url = engine + encodeURIComponent(query);
 
-      // Proxy view inside iframe
+      // Proxy inside iframe
       document.getElementById("proxyContainer").style.display = "block";
       document.getElementById("proxyFrame").src = "/proxy/" + encodeURIComponent(url);
     }
@@ -221,3 +254,4 @@
   </script>
 </body>
 </html>
+
