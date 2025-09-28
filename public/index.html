@@ -1,330 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Omni</title>
+
+  <!-- ✅ Favicons -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #111, #222);
       color: white;
-      background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
-      background-size: cover;
-    }
-    .overlay {
-      background: rgba(0,0,0,0.55);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 1rem;
+      min-height: 100vh;
     }
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      margin-top: 30px;
+      font-size: 3rem;
     }
-    .search-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      background: rgba(30,41,59,0.8);
-      padding: 0.7rem;
-      border-radius: 0.7rem;
-      position: relative;
+    p.description {
+      font-style: italic;
+      margin-top: -10px;
+      margin-bottom: 30px;
+      opacity: 0.8;
     }
-    .search-row input, .search-row select {
-      padding: 0.6rem;
-      border-radius: 0.4rem;
-      border: none;
-    }
-    .search-row input {
-      width: 220px;
-    }
-    .search-row button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 0.4rem;
-      padding: 0.6rem 1rem;
-      cursor: pointer;
-    }
-    .menu-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s;
-    }
-    .menu-btn:hover {
-      background: rgba(255,255,255,0.25);
-    }
-    .dropdown {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 50px;
-      left: 0;
-      background: rgba(30,41,59,0.95);
-      border-radius: 8px;
-      min-width: 200px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      opacity: 0;
-      transform: translateY(-10px);
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      z-index: 1000;
-    }
-    .dropdown.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-    .dropdown a {
-      padding: 10px 14px;
-      color: white;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: background 0.2s;
-      font-size: 15px;
-    }
-    .dropdown a:hover {
-      background: rgba(71,85,105,0.9);
-    }
-    .status {
-      margin-left: auto;
-      display: flex;
-      gap: 0.7rem;
-    }
-    .shortcuts {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.2rem;
-      max-width: 600px;
-    }
-    .shortcut {
-      background: rgba(255,255,255,0.1);
-      padding: 0.6rem 1.2rem;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
+    .search-bar {
       display: flex;
       align-items: center;
       gap: 8px;
+      width: 600px;
+      max-width: 90%;
+      margin-bottom: 20px;
     }
-    .shortcut img {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-    }
-    .shortcut:hover {
-      background: rgba(255,255,255,0.25);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
-    .remove-btn {
-      margin-left: auto;
-      background: transparent;
+    .search-bar select, .search-bar input, .search-bar button {
+      padding: 10px;
+      border-radius: 6px;
       border: none;
-      color: #ff6b6b;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.2s;
     }
-    .remove-btn:hover {
-      transform: scale(1.2);
+    .search-bar input {
+      flex: 1;
     }
-    .add-shortcut-btn {
-      margin-top: 1.5rem;
-      background: rgba(37,99,235,0.9);
-      padding: 0.7rem 1.4rem;
-      border-radius: 25px;
+    .shortcuts {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .shortcuts button {
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
       border: none;
-      cursor: pointer;
       color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    .add-shortcut-btn:hover {
-      background: rgba(59,130,246,1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    .shortcuts button:hover {
+      background: rgba(255,255,255,0.2);
     }
-    .bubble {
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      padding: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      transition: background 0.2s;
+    }
+    .dropbtn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: #333;
+      border-radius: 8px;
+      min-width: 180px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background 0.2s;
+    }
+    .dropdown-content a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    #proxyContainer {
+      width: 90%;
+      height: 70vh;
+      margin-top: 20px;
+      display: none;
+    }
+    #proxyFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+    }
+    /* Bubble credit */
+    .credit-bubble {
       position: fixed;
       bottom: 10px;
       left: 10px;
       font-style: italic;
-      background: rgba(0,0,0,0.5);
-      padding: 5px 10px;
-      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0.7;
     }
-    .edit-bg {
+    /* Music player */
+    .music-player {
       position: fixed;
-      bottom: 10px;
-      right: 10px;
-      padding: 6px 12px;
-      background: rgba(30,41,59,0.8);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
+      top: 10px;
+      left: 10px;
+      width: 300px;
+      height: 180px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    .edit-bg:hover { background: rgba(51,65,85,0.9); }
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <h1>Omni</h1>
+  <h1>Omni</h1>
+  <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
 
-    <div class="search-row">
-      <button class="menu-btn" onclick="toggleDropdown()">⋮</button>
-      <div class="dropdown" id="dropdownMenu">
-        <a href="https://mail.google.com/" target="_blank">📧 Gmail</a>
-        <a href="https://youtube.com/" target="_blank">▶️ YouTube</a>
-        <a href="https://chat.openai.com/" target="_blank">🤖 ChatGPT</a>
-      </div>
-
-      <input id="searchBox" type="text" placeholder="Search..." required />
-      <select id="engineSelect">
-        <option value="duckduckgo">DuckDuckGo</option>
-        <option value="google">Google</option>
-        <option value="bing">Bing</option>
-        <option value="youtube">YouTube</option>
-      </select>
-      <button onclick="searchQuery()">Search</button>
-
-      <div class="status">
-        <span id="battery">🔋 --%</span>
-        <span id="temperature">🌡️ --°F</span>
+  <!-- 🔍 Search bar -->
+  <div class="search-bar">
+    <select id="engine">
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://search.brave.com/search?q=">Brave</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="doSearch()">Search</button>
+    <div class="dropdown">
+      <button class="dropbtn">⋮</button>
+      <div class="dropdown-content">
+        <a href="https://mail.google.com" target="_blank">Gmail</a>
+        <a href="https://youtube.com" target="_blank">YouTube</a>
+        <a href="https://chat.openai.com" target="_blank">ChatGPT</a>
       </div>
     </div>
-
-    <div class="shortcuts" id="shortcuts"></div>
-    <button class="add-shortcut-btn" onclick="addShortcut()">➕ Add Shortcut</button>
   </div>
 
-  <div class="bubble">Made by Jacob Maddox</div>
-  <button class="edit-bg" onclick="editBackground()">Edit Background</button>
+  <!-- Shortcuts -->
+  <div class="shortcuts">
+    <button onclick="openShortcut('https://openai.com')">OpenAI</button>
+    <button onclick="openShortcut('https://github.com')">GitHub</button>
+    <button onclick="openShortcut('https://soundcloud.com')">SoundCloud</button>
+    <button onclick="addShortcut()">+ Add Shortcut</button>
+  </div>
+
+  <!-- Proxy iframe -->
+  <div id="proxyContainer">
+    <iframe id="proxyFrame"></iframe>
+  </div>
+
+  <!-- Music Player -->
+  <div class="music-player">
+    <iframe 
+      width="100%" 
+      height="100%" 
+      scrolling="no" 
+      frameborder="no" 
+      allow="autoplay" 
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/childish-gambino/3005&color=%23ff5500&inverse=false&auto_play=false&show_user=true">
+    </iframe>
+  </div>
+
+  <!-- Credit -->
+  <div class="credit-bubble">made by Jacob Maddox</div>
 
   <script>
-    // Dropdown
-    function toggleDropdown(){
-      const menu = document.getElementById("dropdownMenu");
-      menu.classList.toggle("show");
-    }
-    window.onclick = function(e){
-      if (!e.target.matches('.menu-btn')) {
-        const menu = document.getElementById("dropdownMenu");
-        if (menu.classList.contains("show")) {
-          menu.classList.remove("show");
-        }
-      }
-    };
+    function doSearch() {
+      const engine = document.getElementById("engine").value;
+      const query = document.getElementById("searchInput").value;
+      if (!query) return;
+      const url = engine + encodeURIComponent(query);
 
-    // Multi-engine Search with remembered choice
-    const engineSelect = document.getElementById("engineSelect");
-
-    // Load saved engine on page load
-    window.addEventListener("load", () => {
-      const savedEngine = localStorage.getItem("defaultEngine");
-      if (savedEngine) {
-        engineSelect.value = savedEngine;
-      }
-    });
-
-    // Save selected engine
-    engineSelect.addEventListener("change", () => {
-      localStorage.setItem("defaultEngine", engineSelect.value);
-    });
-
-    function searchQuery(){
-      const q=document.getElementById("searchBox").value;
-      const engine=engineSelect.value;
-      if(!q) return;
-
-      let url="";
-      if(engine==="duckduckgo") url="https://duckduckgo.com/?q="+encodeURIComponent(q);
-      if(engine==="google") url="https://www.google.com/search?q="+encodeURIComponent(q);
-      if(engine==="bing") url="https://www.bing.com/search?q="+encodeURIComponent(q);
-      if(engine==="youtube") url="https://www.youtube.com/results?search_query="+encodeURIComponent(q);
-
-      window.open(url,"_blank");
+      // Proxy view inside iframe
+      document.getElementById("proxyContainer").style.display = "block";
+      document.getElementById("proxyFrame").src = "/proxy/" + encodeURIComponent(url);
     }
 
-    // Battery
-    navigator.getBattery?.().then(b=>{
-      function update(){ document.getElementById("battery").textContent="🔋 "+Math.round(b.level*100)+"%"; }
-      update(); b.addEventListener("levelchange",update);
-    });
-
-    // Weather in Fahrenheit
-    async function fetchWeather(){
-      try{
-        const loc=await fetch("https://ipapi.co/json/").then(r=>r.json());
-        const city=loc.city, region=loc.region;
-        const temp=await fetch(`https://wttr.in/${city}?format=%t&u`).then(r=>r.text());
-        document.getElementById("temperature").textContent=`${city}, ${region} 🌡️ ${temp}`;
-      }catch{ document.getElementById("temperature").textContent="🌡️ N/A"; }
-    } fetchWeather();
-
-    // Background editor
-    function editBackground(){
-      const url=prompt("Enter image URL for background:");
-      if(url){
-        document.body.style.background=`url('${url}') no-repeat center center fixed`;
-        document.body.style.backgroundSize="cover";
-      }
-    }
-
-    // Shortcuts with persistence
-    const shortcutsDiv=document.getElementById("shortcuts");
-
-    window.onload = function() {
-      const saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
-      saved.forEach(sc => renderShortcut(sc.name, sc.url));
-    };
-
-    function renderShortcut(name, url) {
-      const el = document.createElement("div");
-      el.className = "shortcut";
-
-      const domain = (new URL(url)).hostname;
-      el.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${domain}" alt=""> ${name}`;
-
-      el.onclick = () => window.open(url, "_blank");
-
-      shortcutsDiv.appendChild(el);
+    function openShortcut(url) {
+      document.getElementById("proxyContainer").style.display = "block";
+      document.getElementById("proxyFrame").src = "/proxy/" + encodeURIComponent(url);
     }
 
     function addShortcut() {
-      const name = prompt("Shortcut name:");
-      const url = prompt("Shortcut URL:");
-      if (name && url) {
-        renderShortcut(name, url);
-        const saved = JSON.parse(localStorage.getItem("shortcuts")) || [];
-        saved.push({ name, url });
-        localStorage.setItem("shortcuts", JSON.stringify(saved));
+      const url = prompt("Enter shortcut URL:");
+      const name = prompt("Enter shortcut name:");
+      if (url && name) {
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.onclick = () => openShortcut(url);
+        document.querySelector(".shortcuts").insertBefore(btn, document.querySelector(".shortcuts").lastElementChild);
       }
     }
   </script>
 </body>
 </html>
-
