@@ -34,8 +34,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 600px;
-      max-width: 90%;
+      width: 650px;
+      max-width: 95%;
       margin-bottom: 20px;
     }
     .search-bar select, .search-bar input, .search-bar button {
@@ -46,7 +46,7 @@
     .search-bar input {
       flex: 1;
     }
-    .menu-button {
+    .menu-button, .dice-button {
       font-size: 1.2rem;
       background: rgba(255,255,255,0.15);
       border: none;
@@ -54,12 +54,16 @@
       padding: 8px 14px;
       color: white;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+    .menu-button:hover, .dice-button:hover {
+      background: rgba(255,255,255,0.3);
     }
     .sidebar {
       position: fixed;
       top: 0;
-      left: -260px;
-      width: 260px;
+      left: -270px;
+      width: 270px;
       height: 100%;
       background: #1c1c1c;
       padding: 20px;
@@ -75,14 +79,19 @@
     .sidebar button {
       display: block;
       width: 100%;
-      margin: 8px 0;
-      padding: 10px;
+      margin: 10px 0;
+      padding: 12px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background: #333;
       color: white;
       text-align: left;
       cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .sidebar button:hover {
+      background: #444;
     }
     .shortcuts {
       margin: 20px 0;
@@ -147,6 +156,10 @@
       font-weight: bold;
       margin-top: auto;
     }
+    .dropdown {
+      display: none;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -161,6 +174,7 @@
     </select>
     <input type="text" id="query" placeholder="Search the web..." />
     <button onclick="search()">Search</button>
+    <button class="dice-button" onclick="rollDice()">🎲</button>
     <button class="menu-button" onclick="toggleMenu()">☰</button>
   </div>
 
@@ -184,8 +198,8 @@
   <div class="news-controls">
     <label for="news-source">News Source:</label>
     <select id="news-source" onchange="loadNews()">
+      <option value="http://rss.cnn.com/rss/edition.rss" selected>CNN</option>
       <option value="https://feeds.bbci.co.uk/news/rss.xml">BBC</option>
-      <option value="http://rss.cnn.com/rss/edition.rss">CNN(trusted)</option>
       <option value="http://feeds.reuters.com/reuters/topNews">Reuters</option>
     </select>
   </div>
@@ -198,13 +212,16 @@
     <h2>Menu</h2>
     <button onclick="alert('Sign in coming soon!')">Sign In</button>
     <button onclick="toggleSettings()">Settings ▼</button>
-    <div id="settings-menu" style="display:none; margin-left:10px;">
-      <button onclick="document.getElementById('news-feed').style.display='none'">Hide News Feed</button>
+    <div id="settings-menu" class="dropdown">
+      <button onclick="toggleNews()">Hide News Feed</button>
+      <button onclick="localStorage.clear();location.reload();">Clean Data</button>
+      <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical','_blank')">Current GitHub</button>
+    </div>
+    <button onclick="toggleThemes()">Themes ▼</button>
+    <div id="themes-menu" class="dropdown">
       <button onclick="setTheme('light')">Light Mode</button>
       <button onclick="setTheme('dark')">Dark Mode</button>
       <button onclick="setTheme('night')">Night Mode</button>
-      <button onclick="localStorage.clear();location.reload();">Clean Data</button>
-      <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical','_blank')">Current GitHub</button>
     </div>
   </div>
 
@@ -215,6 +232,12 @@
       if (query) window.open(engine + encodeURIComponent(query), "_blank");
     }
 
+    function rollDice() {
+      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+      const randomSite = sites[Math.floor(Math.random() * sites.length)];
+      window.open(randomSite, "_blank");
+    }
+
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("open");
     }
@@ -222,6 +245,11 @@
     function toggleSettings() {
       const settings = document.getElementById("settings-menu");
       settings.style.display = settings.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleThemes() {
+      const themes = document.getElementById("themes-menu");
+      themes.style.display = themes.style.display === "none" ? "block" : "none";
     }
 
     function setTheme(mode) {
@@ -235,6 +263,14 @@
         document.body.style.background = "#0b0b0b";
         document.body.style.color = "#cfcfcf";
       }
+    }
+
+    let newsHidden = false;
+    function toggleNews() {
+      const feed = document.getElementById("news-feed");
+      newsHidden = !newsHidden;
+      feed.style.display = newsHidden ? "none" : "grid";
+      document.querySelector("#settings-menu button").innerText = newsHidden ? "Show News Feed" : "Hide News Feed";
     }
 
     async function loadNews() {
@@ -261,9 +297,10 @@
       }
     }
 
-    // Load news on page load + refresh every 5 minutes
+    // Load CNN by default + refresh every 5 minutes
     loadNews();
     setInterval(loadNews, 300000);
   </script>
 </body>
 </html>
+
