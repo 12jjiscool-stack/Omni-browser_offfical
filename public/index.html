@@ -11,6 +11,7 @@
   <link rel="manifest" href="/site.webmanifest">
 
   <style>
+    /* Default theme (dark) */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -20,67 +21,83 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
     }
-    h1 {
-      margin-top: 30px;
-      font-size: 3rem;
+    h1 { margin-top: 30px; font-size: 3rem; }
+    p.description { font-style: italic; margin-top: -10px; margin-bottom: 30px; opacity: 0.8; }
+
+    /* Light Mode */
+    body.light {
+      background: #f4f4f4;
+      color: #111;
     }
-    p.description {
-      font-style: italic;
-      margin-top: -10px;
-      margin-bottom: 30px;
-      opacity: 0.8;
+    body.light .shortcut-card,
+    body.light .news-card,
+    body.light .menu-button,
+    body.light .sidebar {
+      background: #fff !important;
+      color: #111 !important;
     }
-    .search-bar {
+
+    /* Night Mode */
+    body.night {
+      background: #1a1a1a;
+      color: #ddd;
+    }
+    body.night .shortcut-card,
+    body.night .news-card,
+    body.night .menu-button,
+    body.night .sidebar {
+      background: #222 !important;
+      color: #ddd !important;
+    }
+
+    /* Search + Menu */
+    .search-container {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       width: 600px;
-      max-width: 90%;
+      max-width: 95%;
       margin-bottom: 20px;
     }
+    .search-bar { display: flex; align-items: center; gap: 8px; flex: 1; }
     .search-bar select, .search-bar input, .search-bar button {
       padding: 10px;
       border-radius: 6px;
       border: none;
     }
-    .search-bar input {
-      flex: 1;
-    }
+    .search-bar input { flex: 1; }
     .menu-button {
-      position: absolute;
-      left: 20px;
-      top: 120px;
-      font-size: 1.8rem;
+      font-size: 1.2rem;
       background: rgba(255,255,255,0.15);
       border: none;
       border-radius: 10px;
       padding: 8px 14px;
-      color: white;
+      color: inherit;
       cursor: pointer;
       transition: background 0.2s;
     }
-    .menu-button:hover {
-      background: rgba(255,255,255,0.3);
-    }
+    .menu-button:hover { background: rgba(255,255,255,0.3); }
+
+    /* Sidebar */
     .sidebar {
       position: fixed;
       top: 0;
-      left: -260px;
+      left: -280px;
       width: 260px;
       height: 100%;
-      background: rgba(30,30,30,0.9);
+      background: rgba(30,30,30,0.95);
       backdrop-filter: blur(12px);
       padding: 20px;
       box-shadow: 3px 0 10px rgba(0,0,0,0.5);
-      transition: left 0.3s ease;
+      transition: left 0.4s ease;
+      overflow-y: auto;
+      z-index: 1000;
     }
-    .sidebar.open {
-      left: 0;
-    }
-    .sidebar h2 {
-      margin-top: 0;
-    }
+    .sidebar.open { left: 0; }
+    .sidebar h2 { margin-top: 0; }
     .sidebar button, .sidebar a, .sidebar select {
       display: block;
       width: 100%;
@@ -89,33 +106,50 @@
       border: none;
       border-radius: 8px;
       background: rgba(255,255,255,0.1);
-      color: white;
+      color: inherit;
       text-align: left;
       cursor: pointer;
       text-decoration: none;
+      transition: background 0.2s;
     }
     .sidebar button:hover, .sidebar a:hover, .sidebar select:hover {
       background: rgba(255,255,255,0.2);
     }
+
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 999;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+
+    /* Shortcuts */
     .shortcuts {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 20px;
+      max-width: 800px;
+      width: 95%;
       margin-bottom: 30px;
-      flex-wrap: wrap;
-      justify-content: center;
     }
-    .shortcuts button {
-      padding: 12px 24px;
+    .shortcut-card {
+      background: rgba(255,255,255,0.05);
       border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
+      padding: 20px;
+      text-align: center;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: transform 0.2s, background 0.2s;
     }
-    .shortcuts button:hover {
-      background: rgba(255,255,255,0.2);
-    }
+    .shortcut-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
+    .shortcut-card span { display: block; font-size: 2rem; margin-bottom: 10px; }
+
+    /* News */
     .news-feed {
       max-width: 1000px;
       width: 95%;
@@ -133,47 +167,30 @@
       display: flex;
       flex-direction: column;
     }
-    .news-card:hover {
-      transform: translateY(-5px);
-      background: rgba(255,255,255,0.1);
-    }
-    .news-card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-    }
-    .news-content {
-      padding: 12px;
-      flex: 1;
-    }
-    .news-content h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.1rem;
-    }
-    .news-content p {
-      margin: 0;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
+    .news-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
+    .news-card img { width: 100%; height: 160px; object-fit: cover; }
+    .news-content { padding: 12px; flex: 1; }
+    .news-content h3 { margin: 0 0 8px 0; font-size: 1.1rem; }
+    .news-content p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
   </style>
 </head>
 <body>
   <h1>Omni</h1>
   <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
 
-  <!-- Search bar -->
-  <div class="search-bar">
-    <select id="engine">
-      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-      <option value="https://www.google.com/search?q=">Google</option>
-      <option value="https://www.bing.com/search?q=">Bing</option>
-    </select>
-    <input id="searchQuery" type="text" placeholder="Search...">
-    <button onclick="search()">Search</button>
+  <!-- Search + Menu -->
+  <div class="search-container">
+    <div class="search-bar">
+      <select id="engine">
+        <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+        <option value="https://www.google.com/search?q=">Google</option>
+        <option value="https://www.bing.com/search?q=">Bing</option>
+      </select>
+      <input id="searchQuery" type="text" placeholder="Search...">
+      <button onclick="search()">Search</button>
+    </div>
+    <button class="menu-button" onclick="toggleMenu()">☰</button>
   </div>
-
-  <!-- Menu button -->
-  <button class="menu-button" onclick="toggleMenu()">☰</button>
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
@@ -187,25 +204,33 @@
       <a href="https://github.com/12jjiscool-stack/Omni-browser_offfical" target="_blank">Current GitHub</a>
       <label for="newsSource">News Source:</label>
       <select id="newsSource" onchange="changeNewsSource()">
-        <option value="https://feeds.bbci.co.uk/news/rss.xml">BBC</option>
         <option value="http://rss.cnn.com/rss/edition.rss">CNN</option>
         <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml">NYT</option>
+      </select>
+      <label for="themeSelect">Theme:</label>
+      <select id="themeSelect" onchange="changeTheme()">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="night">Night</option>
       </select>
     </div>
   </div>
 
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
   <!-- Shortcuts -->
-  <div class="shortcuts">
-    <button onclick="window.open('https://mail.google.com','_blank')">Gmail</button>
-    <button onclick="window.open('https://youtube.com','_blank')">YouTube</button>
-    <button onclick="window.open('https://chat.openai.com','_blank')">ChatGPT</button>
-    <button onclick="addShortcut()">+ Add Shortcut</button>
+  <div class="shortcuts" id="shortcutsContainer">
+    <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')"><span>📧</span> Gmail</div>
+    <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')"><span>▶️</span> YouTube</div>
+    <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')"><span>🤖</span> ChatGPT</div>
+    <div class="shortcut-card" onclick="addShortcut()"><span>➕</span> Add Shortcut</div>
   </div>
 
   <!-- News Feed -->
   <div id="newsContainer" class="news-feed"></div>
 
-  <!-- Hidden YouTube iframe for music -->
+  <!-- Hidden YouTube iframe for background music -->
   <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/c9kIsJ15DsM?autoplay=1&loop=1&playlist=c9kIsJ15DsM&mute=1" frameborder="0" allow="autoplay"></iframe>
 
   <script>
@@ -217,6 +242,7 @@
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("overlay").classList.toggle("show");
     }
 
     function toggleSettings() {
@@ -250,8 +276,14 @@
       loadNews();
     }
 
+    function changeTheme() {
+      const theme = document.getElementById("themeSelect").value;
+      document.body.className = theme;
+      localStorage.setItem("theme", theme);
+    }
+
     async function loadNews() {
-      const source = localStorage.getItem("newsSource") || "https://feeds.bbci.co.uk/news/rss.xml";
+      const source = localStorage.getItem("newsSource") || "http://rss.cnn.com/rss/edition.rss";
       document.getElementById("newsSource").value = source;
       try {
         const resp = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source));
@@ -275,13 +307,47 @@
       }
     }
 
-    // Load news on startup
+    function addShortcut() {
+      const name = prompt("Enter shortcut name:");
+      const url = prompt("Enter shortcut URL:");
+      if (name && url) {
+        let shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+        shortcuts.push({ name, url });
+        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+        renderShortcuts();
+      }
+    }
+
+    function renderShortcuts() {
+      const container = document.getElementById("shortcutsContainer");
+      container.innerHTML = `
+        <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')"><span>📧</span> Gmail</div>
+        <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')"><span>▶️</span> YouTube</div>
+        <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')"><span>🤖</span> ChatGPT</div>
+      `;
+      const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
+      shortcuts.forEach(s => {
+        const card = document.createElement("div");
+        card.className = "shortcut-card";
+        card.innerHTML = `<span>🔗</span>${s.name}`;
+        card.onclick = () => window.open(s.url, "_blank");
+        container.appendChild(card);
+      });
+      container.innerHTML += `<div class="shortcut-card" onclick="addShortcut()"><span>➕</span>Add Shortcut</div>`;
+    }
+
     window.onload = () => {
+      // Load theme
+      const theme = localStorage.getItem("theme") || "dark";
+      document.body.className = theme;
+      document.getElementById("themeSelect").value = theme;
+
+      renderShortcuts();
       loadNews();
-      // Refresh news every 5 minutes
-      setInterval(loadNews, 300000);
+      setInterval(loadNews, 300000); // refresh every 5 min
     };
   </script>
 </body>
 </html>
+
 
