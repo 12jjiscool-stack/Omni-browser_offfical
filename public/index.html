@@ -1,47 +1,302 @@
-<!-- Hidden YouTube Lofi Player -->
-<div id="yt-player" style="display:none;"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Omni</title>
 
-<script>
-  let ytPlayer;
+  <!-- ✅ Favicon set -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
 
-  function onYouTubeIframeAPIReady() {
-    ytPlayer = new YT.Player("yt-player", {
-      height: "0",
-      width: "0",
-      videoId: "c9kIsJ15DsM", // The lofi track
-      playerVars: {
-        autoplay: 1,
-        loop: 1,
-        playlist: "c9kIsJ15DsM",
-      },
-      events: {
-        onReady: (event) => {
-          event.target.setVolume(20); // Start at 20% volume
-          const musicMuted = localStorage.getItem("musicMuted");
-          if (musicMuted === "true") {
-            ytPlayer.mute();
-            document.getElementById("toggleMusicBtn").textContent = "Unmute Music";
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #111, #222);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      margin-top: 30px;
+      font-size: 3rem;
+    }
+    p.description {
+      font-style: italic;
+      margin-top: -10px;
+      margin-bottom: 30px;
+      opacity: 0.8;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 600px;
+      max-width: 90%;
+      margin-bottom: 20px;
+    }
+    .search-bar select, .search-bar input, .search-bar button {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    .search-bar input {
+      flex: 1;
+    }
+    .shortcuts {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .shortcuts button {
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .shortcuts button:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .news-feed {
+      max-width: 800px;
+      width: 90%;
+      margin-top: 20px;
+    }
+    .news-card {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+    .news-card:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .news-card img {
+      width: 120px;
+      object-fit: cover;
+    }
+    .news-content {
+      padding: 10px;
+      flex: 1;
+    }
+    .news-content h3 {
+      margin: 0 0 5px 0;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 220px;
+      background: #1c1c1c;
+      padding-top: 60px;
+      transform: translateX(-220px);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar.show {
+      transform: translateX(0);
+    }
+    .sidebar button, .sidebar a {
+      display: block;
+      padding: 12px 20px;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: left;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sidebar button:hover, .sidebar a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .submenu {
+      display: none;
+      padding-left: 20px;
+    }
+    .submenu.show {
+      display: block;
+    }
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 1100;
+    }
+    .credit {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      font-style: italic;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+  <div class="sidebar" id="sidebar">
+    <a href="#">Sign In</a>
+    <button onclick="toggleSubmenu()">Settings ▼</button>
+    <div class="submenu" id="settingsMenu">
+      <button id="toggleNewsBtn" onclick="toggleNews()">Hide News Feed</button>
+      <button id="toggleMusicBtn" onclick="toggleMusic()">Mute Music</button>
+    </div>
+  </div>
+
+  <h1>Omni</h1>
+  <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
+
+  <div class="search-bar">
+    <select id="engineSelect">
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Search the web...">
+    <button onclick="search()">Search</button>
+  </div>
+
+  <div class="shortcuts">
+    <button onclick="window.open('https://gmail.com','_blank')">Gmail</button>
+    <button onclick="window.open('https://youtube.com','_blank')">YouTube</button>
+    <button onclick="window.open('https://chat.openai.com','_blank')">ChatGPT</button>
+  </div>
+
+  <div class="news-feed" id="newsFeed"></div>
+
+  <div class="credit">made by Jacob maddox</div>
+
+  <!-- 🎵 Hidden YouTube Lofi Player -->
+  <div id="yt-player" style="display:none;"></div>
+
+  <script>
+    function search() {
+      const engine = document.getElementById("engineSelect").value;
+      const query = document.getElementById("searchInput").value;
+      if (query.trim() !== "") {
+        window.open(engine + encodeURIComponent(query), "_blank");
+      }
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("show");
+    }
+
+    function toggleSubmenu() {
+      document.getElementById("settingsMenu").classList.toggle("show");
+    }
+
+    function toggleNews() {
+      const feed = document.getElementById("newsFeed");
+      const btn = document.getElementById("toggleNewsBtn");
+      if (feed.style.display === "none") {
+        feed.style.display = "block";
+        btn.textContent = "Hide News Feed";
+        localStorage.setItem("hideNews", "false");
+      } else {
+        feed.style.display = "none";
+        btn.textContent = "Show News Feed";
+        localStorage.setItem("hideNews", "true");
+      }
+    }
+
+    // ✅ News API
+    async function loadNews() {
+      try {
+        const res = await fetch("https://newsapi.org/v2/top-headlines?country=us&pageSize=5&apiKey=demo"); // replace demo with real key
+        const data = await res.json();
+        const feed = document.getElementById("newsFeed");
+        feed.innerHTML = "";
+        data.articles.forEach(article => {
+          const card = document.createElement("div");
+          card.className = "news-card";
+          card.innerHTML = `
+            <img src="${article.urlToImage || 'https://via.placeholder.com/120'}" alt="thumbnail">
+            <div class="news-content">
+              <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+              <p>${article.description || ''}</p>
+            </div>
+          `;
+          feed.appendChild(card);
+        });
+      } catch (e) {
+        console.error("Error loading news", e);
+      }
+    }
+
+    // ✅ YouTube IFrame API for Lofi
+    let ytPlayer;
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player("yt-player", {
+        height: "0",
+        width: "0",
+        videoId: "c9kIsJ15DsM", // Lofi track
+        playerVars: {
+          autoplay: 1,
+          loop: 1,
+          playlist: "c9kIsJ15DsM"
+        },
+        events: {
+          onReady: (event) => {
+            event.target.setVolume(20); // 20% volume
+            const musicMuted = localStorage.getItem("musicMuted");
+            if (musicMuted === "true") {
+              ytPlayer.mute();
+              document.getElementById("toggleMusicBtn").textContent = "Unmute Music";
+            }
           }
         }
-      }
-    });
-  }
-
-  function toggleMusic() {
-    const btn = document.getElementById("toggleMusicBtn");
-    if (ytPlayer.isMuted()) {
-      ytPlayer.unMute();
-      btn.textContent = "Mute Music";
-      localStorage.setItem("musicMuted", "false");
-    } else {
-      ytPlayer.mute();
-      btn.textContent = "Unmute Music";
-      localStorage.setItem("musicMuted", "true");
+      });
     }
-  }
 
-  // Load YouTube IFrame API
-  const tag = document.createElement("script");
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.body.appendChild(tag);
-</script>
+    function toggleMusic() {
+      const btn = document.getElementById("toggleMusicBtn");
+      if (ytPlayer.isMuted()) {
+        ytPlayer.unMute();
+        btn.textContent = "Mute Music";
+        localStorage.setItem("musicMuted", "false");
+      } else {
+        ytPlayer.mute();
+        btn.textContent = "Unmute Music";
+        localStorage.setItem("musicMuted", "true");
+      }
+    }
+
+    // ✅ Load YouTube IFrame API
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+
+    // ✅ Init on load
+    window.addEventListener("load", () => {
+      if (localStorage.getItem("hideNews") === "true") {
+        document.getElementById("newsFeed").style.display = "none";
+        document.getElementById("toggleNewsBtn").textContent = "Show News Feed";
+      }
+      loadNews();
+    });
+  </script>
+</body>
+</html>
+
