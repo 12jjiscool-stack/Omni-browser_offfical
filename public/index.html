@@ -6,9 +6,7 @@
 
   <!-- ✅ Favicon -->
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
 
   <style>
     body {
@@ -22,297 +20,233 @@
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
     }
-    h1 { margin-top: 30px; font-size: 3rem; }
-    p.description { font-style: italic; margin-top: -10px; margin-bottom: 30px; opacity: 0.8; }
-
-    /* Themes */
-    body.light { background: #f4f4f4; color: #111; }
-    body.light .shortcut-card,
-    body.light .news-card,
-    body.light .menu-button,
-    body.light .sidebar {
-      background: #fff !important; color: #111 !important;
+    h1 {
+      margin-top: 30px;
+      font-size: 3rem;
     }
-    body.night { background: #1a1a1a; color: #ddd; }
-    body.night .shortcut-card,
-    body.night .news-card,
-    body.night .menu-button,
-    body.night .sidebar {
-      background: #222 !important; color: #ddd !important;
+    p.description {
+      font-style: italic;
+      margin-top: -10px;
+      margin-bottom: 30px;
+      opacity: 0.8;
     }
-
-    /* Search + Menu */
-    .search-container {
+    .search-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       width: 600px;
-      max-width: 95%;
+      max-width: 90%;
       margin-bottom: 20px;
     }
-    .search-bar { display: flex; align-items: center; gap: 8px; flex: 1; }
     .search-bar select, .search-bar input, .search-bar button {
-      padding: 10px; border-radius: 6px; border: none;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
     }
-    .search-bar input { flex: 1; }
+    .search-bar input {
+      flex: 1;
+    }
     .menu-button {
       font-size: 1.2rem;
       background: rgba(255,255,255,0.15);
       border: none;
       border-radius: 10px;
       padding: 8px 14px;
-      color: inherit;
+      color: white;
       cursor: pointer;
-      transition: background 0.2s;
     }
-    .menu-button:hover { background: rgba(255,255,255,0.3); }
-
-    /* Sidebar */
     .sidebar {
-      position: fixed; top: 0; left: -280px;
-      width: 260px; height: 100%;
-      background: rgba(30,30,30,0.95);
-      backdrop-filter: blur(12px);
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 260px;
+      height: 100%;
+      background: #1c1c1c;
       padding: 20px;
-      box-shadow: 3px 0 10px rgba(0,0,0,0.5);
-      transition: left 0.4s ease;
-      overflow-y: auto;
-      z-index: 1000;
+      transition: left 0.3s;
     }
-    .sidebar.open { left: 0; }
-    .sidebar h2 { margin-top: 0; }
-    .sidebar button, .sidebar a, .sidebar select {
-      display: block; width: 100%; padding: 12px; margin: 8px 0;
-      border: none; border-radius: 8px;
-      background: rgba(255,255,255,0.1); color: inherit;
-      text-align: left; cursor: pointer; text-decoration: none;
+    .sidebar.open {
+      left: 0;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+    }
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #333;
+      color: white;
+      text-align: left;
+      cursor: pointer;
+    }
+    .shortcuts {
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+    }
+    .shortcut {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
       transition: background 0.2s;
     }
-    .sidebar button:hover, .sidebar a:hover, .sidebar select:hover {
-      background: rgba(255,255,255,0.2);
+    .shortcut:hover {
+      background: rgba(255,255,255,0.25);
     }
-
-    /* Overlay */
-    .overlay {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s ease;
-      z-index: 999;
+    .shortcut img {
+      width: 18px;
+      height: 18px;
     }
-    .overlay.show { opacity: 1; visibility: visible; }
-
-    /* Shortcuts */
-    .shortcuts {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 15px;
-      max-width: 700px;
-      width: 95%;
-      margin-bottom: 30px;
-    }
-    .shortcut-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .shortcut-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.1); }
-    .shortcut-card img {
-      width: 32px; height: 32px;
-      margin-bottom: 6px;
-    }
-
-    /* News */
     .news-feed {
-      max-width: 1000px; width: 95%;
-      margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      gap: 15px;
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px auto;
     }
     .news-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 10px;
       overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .news-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
-    .news-card img { width: 100%; height: 160px; object-fit: cover; }
-    .news-content { padding: 12px; flex: 1; }
-    .news-content h3 { margin: 0 0 8px 0; font-size: 1rem; }
-    .news-content p { margin: 0; font-size: 0.8rem; opacity: 0.8; }
+    .news-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .news-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .news-card p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+    .news-card a {
+      text-decoration: none;
+      color: #ff4d4d;
+      font-weight: bold;
+      margin-top: auto;
+    }
   </style>
 </head>
 <body>
   <h1>Omni</h1>
   <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
 
-  <!-- Search + Menu -->
-  <div class="search-container">
-    <div class="search-bar">
-      <select id="engine">
-        <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-        <option value="https://www.google.com/search?q=">Google</option>
-        <option value="https://www.bing.com/search?q=">Bing</option>
-      </select>
-      <input id="searchQuery" type="text" placeholder="Search...">
-      <button onclick="search()">Search</button>
-    </div>
+  <div class="search-bar">
+    <select id="engine">
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+    </select>
+    <input type="text" id="query" placeholder="Search the web..." />
+    <button onclick="search()">Search</button>
     <button class="menu-button" onclick="toggleMenu()">☰</button>
   </div>
+
+  <!-- Shortcuts -->
+  <div class="shortcuts">
+    <div class="shortcut" onclick="window.open('https://mail.google.com', '_blank')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail">
+      Gmail
+    </div>
+    <div class="shortcut" onclick="window.open('https://youtube.com', '_blank')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube">
+      YouTube
+    </div>
+    <div class="shortcut" onclick="window.open('https://chat.openai.com', '_blank')">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT">
+      ChatGPT
+    </div>
+  </div>
+
+  <!-- News Feed -->
+  <div id="news-feed" class="news-feed"></div>
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <h2>Menu</h2>
-    <button onclick="alert('Sign in coming soon')">Sign In</button>
+    <button onclick="alert('Sign in coming soon!')">Sign In</button>
     <button onclick="toggleSettings()">Settings ▼</button>
-    <div id="settingsMenu" style="display:none; margin-left:10px;">
-      <button onclick="toggleNews()">Hide News Feed</button>
-      <button onclick="clearData()">Clean Data</button>
-      <button onclick="toggleMute()">Mute / Unmute</button>
-      <a href="https://github.com/12jjiscool-stack/Omni-browser_offfical" target="_blank">Current GitHub</a>
-      <label for="newsSource">News Source:</label>
-      <select id="newsSource" onchange="changeNewsSource()">
-        <option value="http://rss.cnn.com/rss/edition.rss">CNN</option>
-        <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml">NYT</option>
-      </select>
-      <label for="themeSelect">Theme:</label>
-      <select id="themeSelect" onchange="changeTheme()">
-        <option value="dark">Dark</option>
-        <option value="light">Light</option>
-        <option value="night">Night</option>
-      </select>
+    <div id="settings-menu" style="display:none; margin-left:10px;">
+      <button onclick="document.getElementById('news-feed').style.display='none'">Hide News Feed</button>
+      <button onclick="setTheme('light')">Light Mode</button>
+      <button onclick="setTheme('dark')">Dark Mode</button>
+      <button onclick="setTheme('night')">Night Mode</button>
+      <button onclick="localStorage.clear();location.reload();">Clean Data</button>
+      <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical','_blank')">Current GitHub</button>
     </div>
   </div>
-
-  <!-- Overlay -->
-  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
-  <!-- Shortcuts -->
-  <div class="shortcuts" id="shortcutsContainer"></div>
-
-  <!-- News Feed -->
-  <div id="newsContainer" class="news-feed"></div>
-
-  <!-- Hidden YouTube iframe -->
-  <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/c9kIsJ15DsM?autoplay=1&loop=1&playlist=c9kIsJ15DsM&mute=1" frameborder="0" allow="autoplay"></iframe>
 
   <script>
     function search() {
       const engine = document.getElementById("engine").value;
-      const query = document.getElementById("searchQuery").value;
-      if(query) window.open(engine + encodeURIComponent(query), "_blank");
+      const query = document.getElementById("query").value;
+      if (query) window.open(engine + encodeURIComponent(query), "_blank");
     }
+
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("open");
-      document.getElementById("overlay").classList.toggle("show");
     }
+
     function toggleSettings() {
-      const sm = document.getElementById("settingsMenu");
-      sm.style.display = sm.style.display === "none" ? "block" : "none";
+      const settings = document.getElementById("settings-menu");
+      settings.style.display = settings.style.display === "none" ? "block" : "none";
     }
-    function toggleNews() {
-      const news = document.getElementById("newsContainer");
-      news.style.display = news.style.display === "none" ? "grid" : "none";
-    }
-    function clearData() {
-      localStorage.clear();
-      alert("Data cleared!");
-      renderShortcuts();
-    }
-    function toggleMute() {
-      const iframe = document.getElementById("bgMusic");
-      const src = iframe.src;
-      iframe.src = src.includes("mute=1") ? src.replace("mute=1","mute=0") : src.replace("mute=0","mute=1");
-    }
-    function changeNewsSource() {
-      const source = document.getElementById("newsSource").value;
-      localStorage.setItem("newsSource", source);
-      loadNews();
-    }
-    function changeTheme() {
-      const theme = document.getElementById("themeSelect").value;
-      document.body.className = theme;
-      localStorage.setItem("theme", theme);
-    }
-    async function loadNews() {
-      const source = localStorage.getItem("newsSource") || "http://rss.cnn.com/rss/edition.rss";
-      document.getElementById("newsSource").value = source;
-      try {
-        const resp = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source));
-        const data = await resp.json();
-        const container = document.getElementById("newsContainer");
-        container.innerHTML = "";
-        data.items.slice(0,8).forEach(article => {
-          const card = document.createElement("div");
-          card.className = "news-card";
-          card.onclick = () => window.open(article.link, "_blank");
-          card.innerHTML = `
-            <img src="${article.enclosure?.link || 'https://via.placeholder.com/280x160'}">
-            <div class="news-content">
-              <h3>${article.title}</h3>
-              <p>${article.description.substring(0,100)}...</p>
-            </div>`;
-          container.appendChild(card);
-        });
-      } catch (err) { console.error("News load failed", err); }
-    }
-    function addShortcut() {
-      const name = prompt("Enter shortcut name:");
-      const url = prompt("Enter shortcut URL:");
-      if (name && url) {
-        let shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
-        shortcuts.push({ name, url });
-        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
-        renderShortcuts();
+
+    function setTheme(mode) {
+      if (mode === "light") {
+        document.body.style.background = "#f5f5f5";
+        document.body.style.color = "#111";
+      } else if (mode === "dark") {
+        document.body.style.background = "linear-gradient(135deg, #111, #222)";
+        document.body.style.color = "white";
+      } else if (mode === "night") {
+        document.body.style.background = "#0b0b0b";
+        document.body.style.color = "#cfcfcf";
       }
     }
-    function renderShortcuts() {
-      const container = document.getElementById("shortcutsContainer");
-      container.innerHTML = `
-        <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')">
-          <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail"> Gmail
-        </div>
-        <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')">
-          <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube"> YouTube
-        </div>
-        <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')">
-          <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT"> ChatGPT
-        </div>
-      `;
-      const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
-      shortcuts.forEach(s => {
-        const domain = new URL(s.url).hostname;
-        const favicon = `https://www.google.com/s2/favicons?domain=${domain}`;
-        const card = document.createElement("div");
-        card.className = "shortcut-card";
-        card.innerHTML = `<img src="${favicon}" alt="icon"><br>${s.name}`;
-        card.onclick = () => window.open(s.url, "_blank");
-        container.appendChild(card);
-      });
-      container.innerHTML += `<div class="shortcut-card" onclick="addShortcut()"><span>➕</span><br>Add</div>`;
+
+    async function loadNews() {
+      try {
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml");
+        const data = await res.json();
+        const feed = document.getElementById("news-feed");
+        feed.innerHTML = "";
+        data.items.slice(0, 8).forEach(article => {
+          const card = document.createElement("div");
+          card.className = "news-card";
+          card.innerHTML = `
+            <img src="${article.enclosure?.link || 'https://via.placeholder.com/300x150'}" alt="Thumbnail">
+            <h3>${article.title}</h3>
+            <p>${article.description.slice(0,120)}...</p>
+            <a href="${article.link}" target="_blank">Read More</a>
+          `;
+          feed.appendChild(card);
+        });
+      } catch (e) {
+        console.error("Failed to load news", e);
+      }
     }
-    window.onload = () => {
-      const hour = new Date().getHours();
-      let savedTheme = localStorage.getItem("theme");
-      if (!savedTheme) savedTheme = (hour >= 20 || hour < 6) ? "night" : "dark";
-      document.body.className = savedTheme;
-      document.getElementById("themeSelect").value = savedTheme;
-      renderShortcuts();
-      loadNews();
-      setInterval(loadNews, 300000);
-    };
+
+    // Load news on page load + refresh every 5 minutes
+    loadNews();
+    setInterval(loadNews, 300000);
   </script>
 </body>
 </html>
-
-
-
