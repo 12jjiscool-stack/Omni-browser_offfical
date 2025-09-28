@@ -11,7 +11,6 @@
   <link rel="manifest" href="/site.webmanifest">
 
   <style>
-    /* Default theme (dark) */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -26,30 +25,20 @@
     h1 { margin-top: 30px; font-size: 3rem; }
     p.description { font-style: italic; margin-top: -10px; margin-bottom: 30px; opacity: 0.8; }
 
-    /* Light Mode */
-    body.light {
-      background: #f4f4f4;
-      color: #111;
-    }
+    /* Themes */
+    body.light { background: #f4f4f4; color: #111; }
     body.light .shortcut-card,
     body.light .news-card,
     body.light .menu-button,
     body.light .sidebar {
-      background: #fff !important;
-      color: #111 !important;
+      background: #fff !important; color: #111 !important;
     }
-
-    /* Night Mode */
-    body.night {
-      background: #1a1a1a;
-      color: #ddd;
-    }
+    body.night { background: #1a1a1a; color: #ddd; }
     body.night .shortcut-card,
     body.night .news-card,
     body.night .menu-button,
     body.night .sidebar {
-      background: #222 !important;
-      color: #ddd !important;
+      background: #222 !important; color: #ddd !important;
     }
 
     /* Search + Menu */
@@ -64,9 +53,7 @@
     }
     .search-bar { display: flex; align-items: center; gap: 8px; flex: 1; }
     .search-bar select, .search-bar input, .search-bar button {
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
+      padding: 10px; border-radius: 6px; border: none;
     }
     .search-bar input { flex: 1; }
     .menu-button {
@@ -83,11 +70,8 @@
 
     /* Sidebar */
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: -280px;
-      width: 260px;
-      height: 100%;
+      position: fixed; top: 0; left: -280px;
+      width: 260px; height: 100%;
       background: rgba(30,30,30,0.95);
       backdrop-filter: blur(12px);
       padding: 20px;
@@ -99,17 +83,10 @@
     .sidebar.open { left: 0; }
     .sidebar h2 { margin-top: 0; }
     .sidebar button, .sidebar a, .sidebar select {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.1);
-      color: inherit;
-      text-align: left;
-      cursor: pointer;
-      text-decoration: none;
+      display: block; width: 100%; padding: 12px; margin: 8px 0;
+      border: none; border-radius: 8px;
+      background: rgba(255,255,255,0.1); color: inherit;
+      text-align: left; cursor: pointer; text-decoration: none;
       transition: background 0.2s;
     }
     .sidebar button:hover, .sidebar a:hover, .sidebar select:hover {
@@ -118,12 +95,10 @@
 
     /* Overlay */
     .overlay {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.5);
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transition: opacity 0.3s ease;
       z-index: 999;
     }
@@ -132,27 +107,30 @@
     /* Shortcuts */
     .shortcuts {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 20px;
-      max-width: 800px;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 15px;
+      max-width: 700px;
       width: 95%;
       margin-bottom: 30px;
     }
     .shortcut-card {
       background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 12px;
       text-align: center;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: transform 0.2s, background 0.2s;
     }
-    .shortcut-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
-    .shortcut-card span { display: block; font-size: 2rem; margin-bottom: 10px; }
+    .shortcut-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.1); }
+    .shortcut-card img {
+      width: 32px; height: 32px;
+      margin-bottom: 6px;
+    }
 
     /* News */
     .news-feed {
-      max-width: 1000px;
-      width: 95%;
+      max-width: 1000px; width: 95%;
       margin-top: 20px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -164,14 +142,13 @@
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.2s, background 0.2s;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
     .news-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
     .news-card img { width: 100%; height: 160px; object-fit: cover; }
     .news-content { padding: 12px; flex: 1; }
-    .news-content h3 { margin: 0 0 8px 0; font-size: 1.1rem; }
-    .news-content p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+    .news-content h3 { margin: 0 0 8px 0; font-size: 1rem; }
+    .news-content p { margin: 0; font-size: 0.8rem; opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -220,17 +197,12 @@
   <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
   <!-- Shortcuts -->
-  <div class="shortcuts" id="shortcutsContainer">
-    <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')"><span>📧</span> Gmail</div>
-    <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')"><span>▶️</span> YouTube</div>
-    <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')"><span>🤖</span> ChatGPT</div>
-    <div class="shortcut-card" onclick="addShortcut()"><span>➕</span> Add Shortcut</div>
-  </div>
+  <div class="shortcuts" id="shortcutsContainer"></div>
 
   <!-- News Feed -->
   <div id="newsContainer" class="news-feed"></div>
 
-  <!-- Hidden YouTube iframe for background music -->
+  <!-- Hidden YouTube iframe -->
   <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/c9kIsJ15DsM?autoplay=1&loop=1&playlist=c9kIsJ15DsM&mute=1" frameborder="0" allow="autoplay"></iframe>
 
   <script>
@@ -239,49 +211,38 @@
       const query = document.getElementById("searchQuery").value;
       if(query) window.open(engine + encodeURIComponent(query), "_blank");
     }
-
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("open");
       document.getElementById("overlay").classList.toggle("show");
     }
-
     function toggleSettings() {
       const sm = document.getElementById("settingsMenu");
       sm.style.display = sm.style.display === "none" ? "block" : "none";
     }
-
     function toggleNews() {
       const news = document.getElementById("newsContainer");
       news.style.display = news.style.display === "none" ? "grid" : "none";
     }
-
     function clearData() {
       localStorage.clear();
       alert("Data cleared!");
+      renderShortcuts();
     }
-
     function toggleMute() {
       const iframe = document.getElementById("bgMusic");
       const src = iframe.src;
-      if (src.includes("mute=1")) {
-        iframe.src = src.replace("mute=1", "mute=0");
-      } else {
-        iframe.src = src.replace("mute=0", "mute=1");
-      }
+      iframe.src = src.includes("mute=1") ? src.replace("mute=1","mute=0") : src.replace("mute=0","mute=1");
     }
-
     function changeNewsSource() {
       const source = document.getElementById("newsSource").value;
       localStorage.setItem("newsSource", source);
       loadNews();
     }
-
     function changeTheme() {
       const theme = document.getElementById("themeSelect").value;
       document.body.className = theme;
       localStorage.setItem("theme", theme);
     }
-
     async function loadNews() {
       const source = localStorage.getItem("newsSource") || "http://rss.cnn.com/rss/edition.rss";
       document.getElementById("newsSource").value = source;
@@ -302,11 +263,8 @@
             </div>`;
           container.appendChild(card);
         });
-      } catch (err) {
-        console.error("News load failed", err);
-      }
+      } catch (err) { console.error("News load failed", err); }
     }
-
     function addShortcut() {
       const name = prompt("Enter shortcut name:");
       const url = prompt("Enter shortcut URL:");
@@ -317,37 +275,44 @@
         renderShortcuts();
       }
     }
-
     function renderShortcuts() {
       const container = document.getElementById("shortcutsContainer");
       container.innerHTML = `
-        <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')"><span>📧</span> Gmail</div>
-        <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')"><span>▶️</span> YouTube</div>
-        <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')"><span>🤖</span> ChatGPT</div>
+        <div class="shortcut-card" onclick="window.open('https://mail.google.com','_blank')">
+          <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail"> Gmail
+        </div>
+        <div class="shortcut-card" onclick="window.open('https://youtube.com','_blank')">
+          <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube"> YouTube
+        </div>
+        <div class="shortcut-card" onclick="window.open('https://chat.openai.com','_blank')">
+          <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT"> ChatGPT
+        </div>
       `;
       const shortcuts = JSON.parse(localStorage.getItem("shortcuts") || "[]");
       shortcuts.forEach(s => {
+        const domain = new URL(s.url).hostname;
+        const favicon = `https://www.google.com/s2/favicons?domain=${domain}`;
         const card = document.createElement("div");
         card.className = "shortcut-card";
-        card.innerHTML = `<span>🔗</span>${s.name}`;
+        card.innerHTML = `<img src="${favicon}" alt="icon"><br>${s.name}`;
         card.onclick = () => window.open(s.url, "_blank");
         container.appendChild(card);
       });
-      container.innerHTML += `<div class="shortcut-card" onclick="addShortcut()"><span>➕</span>Add Shortcut</div>`;
+      container.innerHTML += `<div class="shortcut-card" onclick="addShortcut()"><span>➕</span><br>Add</div>`;
     }
-
     window.onload = () => {
-      // Load theme
-      const theme = localStorage.getItem("theme") || "dark";
-      document.body.className = theme;
-      document.getElementById("themeSelect").value = theme;
-
+      const hour = new Date().getHours();
+      let savedTheme = localStorage.getItem("theme");
+      if (!savedTheme) savedTheme = (hour >= 20 || hour < 6) ? "night" : "dark";
+      document.body.className = savedTheme;
+      document.getElementById("themeSelect").value = savedTheme;
       renderShortcuts();
       loadNews();
-      setInterval(loadNews, 300000); // refresh every 5 min
+      setInterval(loadNews, 300000);
     };
   </script>
 </body>
 </html>
+
 
 
