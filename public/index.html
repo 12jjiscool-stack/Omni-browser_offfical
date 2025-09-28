@@ -241,12 +241,6 @@
       font-size: 0.9rem;
       opacity: 0.9;
     }
-    .audio-player {
-      position: fixed;
-      top: 15px;
-      left: 60px;
-      z-index: 100;
-    }
     .credit-bubble {
       position: fixed;
       bottom: 12px;
@@ -267,6 +261,7 @@
     <button class="expand" onclick="toggleSubmenu(this)">Settings</button>
     <div class="submenu">
       <button id="toggleNewsBtn" onclick="toggleNews()">Hide News Feed</button>
+      <button id="toggleMusicBtn" onclick="toggleMusic()">Mute Music</button>
     </div>
   </div>
 
@@ -307,13 +302,11 @@
     <div id="newsGrid" class="news-grid"><p>Loading news...</p></div>
   </div>
 
-  <!-- Lofi Audio Player -->
-  <div class="audio-player">
-    <audio id="lofiPlayer" autoplay loop controls>
-      <source src="https://files.catbox.moe/4m3z7n.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
+  <!-- Lofi Background Music -->
+  <audio id="lofiPlayer" autoplay loop>
+    <source src="https://files.catbox.moe/4m3z7n.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <!-- Credit -->
   <div class="credit-bubble">made by Jacob Maddox</div>
@@ -357,9 +350,25 @@
       if (news.style.display === "none") {
         news.style.display = "block";
         btn.textContent = "Hide News Feed";
+        localStorage.setItem("newsVisible", "true");
       } else {
         news.style.display = "none";
         btn.textContent = "Show News Feed";
+        localStorage.setItem("newsVisible", "false");
+      }
+    }
+
+    function toggleMusic() {
+      const player = document.getElementById("lofiPlayer");
+      const btn = document.getElementById("toggleMusicBtn");
+      if (player.muted) {
+        player.muted = false;
+        btn.textContent = "Mute Music";
+        localStorage.setItem("musicMuted", "false");
+      } else {
+        player.muted = true;
+        btn.textContent = "Unmute Music";
+        localStorage.setItem("musicMuted", "true");
       }
     }
 
@@ -403,9 +412,29 @@
     }
 
     window.addEventListener("load", () => {
+      // News feed state
+      const newsVisible = localStorage.getItem("newsVisible");
+      if (newsVisible === "false") {
+        document.getElementById("newsContainer").style.display = "none";
+        document.getElementById("toggleNewsBtn").textContent = "Show News Feed";
+      }
+
+      // Music state
+      const lofi = document.getElementById("lofiPlayer");
+      if (lofi) {
+        lofi.volume = 0.2; // default volume
+        const musicMuted = localStorage.getItem("musicMuted");
+        if (musicMuted === "true") {
+          lofi.muted = true;
+          document.getElementById("toggleMusicBtn").textContent = "Unmute Music";
+        }
+      }
+
+      // Fetch news
       fetchNews();
       setInterval(fetchNews, 1000 * 60 * 5);
     });
   </script>
 </body>
 </html>
+
