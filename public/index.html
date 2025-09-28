@@ -107,6 +107,9 @@
       width: 18px;
       height: 18px;
     }
+    .news-controls {
+      margin: 10px 0 20px;
+    }
     .news-feed {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -127,6 +130,8 @@
     .news-card img {
       width: 100%;
       border-radius: 8px;
+      max-height: 160px;
+      object-fit: cover;
     }
     .news-card h3 {
       margin: 0;
@@ -173,6 +178,16 @@
       <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT">
       ChatGPT
     </div>
+  </div>
+
+  <!-- News Source Selector -->
+  <div class="news-controls">
+    <label for="news-source">News Source:</label>
+    <select id="news-source" onchange="loadNews()">
+      <option value="https://feeds.bbci.co.uk/news/rss.xml">BBC</option>
+      <option value="http://rss.cnn.com/rss/edition.rss">CNN(trusted)</option>
+      <option value="http://feeds.reuters.com/reuters/topNews">Reuters</option>
+    </select>
   </div>
 
   <!-- News Feed -->
@@ -223,16 +238,18 @@
     }
 
     async function loadNews() {
+      const source = document.getElementById("news-source").value;
       try {
-        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml");
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source));
         const data = await res.json();
         const feed = document.getElementById("news-feed");
         feed.innerHTML = "";
         data.items.slice(0, 8).forEach(article => {
+          const img = article.enclosure && article.enclosure.link ? article.enclosure.link : "https://via.placeholder.com/300x150";
           const card = document.createElement("div");
           card.className = "news-card";
           card.innerHTML = `
-            <img src="${article.enclosure?.link || 'https://via.placeholder.com/300x150'}" alt="Thumbnail">
+            <img src="${img}" alt="Thumbnail">
             <h3>${article.title}</h3>
             <p>${article.description.slice(0,120)}...</p>
             <a href="${article.link}" target="_blank">Read More</a>
