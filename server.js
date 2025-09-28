@@ -1,155 +1,161 @@
-/**
- * Sleek Proxy Browser - simple educational proxy
- *
- * - Fetches URLs from `GET /proxy?url=ENCODED_URL`
- * - Streams non-HTML (images, css, js) directly
- * - Rewrites HTML <a>, <img>, <script>, <link> to pass through proxy
- *
- * WARNING: This is a lightweight demo. It does NOT:
- * - Strip tracking or sanitize everything
- * - Remove JS-based leaks (cookies, referer may still be exposed)
- * - Bypass authentication/protected content reliably
- *
- * Use responsibly.
- */
-
-import express from 'express';
-import fetch from 'node-fetch';
-import cheerio from 'cheerio';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { URL } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// server.js
+require('dotenv').config();
+const express = require('express');
+const fetch = require('node-fetch');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const { URL } = require('url');
+const dns = require('dns').promises;
+const net = require('net');
 const app = express();
+
 const PORT = process.env.PORT || 3000;
+const BASIC_USER = process.env.BASIC_USER || '';
+const BASIC_PASS = process.env.BASIC_PASS || '';
+const ALLOWLIST = (process.env.ALLOWLIST || '').split(',').map(s => s.trim()).filter(Boolean); // optional
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Simple rate limiter (tweak for your needs)
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60, // requests per IP per window
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-// Helper to normalize/resolve relative URLs to absolute
-function resolveUrl(base, relative) {
+app.use(helmet());
+app.use(limiter);
+
+// Basic auth middleware (optional). If BASIC_USER/BASIC_PASS are empty, skip auth.
+function maybeAuth(req, res, next) {
+  if (!BASIC_USER || !BASIC_PASS) return next();
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.set('WWW-Authenticate', 'Basic realm="Proxy"');
+    return res.status(401).send('Authentication required');
+  }
+  const payload = Buffer.from(auth.split(' ')[1], 'base64').toString();
+  const [user, pass] = payload.split(':');
+  if (user === BASIC_USER && pass === BASIC_PASS) return next();
+  res.set('WWW-Authenticate', 'Basic realm="Proxy"');
+  return res.status(401).send('Invalid credentials');
+}
+
+// helper: block internal IP ranges (RFC1918 + localhost, link-local)
+function isPrivateIP(ip) {
+  if (!ip) return true;
+  // IPv6 hostname mapped to IPv4
+  if (ip.startsWith('::ffff:')) ip = ip.replace('::ffff:', '');
+  const parts = ip.split('.').map(Number);
+  if (parts.length === 4) {
+    const [a,b] = parts;
+    // 10.0.0.0/8
+    if (a === 10) return true;
+    // 172.16.0.0/12
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    // 192.168.0.0/16
+    if (a === 192 && b === 168) return true;
+    // 127.0.0.0/8
+    if (a === 127) return true;
+    // link-local 169.254.0.0/16
+    if (a === 169 && b === 254) return true;
+  }
+  // simple IPv6 checks
+  if (ip === '::1' || ip.startsWith('fe80') || ip.startsWith('fc') || ip.startsWith('fd')) return true;
+  return false;
+}
+
+// resolve hostname -> ip and block private ranges
+async function resolveAndCheck(hostname) {
   try {
-    return new URL(relative, base).toString();
+    const addresses = await dns.lookup(hostname, { all: true });
+    for (const a of addresses) {
+      if (isPrivateIP(a.address)) return false;
+    }
+    return true;
   } catch (e) {
-    return relative;
+    return false;
   }
 }
 
-// Proxy endpoint
-app.get('/proxy', async (req, res) => {
-  const target = req.query.url;
-  if (!target) return res.status(400).send('Missing url parameter');
+// proxy endpoint
+app.get('/proxy', maybeAuth, async (req, res) => {
+  const raw = req.query.url;
+  if (!raw) return res.status(400).send('Missing url parameter');
 
-  // Basic normalization: allow http(s) only
-  if (!/^https?:\/\//i.test(target)) {
-    return res.status(400).send('Only http(s) URLs are supported. Include http:// or https://');
+  let target;
+  try {
+    target = new URL(raw);
+    if (!['http:', 'https:'].includes(target.protocol)) return res.status(400).send('Invalid protocol');
+  } catch (e) {
+    return res.status(400).send('Invalid URL');
   }
 
+  // Optional allowlist check
+  if (ALLOWLIST.length && !ALLOWLIST.includes(target.hostname)) {
+    return res.status(403).send('Host not allowed by server allowlist');
+  }
+
+  // Block private/internal hosts
+  const ok = await resolveAndCheck(target.hostname);
+  if (!ok) return res.status(403).send('Access to private/internal IPs is blocked');
+
+  // fetch the target
   try {
-    // Forward common headers that make sense; do NOT forward cookies from user to upstream.
-    const headers = {
-      'User-Agent': req.get('User-Agent') || 'SleekProxy/1.0',
-      // remove referer to reduce leaking origin — we still pass origin if you want in future
-    };
+    const upstreamRes = await fetch(target.href, {
+      headers: {
+        // pass through user-agent/cookie if desired; be careful with security
+        'user-agent': req.get('user-agent') || 'OmniProxy/1.0',
+        // do not forward original cookies by default (privacy)
+      },
+      redirect: 'follow',
+      timeout: 20000,
+    });
 
-    const upstream = await fetch(target, { headers, redirect: 'follow' });
+    // copy status and headers (but sanitize some)
+    res.status(upstreamRes.status);
+    upstreamRes.headers.forEach((value, name) => {
+      // don't forward hop-by-hop or security headers that break embedding
+      const banned = ['content-security-policy', 'content-security-policy-report-only',
+                      'x-frame-options', 'set-cookie', 'set-cookie2', 'strict-transport-security'];
+      if (banned.includes(name.toLowerCase())) return;
+      // adjust content-length handled by stream
+      res.set(name, value);
+    });
 
-    // If Content-Type is HTML, parse and rewrite links / resources
-    const contentType = upstream.headers.get('content-type') || '';
+    const contentType = upstreamRes.headers.get('content-type') || '';
 
-    // Pass through status for e.g., 404/500 pages from upstream
-    res.status(upstream.status);
-
+    // If HTML, we do a lightweight transformation:
     if (contentType.includes('text/html')) {
-      const text = await upstream.text();
+      const text = await upstreamRes.text();
 
-      const $ = cheerio.load(text, { decodeEntities: false });
+      // Inject a <base> tag to make relative links load through our proxy.
+      // Also rewrite occurrences of src/href that start with '/' or relative to go through /proxy?url=
+      // Basic approach — not perfect for all sites (complex JS or CSP).
+      const baseTag = `<base href="${target.origin}">`;
+      let modified = text.replace(/<head([^>]*)>/i, `<head$1>${baseTag}`);
 
-      // Rewriting helper: given an attribute value, convert it to proxied form or absolute
-      function makeProxyUrl(base, attrVal) {
-        if (!attrVal) return attrVal;
-        // data- urls and javascript: and mailto: should be left alone
-        if (/^(data:|javascript:|mailto:|tel:|#)/i.test(attrVal)) return attrVal;
-        const abs = resolveUrl(base, attrVal);
-        return `/proxy?url=${encodeURIComponent(abs)}`;
-      }
-
-      // Rewrite anchors
-      $('a').each((i, el) => {
-        const href = $(el).attr('href');
-        if (!href) return;
-        $(el).attr('href', makeProxyUrl(target, href));
-        // open in same window — keep proxied
-        $(el).attr('rel', 'noreferrer noopener');
-      });
-
-      // Rewrite src attributes (images, scripts)
-      $('[src]').each((i, el) => {
-        const src = $(el).attr('src');
-        $(el).attr('src', makeProxyUrl(target, src));
-      });
-
-      // Rewrite link[rel=stylesheet] hrefs
-      $('link[href]').each((i, el) => {
-        const href = $(el).attr('href');
-        $(el).attr('href', makeProxyUrl(target, href));
-      });
-
-      // Inject a small topbar so user can easily navigate / see proxied origin
-      const topbar = `
-        <div id="proxy-topbar" style="position:fixed;left:0;right:0;top:0;z-index:9999999;
-          height:56px;backdrop-filter: blur(6px); background: linear-gradient(180deg, rgba(12,18,26,0.9), rgba(12,18,26,0.6));
-          color:#e6eef8; display:flex; align-items:center; gap:12px; padding:8px 16px; box-shadow:0 4px 12px rgba(2,6,23,0.6)">
-          <div style="font-weight:700; font-family:Inter, system-ui; font-size:14px;">SleekProxy</div>
-          <div style="opacity:.9; font-size:13px;">${escapeHtml(target)}</div>
-          <div style="margin-left:auto; display:flex; gap:8px;">
-            <a href="/" style="color:#cfe8ff; text-decoration:none; padding:6px 10px; background:rgba(255,255,255,0.02); border-radius:8px;">New search</a>
-            <a href="${escapeAttr(`/proxy?url=${encodeURIComponent(target)}`)}" style="color:#cfe8ff; text-decoration:none; padding:6px 10px; background:rgba(255,255,255,0.02); border-radius:8px;">Refresh</a>
-          </div>
-        </div>
-        <div style="height:56px;"></div>
-      `;
-
-      // prepend topbar to <body>
-      if ($('body').length) {
-        $('body').prepend(topbar);
-      } else {
-        // fallback: prepend to root
-        $.root().prepend(topbar);
-      }
-
-      // Remove problematic CSP meta tags so proxied scripts/styles can load (best-effort)
-      $('meta[http-equiv="Content-Security-Policy"]').remove();
-
+      // Simple rewrite: replace href="/..." and src="/..." with absolute using origin (keeps browser loading those resources directly).
+      // To route those through proxy you'd need a robust HTML/JS rewriter (not done here for simplicity).
+      // NOTE: we keep resources loading directly from origin to reduce complexity.
       // Send modified HTML
-      res.set('Content-Type', 'text/html; charset=utf-8');
-      res.send($.html());
-      return;
+      res.set('content-type', 'text/html; charset=utf-8');
+      return res.send(modified);
     }
 
-    // For non-HTML, stream bytes and copy important headers
-    // Make sure we don't allow certain headers to leak sensitive info
-    res.set('Content-Type', upstream.headers.get('content-type') || 'application/octet-stream');
-    const buffer = await upstream.arrayBuffer();
-    res.send(Buffer.from(buffer));
+    // For non-HTML, stream the body directly
+    upstreamRes.body.pipe(res);
   } catch (err) {
     console.error('Proxy error:', err);
-    res.status(500).send('Proxy error: ' + String(err.message || err));
+    return res.status(502).send('Bad gateway');
   }
 });
 
-// Tiny helpers for insertion
-function escapeHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-function escapeAttr(s) {
-  if (!s) return '';
-  return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
+// A simple health endpoint
+app.get('/_health', (req, res) => res.send('ok'));
+
+// Serve a helper static UI if you want (optional)
+// app.use(express.static('public'));
 
 app.listen(PORT, () => {
-  console.log(`SleekProxy running on http://localhost:${PORT} — open that in your browser`);
+  console.log(`Proxy server listening on http://localhost:${PORT}`);
 });
