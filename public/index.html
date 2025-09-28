@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Omni</title>
 
-  <!-- ✅ Favicons -->
+  <!-- Favicons -->
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -32,7 +32,6 @@
       margin-bottom: 30px;
       opacity: 0.8;
     }
-    /* 🔍 Search bar */
     .search-bar {
       display: flex;
       align-items: center;
@@ -72,7 +71,6 @@
     .search-bar button:hover {
       background: #ff1e28;
     }
-    /* ⏬ Dropdown */
     .dropdown {
       position: relative;
       display: inline-block;
@@ -114,7 +112,6 @@
     .dropdown:hover .dropdown-content {
       display: block;
     }
-    /* Shortcuts */
     .shortcuts {
       display: flex;
       gap: 25px;
@@ -136,21 +133,41 @@
     .shortcuts button:hover {
       background: rgba(255,255,255,0.15);
     }
-    /* Proxy iframe */
-    #proxyContainer {
-      width: 92%;
-      height: 70vh;
-      margin-top: 20px;
-      display: none;
+    /* News feed list */
+    .news-container {
+      width: 650px;
+      max-width: 95%;
+      margin-top: 30px;
+      margin-bottom: 60px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      overflow: hidden;
+      padding: 16px;
     }
-    #proxyFrame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    .news-item {
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 10px;
     }
-    /* 🎵 Music player */
+    .news-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .news-item a {
+      color: #e50914;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .news-item a:hover {
+      text-decoration: underline;
+    }
+    .news-item p {
+      margin: 4px 0 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
     .music-player {
       position: fixed;
       top: 15px;
@@ -161,7 +178,6 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.6);
     }
-    /* 👤 Credit bubble */
     .credit-bubble {
       position: fixed;
       bottom: 12px;
@@ -176,7 +192,7 @@
   <h1>Omni</h1>
   <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
 
-  <!-- 🔍 Search bar -->
+  <!-- Search bar -->
   <div class="search-bar">
     <select id="engine">
       <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
@@ -196,7 +212,7 @@
     </div>
   </div>
 
-  <!-- ⌨️ Shortcuts -->
+  <!-- Shortcuts -->
   <div class="shortcuts">
     <button onclick="openShortcut('https://openai.com')">OpenAI</button>
     <button onclick="openShortcut('https://github.com')">GitHub</button>
@@ -204,12 +220,16 @@
     <button onclick="addShortcut()">+ Add Shortcut</button>
   </div>
 
-  <!-- 🌐 Proxy iframe -->
-  <div id="proxyContainer">
-    <iframe id="proxyFrame"></iframe>
+  <!-- News feed section -->
+  <div class="news-container" id="newsContainer">
+    <h2>Latest News</h2>
+    <div id="newsList">
+      <!-- News items will be inserted here -->
+      <p>Loading news...</p>
+    </div>
   </div>
 
-  <!-- 🎵 Music Player -->
+  <!-- Music Player -->
   <div class="music-player">
     <iframe 
       width="100%" 
@@ -221,24 +241,20 @@
     </iframe>
   </div>
 
-  <!-- 👤 Credit -->
+  <!-- Credit -->
   <div class="credit-bubble">made by Jacob Maddox</div>
 
   <script>
     function doSearch() {
-      const engine = document.getElementById("engine").value;
+      const eng = document.getElementById("engine").value;
       const query = document.getElementById("searchInput").value;
       if (!query) return;
-      const url = engine + encodeURIComponent(query);
-
-      // Proxy inside iframe
-      document.getElementById("proxyContainer").style.display = "block";
-      document.getElementById("proxyFrame").src = "/proxy/" + encodeURIComponent(url);
+      const url = eng + encodeURIComponent(query);
+      window.open(url, "_blank");
     }
 
     function openShortcut(url) {
-      document.getElementById("proxyContainer").style.display = "block";
-      document.getElementById("proxyFrame").src = "/proxy/" + encodeURIComponent(url);
+      window.open(url, "_blank");
     }
 
     function addShortcut() {
@@ -251,7 +267,45 @@
         document.querySelector(".shortcuts").insertBefore(btn, document.querySelector(".shortcuts").lastElementChild);
       }
     }
+
+    async function fetchNews() {
+      try {
+        // Example: use rss2json.com to convert RSS to JSON
+        const rssUrl = encodeURIComponent("https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml");
+        const resp = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+        const json = await resp.json();
+        const items = json.items || [];
+        const newsList = document.getElementById("newsList");
+        newsList.innerHTML = "";
+        items.slice(0, 5).forEach(item => {
+          const div = document.createElement("div");
+          div.className = "news-item";
+          const a = document.createElement("a");
+          a.href = item.link;
+          a.textContent = item.title;
+          a.target = "_blank";
+          const p = document.createElement("p");
+          p.textContent = item.pubDate;
+          div.appendChild(a);
+          div.appendChild(p);
+          newsList.appendChild(div);
+        });
+        if (items.length === 0) {
+          document.getElementById("newsList").innerHTML = "<p>No news found.</p>";
+        }
+      } catch (err) {
+        console.error("News fetch error:", err);
+        document.getElementById("newsList").innerHTML = "<p>Failed to load news.</p>";
+      }
+    }
+
+    // Load news when page loads
+    window.addEventListener("load", () => {
+      fetchNews();
+      setInterval(fetchNews, 1000 * 60 * 5); // refresh every 5 minutes
+    });
   </script>
 </body>
 </html>
+
 
