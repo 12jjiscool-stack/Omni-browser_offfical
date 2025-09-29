@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omni Browser</title>
-  <link rel="icon" href="favicon.ico" />
   <style>
     body {
       margin: 0;
@@ -72,7 +71,7 @@
     }
     .sidebar.active { left: 0; }
     .sidebar h2 { margin-top: 0; }
-    .sidebar button, .sidebar select {
+    .sidebar button {
       display: block;
       margin: 10px 0;
       padding: 10px;
@@ -81,11 +80,13 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    /* Tabs */
     .tabs {
       display: flex;
       background: #eee;
       border-bottom: 1px solid #ccc;
       overflow-x: auto;
+      align-items: center;
     }
     .tab {
       background: #ddd;
@@ -100,13 +101,24 @@
     }
     .tab.active { background: white; border-bottom: 2px solid #d32f2f; }
     .tab .close { font-weight: bold; cursor: pointer; }
+    .new-tab-btn {
+      padding: 8px 14px;
+      background: #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
     .tab-content { height: calc(100vh - 200px); }
     .tab-content iframe { width: 100%; height: 100%; border: none; }
+    /* Homepage content */
+    .homepage {
+      padding: 20px;
+    }
     .shortcuts {
       display: flex;
       gap: 14px;
-      padding: 20px;
       flex-wrap: wrap;
+      margin-bottom: 20px;
     }
     .shortcut {
       display: flex;
@@ -120,7 +132,6 @@
     }
     .shortcut img { width: 20px; height: 20px; }
     #news-feed {
-      padding: 20px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
@@ -152,7 +163,7 @@
         <option value="https://www.bing.com/search?q=">Bing</option>
       </select>
       <input type="text" id="searchBox" placeholder="Search the web..."/>
-      <button onclick="newTab()">Search</button>
+      <button onclick="searchWeb()">Search</button>
       <span class="dice" onclick="rollDice()">🎲</span>
     </div>
     <button class="profile-bubble" id="profileBubble">?</button>
@@ -160,21 +171,6 @@
 
   <div class="tabs" id="tabs"></div>
   <div class="tab-content" id="tabContent"></div>
-
-  <div class="shortcuts">
-    <div class="shortcut" onclick="openSite('https://mail.google.com')">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
-    </div>
-    <div class="shortcut" onclick="openSite('https://youtube.com')">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
-    </div>
-    <div class="shortcut" onclick="openSite('https://chat.openai.com')">
-      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
-    </div>
-    <div class="shortcut" onclick="addShortcut()">+ Add Shortcut</div>
-  </div>
-
-  <div id="news-feed"></div>
 
   <div class="sidebar" id="sidebar">
     <h2>Menu</h2>
@@ -195,52 +191,108 @@
       sidebar.classList.toggle('active');
     };
 
+    const tabsDiv = document.getElementById('tabs');
+    const tabContent = document.getElementById('tabContent');
     let tabs = [];
-    function newTab() {
+    let activeTab = null;
+
+    function createHomepage() {
+      const id = Date.now();
+      tabs.push({id, title: "New Tab", type: "homepage"});
+      setActiveTab(id);
+      renderTabs();
+    }
+
+    function searchWeb() {
       const engine = document.getElementById('engine').value;
       const query = document.getElementById('searchBox').value;
+      if (!query) return;
       const url = engine + encodeURIComponent(query);
       const id = Date.now();
-      tabs.push({id, url, title: query});
+      tabs.push({id, title: query, type: "web", url});
+      setActiveTab(id);
       renderTabs();
     }
-    function renderTabs() {
-      const tabsDiv = document.getElementById('tabs');
-      const tabContent = document.getElementById('tabContent');
-      tabsDiv.innerHTML = "";
-      tabContent.innerHTML = "";
-      tabs.forEach((tab, i) => {
-        const t = document.createElement('div');
-        t.className = "tab" + (i === tabs.length-1 ? " active" : "");
-        t.innerHTML = tab.title + `<span class='close' onclick='closeTab(${tab.id})'>×</span>`;
-        tabsDiv.appendChild(t);
-        if (i === tabs.length-1) {
-          const iframe = document.createElement('iframe');
-          iframe.src = tab.url;
-          tabContent.appendChild(iframe);
-        }
-      });
+
+    function setActiveTab(id) {
+      activeTab = id;
+      renderTabs();
     }
+
     function closeTab(id) {
       tabs = tabs.filter(t => t.id !== id);
+      if (activeTab === id && tabs.length) {
+        activeTab = tabs[tabs.length - 1].id;
+      }
       renderTabs();
     }
+
+    function renderTabs() {
+      tabsDiv.innerHTML = "";
+      tabContent.innerHTML = "";
+
+      tabs.forEach(tab => {
+        const t = document.createElement("div");
+        t.className = "tab" + (tab.id === activeTab ? " active" : "");
+        t.onclick = () => setActiveTab(tab.id);
+        t.innerHTML = tab.title + ` <span class="close" onclick="event.stopPropagation(); closeTab(${tab.id})">×</span>`;
+        tabsDiv.appendChild(t);
+      });
+
+      const newTabBtn = document.createElement("div");
+      newTabBtn.className = "new-tab-btn";
+      newTabBtn.innerText = "+";
+      newTabBtn.onclick = createHomepage;
+      tabsDiv.appendChild(newTabBtn);
+
+      const tab = tabs.find(t => t.id === activeTab);
+      if (!tab) return;
+
+      if (tab.type === "homepage") {
+        const div = document.createElement("div");
+        div.className = "homepage";
+        div.innerHTML = `
+          <div class="shortcuts">
+            <div class="shortcut" onclick="openSite('https://mail.google.com')">
+              <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
+            </div>
+            <div class="shortcut" onclick="openSite('https://youtube.com')">
+              <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
+            </div>
+            <div class="shortcut" onclick="openSite('https://chat.openai.com')">
+              <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
+            </div>
+            <div class="shortcut" onclick="addShortcut()">+ Add Shortcut</div>
+          </div>
+          <div id="news-feed"></div>
+        `;
+        tabContent.appendChild(div);
+        loadNews();
+      } else if (tab.type === "web") {
+        const iframe = document.createElement("iframe");
+        iframe.src = tab.url;
+        tabContent.appendChild(iframe);
+      }
+    }
+
     function openSite(url) {
       const id = Date.now();
-      tabs.push({id, url, title: url});
+      tabs.push({id, title: url, type: "web", url});
+      setActiveTab(id);
       renderTabs();
     }
+
     function rollDice() {
       const sites = ["https://pbskids.org","https://youtube.com","https://coolmathgames.com"];
       const site = sites[Math.floor(Math.random()*sites.length)];
       openSite(site);
     }
 
-    // News Feed
     async function loadNews() {
       const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://rss.cnn.com/rss/cnn_topstories.rss");
       const data = await res.json();
       const feed = document.getElementById("news-feed");
+      if (!feed) return;
       feed.innerHTML = "";
       data.items.slice(0,6).forEach(item => {
         const card = document.createElement("div");
@@ -251,10 +303,8 @@
         feed.appendChild(card);
       });
     }
-    loadNews();
     setInterval(loadNews, 300000);
 
-    // Themes
     function toggleThemeMenu() {
       const menu = document.getElementById('themeMenu');
       menu.style.display = menu.style.display === "none" ? "block" : "none";
@@ -280,16 +330,15 @@
       input.click();
     }
 
-    // News toggle
     let newsVisible = true;
     function toggleNews() {
       const feed = document.getElementById("news-feed");
+      if (!feed) return;
       newsVisible = !newsVisible;
       feed.style.display = newsVisible ? "grid" : "none";
       event.target.innerText = newsVisible ? "Hide News Feed" : "Show News Feed";
     }
 
-    // Sign in
     const profileBubble = document.getElementById("profileBubble");
     function signIn() {
       const username = prompt("Enter username:");
@@ -316,6 +365,9 @@
       profileBubble.innerText = user.username[0].toUpperCase();
       profileBubble.onclick = editProfile;
     }
+
+    // Load default homepage on startup
+    createHomepage();
   </script>
 </body>
 </html>
