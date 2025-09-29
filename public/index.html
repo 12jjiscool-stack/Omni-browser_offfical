@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Omni</title>
 
-  <!-- ✅ Favicon -->
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -38,269 +37,441 @@
       max-width: 95%;
       margin-bottom: 20px;
     }
-    .search-bar select, .search-bar input, .search-bar button {
+    .search-bar select, 
+    .search-bar input, 
+    .search-bar button {
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
     }
     .search-bar input {
       flex: 1;
     }
-    .menu-button, .dice-button {
+    .menu-button, .dice-button, .signin-bubble {
       font-size: 1.2rem;
       background: rgba(255,255,255,0.15);
       border: none;
-      border-radius: 10px;
-      padding: 8px 14px;
+      border-radius: 50%;
+      padding: 10px 14px;
       color: white;
       cursor: pointer;
       transition: background 0.2s;
     }
-    .menu-button:hover, .dice-button:hover {
+    .signin-bubble {
+      font-weight: bold;
+      position: relative;
+    }
+    .menu-button:hover, .dice-button:hover, .signin-bubble:hover {
       background: rgba(255,255,255,0.3);
     }
     .sidebar {
       position: fixed;
       top: 0;
-      left: -270px;
-      width: 270px;
+      left: -260px;
+      width: 250px;
       height: 100%;
-      background: #1c1c1c;
+      background: #222;
       padding: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.5);
       transition: left 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
     }
-    .sidebar.open {
+    .sidebar.active {
       left: 0;
     }
-    .sidebar h2 {
-      margin-top: 0;
-      font-size: 1.4rem;
-    }
     .sidebar button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
       padding: 12px;
+      background: #444;
       border: none;
       border-radius: 8px;
-      background: #333;
       color: white;
       text-align: left;
       cursor: pointer;
-      font-size: 1rem;
       transition: background 0.2s;
     }
     .sidebar button:hover {
-      background: #444;
+      background: #666;
+    }
+    .dropdown {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin-left: 10px;
+    }
+    .dropdown.active {
+      display: flex;
     }
     .shortcuts {
-      margin: 20px 0;
       display: flex;
-      gap: 12px;
+      gap: 15px;
+      margin-bottom: 20px;
     }
     .shortcut {
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.1);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 0.9rem;
+      gap: 8px;
       cursor: pointer;
       transition: background 0.2s;
     }
     .shortcut:hover {
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.3);
     }
     .shortcut img {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
+    }
+    .add-shortcut {
+      padding: 10px 14px;
+      background: rgba(0,200,200,0.3);
+      border-radius: 8px;
+      cursor: pointer;
     }
     .news-controls {
-      margin: 10px 0 20px;
+      margin: 20px;
+      display: flex;
+      gap: 10px;
     }
-    .news-feed {
+    .news-controls button {
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: none;
+      background: #444;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .news-controls button:hover {
+      background: #666;
+    }
+    .news-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 15px;
-      width: 90%;
+      gap: 20px;
+      padding: 20px;
       max-width: 1200px;
-      margin: 20px auto;
+      width: 100%;
     }
     .news-card {
-      background: #2a2a2a;
+      background: #333;
       border-radius: 10px;
-      padding: 10px;
       overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      gap: 8px;
     }
     .news-card img {
       width: 100%;
-      border-radius: 8px;
-      max-height: 160px;
+      height: 160px;
       object-fit: cover;
     }
-    .news-card h3 {
+    .news-content {
+      padding: 10px;
+    }
+    .news-content h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
-    .news-card p {
-      font-size: 0.9rem;
-      opacity: 0.85;
+    .news-content p {
+      font-size: 0.85rem;
+      opacity: 0.8;
     }
-    .news-card a {
-      text-decoration: none;
-      color: #ff4d4d;
-      font-weight: bold;
-      margin-top: auto;
-    }
-    .dropdown {
+    /* Sign in popup */
+    #signinPopup {
       display: none;
-      margin-left: 10px;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      z-index: 1000;
+      color: white;
+    }
+    #signinPopup input {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 250px;
+      border-radius: 6px;
+      border: none;
+    }
+    #signinPopup button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    /* User dropdown */
+    .user-dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1001;
+      width: 220px;
+    }
+    .user-dropdown input {
+      padding: 6px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+    }
+    .user-dropdown button {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #444;
+      color: white;
+    }
+    .user-dropdown button:hover {
+      background: #666;
     }
   </style>
 </head>
 <body>
   <h1>Omni</h1>
-  <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
+  <p class="description">A multi tool search engine that will be safe for you and generations to come</p>
 
   <div class="search-bar">
     <select id="engine">
       <option value="https://www.google.com/search?q=">Google</option>
-      <option value="https://www.bing.com/search?q=">Bing</option>
       <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
     </select>
-    <input type="text" id="query" placeholder="Search the web..." />
-    <button onclick="search()">Search</button>
+    <input type="text" id="searchInput" placeholder="Search the web...">
+    <button onclick="doSearch()">Search</button>
     <button class="dice-button" onclick="rollDice()">🎲</button>
+    <span id="signinArea"></span>
     <button class="menu-button" onclick="toggleMenu()">☰</button>
   </div>
 
   <!-- Shortcuts -->
-  <div class="shortcuts">
-    <div class="shortcut" onclick="window.open('https://mail.google.com', '_blank')">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail">
-      Gmail
+  <div class="shortcuts" id="shortcuts">
+    <div class="shortcut" onclick="window.open('https://youtube.com','_blank')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"><span>YouTube</span>
     </div>
-    <div class="shortcut" onclick="window.open('https://youtube.com', '_blank')">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube">
-      YouTube
+    <div class="shortcut" onclick="window.open('https://mail.google.com','_blank')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"><span>Gmail</span>
     </div>
-    <div class="shortcut" onclick="window.open('https://chat.openai.com', '_blank')">
-      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT">
-      ChatGPT
+    <div class="shortcut" onclick="window.open('https://chat.openai.com','_blank')">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"><span>ChatGPT</span>
     </div>
+    <div class="add-shortcut" onclick="addShortcut()">+ Add Shortcut</div>
   </div>
 
-  <!-- News Source Selector -->
+  <!-- News Source Controls -->
   <div class="news-controls">
-    <label for="news-source">News Source:</label>
-    <select id="news-source" onchange="loadNews()">
-      <option value="http://rss.cnn.com/rss/edition.rss" selected>CNN</option>
-      <option value="https://feeds.bbci.co.uk/news/rss.xml">BBC</option>
-      <option value="http://feeds.reuters.com/reuters/topNews">Reuters</option>
-    </select>
+    <button onclick="loadNews('cnn')">CNN</button>
+    <button onclick="loadNews('bbc')">BBC</button>
+    <button onclick="loadNews('reuters')">Reuters</button>
   </div>
-
-  <!-- News Feed -->
-  <div id="news-feed" class="news-feed"></div>
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <h2>Menu</h2>
-    <button onclick="alert('Sign in coming soon!')">Sign In</button>
-    <button onclick="toggleSettings()">Settings ▼</button>
-    <div id="settings-menu" class="dropdown">
-      <button onclick="toggleNews()">Hide News Feed</button>
-      <button onclick="localStorage.clear();location.reload();">Clean Data</button>
+    <button onclick="toggleDropdown('settingsDropdown')">Settings ⚙️</button>
+    <div id="settingsDropdown" class="dropdown">
+      <button onclick="toggleNews()">Hide/Show News Feed</button>
+      <button onclick="clearData()">Clean Data</button>
       <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical','_blank')">Current GitHub</button>
     </div>
-    <button onclick="toggleThemes()">Themes ▼</button>
-    <div id="themes-menu" class="dropdown">
+    <button onclick="toggleDropdown('themesDropdown')">Themes 🎨</button>
+    <div id="themesDropdown" class="dropdown">
       <button onclick="setTheme('light')">Light Mode</button>
       <button onclick="setTheme('dark')">Dark Mode</button>
       <button onclick="setTheme('night')">Night Mode</button>
+      <button onclick="document.getElementById('bgUpload').click()">Edit Background</button>
+      <input type="file" id="bgUpload" accept="image/*" style="display:none" onchange="uploadBackground(event)">
     </div>
+    <button onclick="openSignin()">Sign In</button>
   </div>
 
+  <!-- Sign In Popup -->
+  <div id="signinPopup">
+    <h3>Sign In</h3>
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="submitSignin()">Submit</button>
+  </div>
+
+  <!-- News Feed -->
+  <div id="newsContainer" class="news-container"></div>
+
   <script>
-    function search() {
-      const engine = document.getElementById("engine").value;
-      const query = document.getElementById("query").value;
-      if (query) window.open(engine + encodeURIComponent(query), "_blank");
+    // Sidebar toggle
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+    function toggleDropdown(id) {
+      document.getElementById(id).classList.toggle("active");
     }
 
+    // Search
+    function doSearch() {
+      const engine = document.getElementById("engine").value;
+      const query = document.getElementById("searchInput").value;
+      if (query.trim() !== "") {
+        window.open(engine + encodeURIComponent(query), "_blank");
+      }
+    }
+
+    // Dice
     function rollDice() {
       const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
       const randomSite = sites[Math.floor(Math.random() * sites.length)];
       window.open(randomSite, "_blank");
     }
 
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("open");
-    }
-
-    function toggleSettings() {
-      const settings = document.getElementById("settings-menu");
-      settings.style.display = settings.style.display === "none" ? "block" : "none";
-    }
-
-    function toggleThemes() {
-      const themes = document.getElementById("themes-menu");
-      themes.style.display = themes.style.display === "none" ? "block" : "none";
-    }
-
+    // Theme switching
     function setTheme(mode) {
       if (mode === "light") {
         document.body.style.background = "#f5f5f5";
-        document.body.style.color = "#111";
+        document.body.style.color = "#000";
       } else if (mode === "dark") {
         document.body.style.background = "linear-gradient(135deg, #111, #222)";
-        document.body.style.color = "white";
+        document.body.style.color = "#fff";
       } else if (mode === "night") {
-        document.body.style.background = "#0b0b0b";
-        document.body.style.color = "#cfcfcf";
+        document.body.style.background = "#0a0a0a";
+        document.body.style.color = "#ccc";
       }
     }
 
-    let newsHidden = false;
-    function toggleNews() {
-      const feed = document.getElementById("news-feed");
-      newsHidden = !newsHidden;
-      feed.style.display = newsHidden ? "none" : "grid";
-      document.querySelector("#settings-menu button").innerText = newsHidden ? "Show News Feed" : "Hide News Feed";
+    function uploadBackground(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.body.style.background = `url('${e.target.result}') no-repeat center center fixed`;
+          document.body.style.backgroundSize = "cover";
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
-    async function loadNews() {
-      const source = document.getElementById("news-source").value;
+    // Toggle news
+    function toggleNews() {
+      const container = document.getElementById("newsContainer");
+      container.style.display = (container.style.display === "none") ? "grid" : "none";
+    }
+
+    // Clear Data
+    function clearData() {
+      localStorage.clear();
+      alert("Local data cleared!");
+      location.reload();
+    }
+
+    // Shortcuts
+    function addShortcut() {
+      const name = prompt("Enter shortcut name:");
+      const url = prompt("Enter shortcut URL:");
+      if (name && url) {
+        const div = document.createElement("div");
+        div.className = "shortcut";
+        div.innerHTML = `<span>${name}</span>`;
+        div.onclick = () => window.open(url, "_blank");
+        document.getElementById("shortcuts").insertBefore(div, document.querySelector(".add-shortcut"));
+      }
+    }
+
+    // Sign in
+    function openSignin() {
+      document.getElementById("signinPopup").style.display = "block";
+    }
+    function submitSignin() {
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (username && email && password) {
+        localStorage.setItem("user", JSON.stringify({ username, email, password }));
+        document.getElementById("signinPopup").style.display = "none";
+        showUserBubble(username);
+      }
+    }
+    function showUserBubble(username) {
+      document.getElementById("signinArea").innerHTML = `
+        <span class="signin-bubble" onclick="toggleUserDropdown()">${username[0].toUpperCase()}
+          <div class="user-dropdown" id="userDropdown">
+            <input type="text" id="editUsername" placeholder="Username">
+            <input type="email" id="editEmail" placeholder="Email">
+            <input type="password" id="editPassword" placeholder="Password">
+            <button onclick="updateUser()">Update</button>
+          </div>
+        </span>`;
+      const user = JSON.parse(localStorage.getItem("user"));
+      document.getElementById("editUsername").value = user.username;
+      document.getElementById("editEmail").value = user.email;
+      document.getElementById("editPassword").value = user.password;
+    }
+    function toggleUserDropdown() {
+      document.getElementById("userDropdown").style.display =
+        (document.getElementById("userDropdown").style.display === "flex") ? "none" : "flex";
+    }
+    function updateUser() {
+      const newUsername = document.getElementById("editUsername").value;
+      const newEmail = document.getElementById("editEmail").value;
+      const newPassword = document.getElementById("editPassword").value;
+      if (newUsername && newEmail && newPassword) {
+        localStorage.setItem("user", JSON.stringify({ username: newUsername, email: newEmail, password: newPassword }));
+        showUserBubble(newUsername);
+      }
+    }
+
+    // Load News
+    async function loadNews(source) {
+      let url = "";
+      if (source === "cnn") url = "https://rss2json.com/api.json?rss_url=https://rss.cnn.com/rss/edition.rss";
+      if (source === "bbc") url = "https://rss2json.com/api.json?rss_url=http://feeds.bbci.co.uk/news/rss.xml";
+      if (source === "reuters") url = "https://rss2json.com/api.json?rss_url=http://feeds.reuters.com/reuters/topNews";
+
       try {
-        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source));
+        const res = await fetch(url);
         const data = await res.json();
-        const feed = document.getElementById("news-feed");
-        feed.innerHTML = "";
-        data.items.slice(0, 8).forEach(article => {
-          const img = article.enclosure && article.enclosure.link ? article.enclosure.link : "https://via.placeholder.com/300x150";
+        const container = document.getElementById("newsContainer");
+        container.innerHTML = "";
+        data.items.forEach(article => {
           const card = document.createElement("div");
           card.className = "news-card";
+          card.onclick = () => window.open(article.link, "_blank");
           card.innerHTML = `
-            <img src="${img}" alt="Thumbnail">
-            <h3>${article.title}</h3>
-            <p>${article.description.slice(0,120)}...</p>
-            <a href="${article.link}" target="_blank">Read More</a>
-          `;
-          feed.appendChild(card);
+            <img src="${article.enclosure?.link || 'https://via.placeholder.com/280x160'}" alt="thumbnail">
+            <div class="news-content">
+              <h3>${article.title}</h3>
+              <p>${article.description}</p>
+            </div>`;
+          container.appendChild(card);
         });
-      } catch (e) {
-        console.error("Failed to load news", e);
+      } catch (err) {
+        console.error("Failed to load news", err);
       }
     }
 
-    // Load CNN by default + refresh every 5 minutes
-    loadNews();
-    setInterval(loadNews, 300000);
+    // Init
+    window.onload = () => {
+      const user = localStorage.getItem("user");
+      if (user) {
+        const { username } = JSON.parse(user);
+        showUserBubble(username);
+      }
+      loadNews('cnn');
+    };
   </script>
 </body>
 </html>
+
 
