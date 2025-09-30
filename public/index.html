@@ -159,7 +159,7 @@
       background: #444;
     }
 
-    /* Math Solver Modal */
+    /* Calculator Modal */
     #calculatorModal {
       display: none;
       position: fixed;
@@ -171,6 +171,22 @@
       border-radius: 15px;
       z-index: 2000;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    #calculatorHeader {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+
+    #closeCalc {
+      background: #333;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 2px 8px;
     }
 
     #calculatorDisplay {
@@ -207,7 +223,7 @@
     }
 
     /* Sign In Modal */
-    #signInModal {
+    #signInModal, #accountModal {
       display: none;
       position: fixed;
       top: 50%;
@@ -221,7 +237,7 @@
       text-align: center;
     }
 
-    #signInModal input {
+    #signInModal input, #accountModal input {
       width: 90%;
       padding: 10px;
       margin: 8px 0;
@@ -230,7 +246,7 @@
       font-size: 1rem;
     }
 
-    #signInModal button {
+    #signInModal button, #accountModal button {
       background: #333;
       color: white;
       border: none;
@@ -241,7 +257,7 @@
       width: 100%;
     }
 
-    #signInModal button:hover {
+    #signInModal button:hover, #accountModal button:hover {
       background: #444;
     }
   </style>
@@ -284,7 +300,6 @@
   <div id="sideMenu">
     <button id="signInBtn">Sign In</button>
     <button id="themesBtn">Themes</button>
-    <button id="toggleNewsBtn">Hide News Feed</button>
     <button id="cleanDataBtn">Clean Data</button>
     <a href="https://github.com/12jjiscool-stack/Omni-browser_offfical" target="_blank">Current GitHub</a>
     <button id="mathSolverBtn">Math Solver</button>
@@ -292,6 +307,7 @@
 
   <!-- Calculator Modal -->
   <div id="calculatorModal">
+    <div id="calculatorHeader"><button id="closeCalc">X</button></div>
     <input type="text" id="calculatorDisplay" readonly>
     <div class="calc-grid">
       <button class="calc-btn">7</button>
@@ -328,6 +344,15 @@
     <input type="email" id="emailInput" placeholder="Email">
     <input type="password" id="passwordInput" placeholder="Password">
     <button id="signInSubmit">Sign In</button>
+  </div>
+
+  <!-- Account Modal -->
+  <div id="accountModal">
+    <h2>Account Settings</h2>
+    <input type="text" id="editUsername" placeholder="Username">
+    <input type="email" id="editEmail" placeholder="Email">
+    <input type="password" id="editPassword" placeholder="Password">
+    <button id="updateAccount">Update</button>
   </div>
 
   <script>
@@ -367,6 +392,9 @@
     document.getElementById("mathSolverBtn").addEventListener("click", () => {
       calcModal.style.display = "block";
     });
+    document.getElementById("closeCalc").addEventListener("click", () => {
+      calcModal.style.display = "none";
+    });
     document.querySelectorAll(".calc-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const val = btn.textContent;
@@ -374,7 +402,12 @@
           calcDisplay.value = "";
         } else if(val === "=") {
           try {
-            calcDisplay.value = eval(calcDisplay.value.replace("√", "Math.sqrt").replace("log", "Math.log").replace("sin", "Math.sin").replace("cos", "Math.cos").replace("tan", "Math.tan"));
+            calcDisplay.value = eval(calcDisplay.value
+              .replace("√", "Math.sqrt")
+              .replace("log", "Math.log")
+              .replace("sin", "Math.sin")
+              .replace("cos", "Math.cos")
+              .replace("tan", "Math.tan"));
           } catch {
             calcDisplay.value = "Error";
           }
@@ -388,6 +421,8 @@
     const signInModal = document.getElementById("signInModal");
     const signInSubmit = document.getElementById("signInSubmit");
     const profileBubble = document.getElementById("profileBubble");
+    const accountModal = document.getElementById("accountModal");
+    const updateAccount = document.getElementById("updateAccount");
 
     function checkSignIn() {
       const user = localStorage.getItem("user");
@@ -410,7 +445,54 @@
         signInModal.style.display = "none";
       }
     });
+
+    profileBubble.addEventListener("click", () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      document.getElementById("editUsername").value = user.username;
+      document.getElementById("editEmail").value = user.email;
+      document.getElementById("editPassword").value = user.password;
+      accountModal.style.display = "block";
+    });
+
+    updateAccount.addEventListener("click", () => {
+      const username = document.getElementById("editUsername").value;
+      const email = document.getElementById("editEmail").value;
+      const password = document.getElementById("editPassword").value;
+      if(username && email && password) {
+        localStorage.setItem("user", JSON.stringify({username,email,password}));
+        profileBubble.textContent = username[0].toUpperCase();
+        accountModal.style.display = "none";
+      }
+    });
+
+    // Themes
+    const themes = {
+      light: { bg: "#f5f5f5", text: "#000", accent: "#0078d7" },
+      dark: { bg: "#0a0a0a", text: "#fff", accent: "#0ff" },
+      night: { bg: "#111", text: "#ccc", accent: "#7af" }
+    };
+
+    let currentTheme = "night"; // default
+
+    function applyTheme(theme) {
+      const t = themes[theme];
+      document.body.style.background = t.bg;
+      document.body.style.color = t.text;
+      document.querySelectorAll("button, select, input, .shortcut, .add-shortcut, #sideMenu, #calculatorModal, #signInModal, #accountModal")
+        .forEach(el => {
+          el.style.background = t.bg === "#f5f5f5" ? "#ddd" : "#333";
+          el.style.color = t.text;
+        });
+      document.getElementById("clock").style.textShadow = `0 0 10px ${t.accent}`;
+      currentTheme = theme;
+    }
+    applyTheme(currentTheme);
+
+    document.getElementById("themesBtn").addEventListener("click", () => {
+      if(currentTheme === "light") applyTheme("dark");
+      else if(currentTheme === "dark") applyTheme("night");
+      else applyTheme("light");
+    });
   </script>
 </body>
 </html>
-
