@@ -5,254 +5,239 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omni Browser</title>
   <style>
-    :root {
-      --bg-color: #0f0f0f;
-      --text-color: #fff;
-      --card-bg: #1a1a1a;
-      --accent: #3a82f7;
-      --clock-glow: #3a82f7;
-    }
-    [data-theme="light"] {
-      --bg-color: #ffffff;
-      --text-color: #111;
-      --card-bg: #f1f1f1;
-      --accent: #0078d7;
-      --clock-glow: #0078d7;
-    }
-    [data-theme="dark"] {
-      --bg-color: #121212;
-      --text-color: #eaeaea;
-      --card-bg: #1e1e1e;
-      --accent: #bb86fc;
-      --clock-glow: #bb86fc;
-    }
-    [data-theme="night"] {
-      --bg-color: #0f0f0f;
-      --text-color: #fff;
-      --card-bg: #1a1a1a;
-      --accent: #3a82f7;
-      --clock-glow: #3a82f7;
-    }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
-      overflow-x: hidden;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
     header {
-      text-align: center;
-      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      position: relative;
     }
-    header h1 {
-      font-size: 2.5em;
-      margin: 0;
+
+    #menuButton {
+      margin-left: 10px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    header p {
-      font-size: 1.3em;
-      margin: 10px 0;
-      color: var(--text-color);
+
+    #diceButton {
+      margin-left: 10px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
     }
+
+    #profileBubble {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 10px 0 0 0;
+    }
+
+    .description {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: white;
+    }
+
     #clock {
       font-family: monospace;
-      font-size: 2.5em;
-      margin: 10px 0;
-      text-shadow: 0 0 15px var(--clock-glow);
-      cursor: pointer;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0ff;
     }
-    .search-row {
+
+    #searchContainer {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      margin: 20px auto;
+      gap: 10px;
       width: 80%;
+      max-width: 800px;
+      margin-bottom: 20px;
     }
-    .search-container {
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .search-container select,
-    .search-container input {
+
+    #searchBar {
+      flex: 1;
       padding: 12px;
-      border-radius: 5px;
-      border: 1px solid #444;
+      font-size: 1.2rem;
+      border-radius: 25px;
+      border: none;
       outline: none;
-      background: var(--card-bg);
-      color: var(--text-color);
     }
-    .search-container input {
-      flex-grow: 1;
-      font-size: 1.1em;
-    }
-    .search-container button {
-      padding: 12px 16px;
+
+    #engineSelect, #searchButton {
+      padding: 10px 15px;
+      border-radius: 25px;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      background: var(--accent);
-      color: #fff;
-      font-size: 1em;
+      font-size: 1rem;
     }
-    #menu-btn, #dice-btn, #profile-bubble {
-      padding: 12px;
-      border: none;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.1em;
-    }
-    #profile-bubble {
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-    #tabs {
-      display: flex;
-      background: var(--card-bg);
-      padding: 5px 10px;
-    }
-    .tab {
-      background: var(--bg-color);
-      border: 1px solid #444;
-      padding: 5px 10px;
-      margin-right: 5px;
-      border-radius: 5px 5px 0 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .tab.active {
-      background: var(--accent);
-      color: #fff;
-    }
-    .tab span.close {
-      cursor: pointer;
-    }
+
     .shortcuts {
       display: flex;
-      justify-content: center;
       gap: 15px;
-      margin: 20px;
+      margin-bottom: 20px;
     }
+
     .shortcut {
-      padding: 10px 15px;
-      border-radius: 10px;
-      background: var(--card-bg);
       display: flex;
       align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: transform 0.2s;
+      background: #333;
+      padding: 10px 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: white;
+      font-size: 0.9rem;
+      transition: background 0.3s;
     }
+
+    .shortcut:hover {
+      background: #444;
+    }
+
     .shortcut img {
       width: 20px;
       height: 20px;
+      margin-right: 8px;
     }
-    .shortcut:hover {
-      transform: scale(1.05);
-    }
-    .news-controls {
-      display: flex;
-      justify-content: center;
-      margin: 15px 0;
-    }
-    .news-controls select {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #444;
-      background: var(--card-bg);
-      color: var(--text-color);
-    }
-    .news-feed {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-    }
-    .news-card {
-      background: var(--card-bg);
+
+    .add-shortcut {
+      background: #444;
+      border: none;
+      padding: 10px 15px;
       border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    /* News feed */
+    #newsControls {
+      margin: 10px 0;
+    }
+
+    #newsContainer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      width: 90%;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .news-card {
+      background: #1e1e1e;
+      border-radius: 12px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
       transition: transform 0.2s;
     }
+
     .news-card:hover {
-      transform: scale(1.03);
+      transform: scale(1.02);
     }
+
     .news-card img {
       width: 100%;
       height: 150px;
       object-fit: cover;
     }
-    .news-card div {
+
+    .news-card .content {
       padding: 10px;
     }
-    .news-error {
-      background: #ff4444;
-      color: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
+
+    .news-card .content h3 {
+      margin: 0 0 5px 0;
+      font-size: 1rem;
+    }
+
+    .news-card .content p {
+      font-size: 0.85rem;
+      color: #ccc;
     }
   </style>
 </head>
-<body data-theme="night">
+<body>
   <header>
     <h1>Omni</h1>
-    <p>A multi-tool search engine that will be safe for you and generations to come</p>
-    <div id="clock" title=""></div>
+    <button id="menuButton">☰ Menu</button>
+    <button id="diceButton">🎲</button>
+    <div id="profileBubble">U</div>
   </header>
 
-  <div class="search-row">
-    <button id="menu-btn">☰</button>
-    <div class="search-container">
-      <select id="engine">
-        <option value="https://www.google.com/search?q=">Google</option>
-        <option value="https://www.bing.com/search?q=">Bing</option>
-        <option value="https://search.yahoo.com/search?p=">Yahoo</option>
-      </select>
-      <input type="text" id="search" placeholder="Search the web..."/>
-      <button id="search-btn">Search</button>
-    </div>
-    <button id="dice-btn">🎲</button>
-    <div id="profile-bubble">U</div>
-  </div>
+  <div class="description">A multi tool search engine that will be safe for you and generations to come</div>
+  <div id="clock" title=""></div>
 
-  <div id="tabs">
-    <div class="tab active">New Tab <span class="close">x</span></div>
+  <div id="searchContainer">
+    <input type="text" id="searchBar" placeholder="Search the web...">
+    <select id="engineSelect">
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+    </select>
+    <button id="searchButton">Search</button>
   </div>
 
   <div class="shortcuts">
-    <div class="shortcut" onclick="openInNewTab('https://mail.google.com')">
+    <a href="https://mail.google.com" target="_blank" class="shortcut">
       <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
-    </div>
-    <div class="shortcut" onclick="openInNewTab('https://youtube.com')">
+    </a>
+    <a href="https://www.youtube.com" target="_blank" class="shortcut">
       <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
-    </div>
-    <div class="shortcut" onclick="openInNewTab('https://chat.openai.com')">
+    </a>
+    <a href="https://chat.openai.com" target="_blank" class="shortcut">
       <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
-    </div>
-    <div class="shortcut" onclick="addShortcut()">➕ Add Shortcut</div>
+    </a>
+    <button class="add-shortcut">+ Add Shortcut</button>
   </div>
 
-  <div class="news-controls">
-    <select id="news-source">
+  <!-- News Source Selector -->
+  <div id="newsControls">
+    <label for="newsSource">News Source:</label>
+    <select id="newsSource">
       <option value="cnn">CNN</option>
       <option value="bbc">BBC</option>
       <option value="reuters">Reuters</option>
     </select>
   </div>
 
-  <div class="news-feed" id="news-feed"></div>
+  <!-- News Grid -->
+  <div id="newsContainer"></div>
 
   <script>
     // Clock
@@ -260,95 +245,60 @@
       const now = new Date();
       const time = now.toLocaleTimeString();
       const date = now.toDateString();
-      const clock = document.getElementById('clock');
-      clock.textContent = time;
-      clock.title = date;
+      document.getElementById("clock").textContent = time;
+      document.getElementById("clock").title = date;
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Search
-    document.getElementById('search-btn').onclick = () => {
-      const engine = document.getElementById('engine').value;
-      const query = document.getElementById('search').value;
-      if (query) openInNewTab(engine + encodeURIComponent(query));
-    };
-
-    // Dice
-    document.getElementById('dice-btn').onclick = () => {
-      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
-      const choice = sites[Math.floor(Math.random()*sites.length)];
-      openInNewTab(choice);
-    };
-
-    function openInNewTab(url) {
-      window.open(url, '_blank');
-    }
-
-    // Load live news using RSS → JSON (via rss2json.com)
-    let page = 1;
-    async function loadNews(source = 'cnn') {
-      const feedUrl = {
-        cnn: 'https://rss.cnn.com/rss/edition.rss',
-        bbc: 'http://feeds.bbci.co.uk/news/rss.xml',
-        reuters: 'http://feeds.reuters.com/reuters/topNews'
-      }[source];
-
-      const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=YOUR_API_KEY&page=${page}`;
-      try {
-        const resp = await fetch(api);
-        if (!resp.ok) throw new Error(`HTTP error! ${resp.status}`);
-        const data = await resp.json();
-
-        if (!data.items || data.items.length === 0) {
-          throw new Error("No news items available.");
-        }
-
-        const container = document.getElementById('news-feed');
-        data.items.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'news-card';
-          card.innerHTML = `
-            <img src="${item.enclosure?.link || 'https://via.placeholder.com/300x150'}" alt="">
-            <div>
-              <a href="${item.link}" target="_blank">${item.title}</a>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Error loading news:', err);
-        showNewsError("⚠️ Failed to load news. Retrying...");
-        // Retry after 10s
-        setTimeout(() => loadNews(source), 10000);
-      }
-    }
-
-    function showNewsError(msg) {
-      const container = document.getElementById('news-feed');
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'news-error';
-      errorDiv.textContent = msg;
-      container.appendChild(errorDiv);
-    }
-
-    // Infinite scroll
-    window.addEventListener('scroll', () => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        const src = document.getElementById('news-source').value;
-        page++;
-        loadNews(src);
-      }
+    // Dice random site
+    const diceSites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+    document.getElementById("diceButton").addEventListener("click", () => {
+      const randomSite = diceSites[Math.floor(Math.random() * diceSites.length)];
+      window.open(randomSite, "_blank");
     });
 
-    document.getElementById('news-source').onchange = () => {
-      page = 1;
-      document.getElementById('news-feed').innerHTML = '';
-      loadNews(document.getElementById('news-source').value);
-    };
+    // Search
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const query = document.getElementById("searchBar").value;
+      const engine = document.getElementById("engineSelect").value;
+      if(query) window.open(engine + encodeURIComponent(query), "_blank");
+    });
 
-    // First load
-    loadNews(document.getElementById('news-source').value);
+    // Load News
+    async function loadNews(source="cnn") {
+      const newsContainer = document.getElementById("newsContainer");
+      newsContainer.innerHTML = "<p>Loading news...</p>";
+      try {
+        const res = await fetch(`https://gnews.io/api/v4/top-headlines?token=demo&lang=en&max=12&q=${source}`);
+        const data = await res.json();
+        newsContainer.innerHTML = "";
+        data.articles.slice(0,12).forEach(article => {
+          const card = document.createElement("div");
+          card.className = "news-card";
+          card.innerHTML = `
+            <img src="${article.image || 'https://via.placeholder.com/300'}" alt="thumbnail"/>
+            <div class="content">
+              <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+              <p>${article.description || ""}</p>
+            </div>
+          `;
+          newsContainer.appendChild(card);
+        });
+      } catch(err) {
+        newsContainer.innerHTML = "<p>Failed to load news.</p>";
+      }
+    }
+    loadNews();
+
+    document.getElementById("newsSource").addEventListener("change", (e) => {
+      loadNews(e.target.value);
+    });
+
+    setInterval(() => {
+      const source = document.getElementById("newsSource").value;
+      loadNews(source);
+    }, 300000); // refresh every 5 min
   </script>
 </body>
 </html>
