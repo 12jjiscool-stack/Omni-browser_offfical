@@ -1,498 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Omni Browser</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni</title>
   <style>
-    body {
+    /* ===== General Reset ===== */
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: Arial, sans-serif;
-      background-color: #0a0a0a;
-      color: white;
+    }
+
+    body {
+      background-color: #0d1117;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
     }
 
-    header {
+    /* ===== Header ===== */
+    h1 {
+      margin-top: 40px;
+      font-size: 2.5rem;
+    }
+
+    p.description {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    #clock {
+      font-family: monospace;
+      font-size: 2rem;
+      margin: 20px 0;
+      text-shadow: 0 0 10px #9f7aea;
+      cursor: pointer;
+    }
+
+    /* ===== Search Bar Area ===== */
+    .search-container {
       display: flex;
-      justify-content: flex-end;
       align-items: center;
-      width: 100%;
-      padding: 10px 15px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
+    select, input, button {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    select, input {
+      background: #161b22;
+      color: white;
+    }
+
+    button {
+      background: #9f7aea;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    /* ===== Shortcuts ===== */
+    .shortcuts {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .shortcut {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #161b22;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .shortcut:hover {
+      background: #21262d;
+    }
+
+    .shortcut img {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===== Profile Bubble ===== */
     #profileBubble {
-      width: 40px;
-      height: 40px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: #444;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-weight: bold;
       cursor: pointer;
-      user-select: none;
+      overflow: hidden;
     }
 
-    h1 {
-      font-size: 2.5rem;
-      margin: 10px 0 0 0;
+    #profileBubble img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .description {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-      color: white;
-      text-align: center;
-    }
-
-    #clock {
-      font-family: monospace;
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px #0ff;
-    }
-
-    #searchContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      width: 80%;
-      max-width: 900px;
-      margin-bottom: 20px;
-    }
-
-    #searchBar {
-      flex: 1;
-      padding: 14px;
-      font-size: 1.2rem;
-      border-radius: 25px;
-      border: none;
-      outline: none;
-    }
-
-    #engineSelect, #searchButton, #menuButton, #diceButton {
-      padding: 10px 15px;
-      border-radius: 25px;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      background: #333;
-      color: white;
-    }
-
-    .shortcuts {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .shortcut {
-      display: flex;
-      align-items: center;
-      background: #333;
-      padding: 10px 15px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: white;
-      font-size: 0.9rem;
-      transition: background 0.3s;
-    }
-
-    .shortcut:hover {
-      background: #444;
-    }
-
-    .shortcut img {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-    }
-
-    .add-shortcut {
-      background: #444;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-      color: white;
-      font-size: 0.9rem;
-    }
-
-    /* Sliding Menu */
+    /* ===== Side Menu ===== */
     #sideMenu {
       position: fixed;
+      left: -260px;
       top: 0;
-      left: -250px;
-      width: 250px;
+      width: 260px;
       height: 100%;
-      background: #1a1a1a;
-      transition: left 0.3s ease;
+      background: #161b22;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 1000;
+      transition: left 0.3s ease;
     }
 
     #sideMenu.active {
       left: 0;
     }
 
-    #sideMenu button, #sideMenu a {
-      background: #333;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: left;
-      cursor: pointer;
-      font-size: 1rem;
-      text-decoration: none;
+    #sideMenu h2 {
+      margin-bottom: 20px;
     }
 
-    #sideMenu button:hover, #sideMenu a:hover {
-      background: #444;
+    #sideMenu button {
+      width: 100%;
+      margin: 6px 0;
+      background: #21262d;
     }
 
-    /* Calculator Modal */
-    #calculatorModal {
+    /* ===== Math Solver Modal ===== */
+    #mathModal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #1a1a1a;
+      background: #161b22;
       padding: 20px;
-      border-radius: 15px;
-      z-index: 2000;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      width: 320px;
+      z-index: 1000;
     }
 
-    #calculatorHeader {
+    #mathModal.active {
+      display: block;
+    }
+
+    #mathModal header {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
-    #closeCalc {
-      background: #333;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      border-radius: 5px;
+    #mathModal header h3 {
+      margin: 0;
+    }
+
+    #mathModal header span {
       cursor: pointer;
-      padding: 2px 8px;
+      font-size: 20px;
     }
 
-    #calculatorDisplay {
+    #calcDisplay {
       width: 100%;
-      height: 50px;
-      margin-bottom: 10px;
-      font-size: 1.2rem;
-      text-align: right;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #333;
+      height: 40px;
+      background: #0d1117;
       color: white;
+      text-align: right;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-family: monospace;
+      font-size: 1.2rem;
     }
 
-    .calc-grid {
+    .calc-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 6px;
     }
 
-    .calc-btn {
-      padding: 15px;
-      background: #333;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      color: white;
-      cursor: pointer;
+    .calc-buttons button {
+      padding: 12px;
+      background: #21262d;
     }
 
-    .calc-btn:hover {
-      background: #444;
-    }
-
-    /* Sign In Modal */
-    #signInModal, #accountModal {
+    /* ===== Sign In Modal ===== */
+    #signInModal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #1a1a1a;
+      background: #161b22;
       padding: 20px;
-      border-radius: 15px;
-      z-index: 3000;
+      border-radius: 12px;
       width: 300px;
-      text-align: center;
+      z-index: 2000;
     }
 
-    #signInModal input, #accountModal input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+    #signInModal.active {
+      display: block;
     }
 
-    #signInModal button, #accountModal button {
-      background: #333;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      cursor: pointer;
+    #signInModal input {
       width: 100%;
+      margin: 6px 0;
     }
 
-    #signInModal button:hover, #accountModal button:hover {
-      background: #444;
+    /* ===== Theme Colors ===== */
+    body.light {
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    body.dark {
+      background: #0d1117;
+      color: #fff;
+    }
+
+    body.night {
+      background: #001f3f;
+      color: #ddd;
     }
   </style>
 </head>
-<body>
-  <header>
-    <div id="profileBubble">U</div>
-  </header>
+<body class="dark">
+  <!-- Profile Bubble -->
+  <div id="profileBubble">?</div>
 
+  <!-- Title + Description + Clock -->
   <h1>Omni</h1>
-  <div class="description">A multi tool search engine that will be safe for you and generations to come</div>
+  <p class="description">a multi tool search engine that will be safe for you and generations to come</p>
   <div id="clock" title=""></div>
 
-  <div id="searchContainer">
-    <input type="text" id="searchBar" placeholder="Search the web...">
-    <select id="engineSelect">
+  <!-- Search Bar + Menu + Dice -->
+  <div class="search-container">
+    <select id="engine">
       <option value="https://www.google.com/search?q=">Google</option>
       <option value="https://www.bing.com/search?q=">Bing</option>
-      <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
     </select>
-    <button id="searchButton">Search</button>
-    <button id="menuButton">☰ Menu</button>
-    <button id="diceButton">🎲</button>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="doSearch()">Search</button>
+    <button onclick="toggleMenu()">☰</button>
+    <button onclick="randomSite()">🎲</button>
   </div>
 
-  <div class="shortcuts">
-    <a href="https://mail.google.com" target="_blank" class="shortcut">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
-    </a>
-    <a href="https://www.youtube.com" target="_blank" class="shortcut">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
-    </a>
-    <a href="https://chat.openai.com" target="_blank" class="shortcut">
-      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
-    </a>
-    <button class="add-shortcut">+ Add Shortcut</button>
+  <!-- Shortcuts -->
+  <div class="shortcuts" id="shortcuts">
+    <div class="shortcut" onclick="openInNewTab('https://mail.google.com')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail"> Gmail
+    </div>
+    <div class="shortcut" onclick="openInNewTab('https://youtube.com')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube"> YouTube
+    </div>
+    <div class="shortcut" onclick="openInNewTab('https://chat.openai.com')">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT"> ChatGPT
+    </div>
+    <div class="shortcut" onclick="addShortcut()">+ Add Shortcut</div>
   </div>
 
   <!-- Side Menu -->
   <div id="sideMenu">
-    <button id="signInBtn">Sign In</button>
-    <button id="themesBtn">Themes</button>
-    <button id="cleanDataBtn">Clean Data</button>
-    <a href="https://github.com/12jjiscool-stack/Omni-browser_offfical" target="_blank">Current GitHub</a>
-    <button id="mathSolverBtn">Math Solver</button>
+    <h2>Omni Menu</h2>
+    <button onclick="openSignIn()">Sign In / Profile</button>
+    <button onclick="setTheme('light')">Light</button>
+    <button onclick="setTheme('dark')">Dark</button>
+    <button onclick="setTheme('night')">Night</button>
+    <button onclick="localStorage.clear(); location.reload();">Clean Data</button>
+    <button onclick="openInNewTab('https://github.com/12jjiscool-stack/Omni-browser_offfical')">Current GitHub</button>
+    <button onclick="openMathSolver()">Math Solver</button>
+    <p style="margin-top:12px;">Profile custom:</p>
+    <input type="file" id="avatarUpload" accept="image/*">
   </div>
 
-  <!-- Calculator Modal -->
-  <div id="calculatorModal">
-    <div id="calculatorHeader"><button id="closeCalc">X</button></div>
-    <input type="text" id="calculatorDisplay" readonly>
-    <div class="calc-grid">
-      <button class="calc-btn">7</button>
-      <button class="calc-btn">8</button>
-      <button class="calc-btn">9</button>
-      <button class="calc-btn">/</button>
-      <button class="calc-btn">4</button>
-      <button class="calc-btn">5</button>
-      <button class="calc-btn">6</button>
-      <button class="calc-btn">*</button>
-      <button class="calc-btn">1</button>
-      <button class="calc-btn">2</button>
-      <button class="calc-btn">3</button>
-      <button class="calc-btn">-</button>
-      <button class="calc-btn">0</button>
-      <button class="calc-btn">.</button>
-      <button class="calc-btn">=</button>
-      <button class="calc-btn">+</button>
-      <button class="calc-btn">(</button>
-      <button class="calc-btn">)</button>
-      <button class="calc-btn">sin</button>
-      <button class="calc-btn">cos</button>
-      <button class="calc-btn">tan</button>
-      <button class="calc-btn">log</button>
-      <button class="calc-btn">√</button>
-      <button class="calc-btn">C</button>
+  <!-- Math Solver Modal -->
+  <div id="mathModal">
+    <header>
+      <h3>Math Solver</h3>
+      <span onclick="closeMathSolver()">✖</span>
+    </header>
+    <div id="calcDisplay">0</div>
+    <div class="calc-buttons">
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button onclick="press('/')">÷</button>
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button onclick="press('*')">×</button>
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button onclick="press('-')">−</button>
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="calculate()">=</button>
+      <button onclick="press('+')">+</button>
     </div>
   </div>
 
   <!-- Sign In Modal -->
   <div id="signInModal">
     <h2>Sign In</h2>
-    <input type="text" id="usernameInput" placeholder="Username">
-    <input type="email" id="emailInput" placeholder="Email">
-    <input type="password" id="passwordInput" placeholder="Password">
-    <button id="signInSubmit">Sign In</button>
-  </div>
-
-  <!-- Account Modal -->
-  <div id="accountModal">
-    <h2>Account Settings</h2>
-    <input type="text" id="editUsername" placeholder="Username">
-    <input type="email" id="editEmail" placeholder="Email">
-    <input type="password" id="editPassword" placeholder="Password">
-    <button id="updateAccount">Update</button>
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="saveProfile()">Save</button>
   </div>
 
   <script>
-    // Clock
+    /* === Clock === */
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString();
-      const date = now.toDateString();
-      document.getElementById("clock").textContent = time;
-      document.getElementById("clock").title = date;
+      document.getElementById("clock").innerText = time;
+      document.getElementById("clock").title = now.toDateString();
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Dice random site
-    const diceSites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
-    document.getElementById("diceButton").addEventListener("click", () => {
-      const randomSite = diceSites[Math.floor(Math.random() * diceSites.length)];
-      window.open(randomSite, "_blank");
-    });
+    /* === Search === */
+    function doSearch() {
+      const engine = document.getElementById("engine").value;
+      const query = document.getElementById("searchInput").value;
+      if (query.trim()) window.open(engine + encodeURIComponent(query), "_blank");
+    }
 
-    // Search
-    document.getElementById("searchButton").addEventListener("click", () => {
-      const query = document.getElementById("searchBar").value;
-      const engine = document.getElementById("engineSelect").value;
-      if(query) window.open(engine + encodeURIComponent(query), "_blank");
-    });
+    /* === Shortcuts === */
+    function openInNewTab(url) {
+      window.open(url, "_blank");
+    }
 
-    // Menu toggle
-    document.getElementById("menuButton").addEventListener("click", () => {
-      document.getElementById("sideMenu").classList.toggle("active");
-    });
-
-    // Math Solver
-    const calcModal = document.getElementById("calculatorModal");
-    const calcDisplay = document.getElementById("calculatorDisplay");
-    document.getElementById("mathSolverBtn").addEventListener("click", () => {
-      calcModal.style.display = "block";
-    });
-    document.getElementById("closeCalc").addEventListener("click", () => {
-      calcModal.style.display = "none";
-    });
-    document.querySelectorAll(".calc-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const val = btn.textContent;
-        if(val === "C") {
-          calcDisplay.value = "";
-        } else if(val === "=") {
-          try {
-            calcDisplay.value = eval(calcDisplay.value
-              .replace("√", "Math.sqrt")
-              .replace("log", "Math.log")
-              .replace("sin", "Math.sin")
-              .replace("cos", "Math.cos")
-              .replace("tan", "Math.tan"));
-          } catch {
-            calcDisplay.value = "Error";
-          }
-        } else {
-          calcDisplay.value += val;
-        }
-      });
-    });
-
-    // Sign In Modal
-    const signInModal = document.getElementById("signInModal");
-    const signInSubmit = document.getElementById("signInSubmit");
-    const profileBubble = document.getElementById("profileBubble");
-    const accountModal = document.getElementById("accountModal");
-    const updateAccount = document.getElementById("updateAccount");
-
-    function checkSignIn() {
-      const user = localStorage.getItem("user");
-      if(!user) {
-        signInModal.style.display = "block";
-      } else {
-        const parsed = JSON.parse(user);
-        profileBubble.textContent = parsed.username[0].toUpperCase();
+    function addShortcut() {
+      const name = prompt("Enter shortcut name:");
+      const url = prompt("Enter URL:");
+      if (name && url) {
+        const div = document.createElement("div");
+        div.className = "shortcut";
+        div.textContent = name;
+        div.onclick = () => openInNewTab(url);
+        document.getElementById("shortcuts").appendChild(div);
       }
     }
-    checkSignIn();
 
-    signInSubmit.addEventListener("click", () => {
-      const username = document.getElementById("usernameInput").value;
-      const email = document.getElementById("emailInput").value;
-      const password = document.getElementById("passwordInput").value;
-      if(username && email && password) {
-        localStorage.setItem("user", JSON.stringify({username,email,password}));
-        profileBubble.textContent = username[0].toUpperCase();
-        signInModal.style.display = "none";
+    /* === Dice === */
+    function randomSite() {
+      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+      const pick = sites[Math.floor(Math.random() * sites.length)];
+      openInNewTab(pick);
+    }
+
+    /* === Side Menu === */
+    function toggleMenu() {
+      document.getElementById("sideMenu").classList.toggle("active");
+    }
+
+    /* === Math Solver === */
+    let expr = "";
+    function press(val) {
+      expr += val;
+      document.getElementById("calcDisplay").innerText = expr;
+    }
+    function calculate() {
+      try {
+        expr = eval(expr).toString();
+      } catch {
+        expr = "Error";
       }
-    });
+      document.getElementById("calcDisplay").innerText = expr;
+    }
+    function openMathSolver() {
+      document.getElementById("mathModal").classList.add("active");
+    }
+    function closeMathSolver() {
+      document.getElementById("mathModal").classList.remove("active");
+      expr = "";
+      document.getElementById("calcDisplay").innerText = "0";
+    }
 
-    profileBubble.addEventListener("click", () => {
+    /* === Themes === */
+    function setTheme(theme) {
+      document.body.className = theme;
+      localStorage.setItem("theme", theme);
+    }
+    const savedTheme = localStorage.getItem("theme") || "night";
+    setTheme(savedTheme);
+
+    /* === Sign In === */
+    function openSignIn() {
+      document.getElementById("signInModal").classList.add("active");
+    }
+
+    function saveProfile() {
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (username && email && password) {
+        localStorage.setItem("user", JSON.stringify({ username, email, password }));
+        document.getElementById("signInModal").classList.remove("active");
+        renderProfileBubble();
+      }
+    }
+
+    function renderProfileBubble() {
       const user = JSON.parse(localStorage.getItem("user"));
-      document.getElementById("editUsername").value = user.username;
-      document.getElementById("editEmail").value = user.email;
-      document.getElementById("editPassword").value = user.password;
-      accountModal.style.display = "block";
-    });
-
-    updateAccount.addEventListener("click", () => {
-      const username = document.getElementById("editUsername").value;
-      const email = document.getElementById("editEmail").value;
-      const password = document.getElementById("editPassword").value;
-      if(username && email && password) {
-        localStorage.setItem("user", JSON.stringify({username,email,password}));
-        profileBubble.textContent = username[0].toUpperCase();
-        accountModal.style.display = "none";
+      if (user) {
+        const bubble = document.getElementById("profileBubble");
+        bubble.textContent = user.username[0].toUpperCase();
       }
-    });
+    }
 
-    // Themes
-    const themes = {
-      light: { bg: "#f5f5f5", text: "#000", accent: "#0078d7" },
-      dark: { bg: "#0a0a0a", text: "#fff", accent: "#0ff" },
-      night: { bg: "#111", text: "#ccc", accent: "#7af" }
+    window.onload = () => {
+      if (!localStorage.getItem("user")) {
+        document.getElementById("signInModal").classList.add("active");
+      } else {
+        renderProfileBubble();
+      }
     };
 
-    let currentTheme = "night"; // default
-
-    function applyTheme(theme) {
-      const t = themes[theme];
-      document.body.style.background = t.bg;
-      document.body.style.color = t.text;
-      document.querySelectorAll("button, select, input, .shortcut, .add-shortcut, #sideMenu, #calculatorModal, #signInModal, #accountModal")
-        .forEach(el => {
-          el.style.background = t.bg === "#f5f5f5" ? "#ddd" : "#333";
-          el.style.color = t.text;
-        });
-      document.getElementById("clock").style.textShadow = `0 0 10px ${t.accent}`;
-      currentTheme = theme;
-    }
-    applyTheme(currentTheme);
-
-    document.getElementById("themesBtn").addEventListener("click", () => {
-      if(currentTheme === "light") applyTheme("dark");
-      else if(currentTheme === "dark") applyTheme("night");
-      else applyTheme("light");
+    /* === Avatar Upload === */
+    document.getElementById("avatarUpload").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          localStorage.setItem("avatar", evt.target.result);
+          document.getElementById("profileBubble").innerHTML = `<img src="${evt.target.result}" alt="avatar">`;
+        };
+        reader.readAsDataURL(file);
+      }
     });
+
+    const savedAvatar = localStorage.getItem("avatar");
+    if (savedAvatar) {
+      document.getElementById("profileBubble").innerHTML = `<img src="${savedAvatar}" alt="avatar">`;
+    }
   </script>
 </body>
 </html>
+
