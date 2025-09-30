@@ -1,635 +1,416 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Omni — Home</title>
-<style>
-  :root{
-    --bg:#0f1720; --text:#e6eef8; --card:#121821; --accent:#6aa7ff; --clock-glow:#6aa7ff;
-    --btn-bg:#1f2a36; --btn-hover:#2b3a4a;
-  }
-  [data-theme="light"]{
-    --bg:#ffffff; --text:#0b1220; --card:#f4f7fb; --accent:#0078d7; --clock-glow:#0078d7;
-    --btn-bg:#f1f4f8; --btn-hover:#e0e8f5;
-  }
-  [data-theme="dark"]{
-    --bg:#0e1114; --text:#eef2f7; --card:#15181b; --accent:#8be5d9; --clock-glow:#8be5d9;
-    --btn-bg:#1a2024; --btn-hover:#243033;
-  }
-  [data-theme="night"]{
-    --bg:#071126; --text:#e6eef8; --card:#0b1730; --accent:#9a7cff; --clock-glow:#9a7cff;
-    --btn-bg:#0f1b34; --btn-hover:#13243f;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Omni Browser</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
-  .container{max-width:1200px; margin:0 auto; padding:18px; display:flex; flex-direction:column; align-items:center; gap:10px;}
-  header{width:100%; text-align:center; margin-top:8px;}
-  h1{font-size:2.4rem; margin:0; letter-spacing:0.6px;}
-  .desc{margin-top:8px; font-size:1.05rem; font-weight:600; color:var(--text); opacity:0.95; text-align:center; max-width:980px;}
-  /* clock */
-  #clock{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-size:2.2rem; margin-top:10px;
-         text-shadow:0 0 18px var(--clock-glow); cursor:default;}
-  #clock[data-tooltip]:hover::after{
-    content:attr(data-tooltip); display:block; font-size:0.95rem; margin-top:8px; opacity:0.95;
-  }
+    header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      padding: 10px 15px;
+    }
 
-  /* Search row */
-  .search-row{display:flex; align-items:center; gap:10px; width:100%; justify-content:center; margin-top:6px;}
-  .search-box{display:flex; align-items:center; gap:8px; width:78%; max-width:920px;}
-  select.engine, input.q{padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); background:var(--card); color:var(--text); font-size:1rem; outline:none;}
-  input.q{flex:1; font-size:1.05rem;}
-  button.search-btn{padding:12px 16px; background:var(--accent); color:#fff; border:none; border-radius:12px; cursor:pointer; font-weight:600;}
-  /* small round buttons */
-  .round-btn{width:44px; height:44px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; border:none; background:var(--btn-bg); color:var(--text); cursor:pointer;}
-  .round-btn:hover{background:var(--btn-hover);}
+    #profileBubble {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
 
-  /* profile bubble top-right */
-  .top-right{position:fixed; right:18px; top:12px; z-index:1400;}
-  #profileBubble{width:46px;height:46px;border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; background:var(--accent); color:#001022; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.35);}
+    h1 {
+      font-size: 2.5rem;
+      margin: 10px 0 0 0;
+    }
 
-  /* left sliding menu */
-  #sidebar{position:fixed; left:-320px; top:0; bottom:0; width:300px; background:var(--card); box-shadow:2px 0 20px rgba(0,0,0,0.6); padding:18px; z-index:1200; transition:left .28s ease;}
-  #sidebar.open{left:12px;}
-  #sidebar h3{margin:4px 0 14px 0; font-size:1.1rem;}
-  .menu-list{display:flex; flex-direction:column; gap:8px;}
-  .menu-list button{padding:10px 12px; border-radius:8px; border:none; cursor:pointer; background:var(--btn-bg); color:var(--text); text-align:left;}
-  .menu-list input[type="color"]{height:36px; width:42px; border-radius:6px; border:none; padding:0;}
+    .description {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: white;
+      text-align: center;
+    }
 
-  /* shortcuts */
-  .shortcuts{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:8px;}
-  .shortcut{display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; background:var(--card); color:var(--text); cursor:pointer; border:1px solid rgba(255,255,255,0.02);}
-  .shortcut img{width:20px;height:20px;border-radius:3px; object-fit:cover;}
-  .add-shortcut{padding:10px 14px; border-radius:10px; background:transparent; border:1px dashed rgba(255,255,255,0.06); cursor:pointer; color:var(--text);}
+    #clock {
+      font-family: monospace;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0ff;
+    }
 
-  /* news controls */
-  .news-controls{margin-top:14px; display:flex; gap:10px; align-items:center; justify-content:center; width:100%;}
-  .news-controls select{padding:8px 10px; border-radius:8px; border:none; background:var(--card); color:var(--text);}
+    #searchContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 80%;
+      max-width: 900px;
+      margin-bottom: 20px;
+    }
 
-  /* news grid 3x4 */
-  #newsGrid{width:100%; max-width:1100px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:18px 0 80px;}
-  .news-card{background:var(--card); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease; border:1px solid rgba(255,255,255,0.02);}
-  .news-card:hover{transform:translateY(-6px); box-shadow:0 8px 30px rgba(0,0,0,0.45);}
-  .news-thumb{width:100%; height:150px; object-fit:cover; background:#0c0c0c;}
-  .news-body{padding:12px; display:flex; flex-direction:column; gap:6px;}
-  .news-title{font-weight:700; font-size:1rem; color:var(--text);}
-  .news-desc{font-size:0.92rem; color:rgba(255,255,255,0.78); line-height:1.2; max-height:3.6em; overflow:hidden;}
+    #searchBar {
+      flex: 1;
+      padding: 14px;
+      font-size: 1.2rem;
+      border-radius: 25px;
+      border: none;
+      outline: none;
+    }
 
-  /* math modal */
-  #calcModal{position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:360px; background:var(--card); border-radius:12px; padding:12px; box-shadow:0 20px 50px rgba(0,0,0,0.6); z-index:1500; display:none;}
-  #calcModal.dragging{opacity:.85;}
-  #calcDisplay{width:100%; padding:10px; border-radius:8px; border:none; background:var(--bg); color:var(--text); font-family:monospace; font-size:1.25rem; text-align:right;}
-  .calc-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:10px;}
-  .calc-btn{padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; background:var(--btn-bg); color:var(--text);}
-  .calc-btn:hover{filter:brightness(.95); transform:translateY(-1px);}
+    #engineSelect, #searchButton, #menuButton, #diceButton {
+      padding: 10px 15px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      background: #333;
+      color: white;
+    }
 
-  /* theme-aware button styles (examples) */
-  [data-theme="light"] .calc-btn{background:#f1f4f8; color:#0a1730;}
-  [data-theme="light"] .calc-btn:hover{background:#e0e8f5;}
-  [data-theme="dark"] .calc-btn{background:#1a2228; color:#eef2f7;}
-  [data-theme="dark"] .calc-btn:hover{background:#243036;}
-  [data-theme="night"] .calc-btn{background:#08122a; color:#dbeefe;}
-  [data-theme="night"] .calc-btn:hover{background:#0f2a53;}
+    .shortcuts {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
 
-  /* small helpers */
-  a { color:inherit; text-decoration:none; }
-  .flex-row{display:flex; gap:10px; align-items:center;}
-  @media (max-width:980px){
-    .search-box{width:92%}
-    #newsGrid{grid-template-columns:repeat(2,1fr);}
-    #calcModal{width:320px;}
-  }
-  @media (max-width:560px){
-    #newsGrid{grid-template-columns:1fr;}
-    input.q, .search-box{width:100%;}
-  }
-</style>
+    .shortcut {
+      display: flex;
+      align-items: center;
+      background: #333;
+      padding: 10px 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: white;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .shortcut:hover {
+      background: #444;
+    }
+
+    .shortcut img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+
+    .add-shortcut {
+      background: #444;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    /* Sliding Menu */
+    #sideMenu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #1a1a1a;
+      transition: left 0.3s ease;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+    }
+
+    #sideMenu.active {
+      left: 0;
+    }
+
+    #sideMenu button, #sideMenu a {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    #sideMenu button:hover, #sideMenu a:hover {
+      background: #444;
+    }
+
+    /* Math Solver Modal */
+    #calculatorModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 15px;
+      z-index: 2000;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    #calculatorDisplay {
+      width: 100%;
+      height: 50px;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+      text-align: right;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: white;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .calc-btn {
+      padding: 15px;
+      background: #333;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    .calc-btn:hover {
+      background: #444;
+    }
+
+    /* Sign In Modal */
+    #signInModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 15px;
+      z-index: 3000;
+      width: 300px;
+      text-align: center;
+    }
+
+    #signInModal input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    #signInModal button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    #signInModal button:hover {
+      background: #444;
+    }
+  </style>
 </head>
-<body data-theme="night">
-  <!-- LEFT SLIDING MENU -->
-  <aside id="sidebar" aria-hidden="true">
-    <h3>Omni Menu</h3>
-    <div class="menu-list">
-      <button id="signInBtn">Sign In / Profile</button>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button id="themeLight">Light</button>
-        <button id="themeDark">Dark</button>
-        <button id="themeNight">Night</button>
-      </div>
-      <button id="toggleNewsBtn">Hide News Feed</button>
-      <button id="cleanDataBtn">Clean Data</button>
-      <button id="openGitBtn">Current GitHub</button>
-      <button id="openCalcBtn">Math Solver</button>
-      <div style="margin-top:6px; font-size:0.9rem; color:rgba(255,255,255,0.7)">Profile custom:</div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <input id="bubbleColor" type="color" title="Choose bubble color" />
-        <button id="uploadAvatarBtn">Upload Avatar</button>
-      </div>
-    </div>
-  </aside>
+<body>
+  <header>
+    <div id="profileBubble">U</div>
+  </header>
 
-  <!-- PROFILE BUBBLE TOP RIGHT -->
-  <div class="top-right">
-    <div id="profileBubble" title="Open profile"></div>
+  <h1>Omni</h1>
+  <div class="description">A multi tool search engine that will be safe for you and generations to come</div>
+  <div id="clock" title=""></div>
+
+  <div id="searchContainer">
+    <input type="text" id="searchBar" placeholder="Search the web...">
+    <select id="engineSelect">
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+    </select>
+    <button id="searchButton">Search</button>
+    <button id="menuButton">☰ Menu</button>
+    <button id="diceButton">🎲</button>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="container">
-    <header>
-      <h1>Omni</h1>
-      <div class="desc">a multi tool search engine that will be safe for you and generations to come</div>
-      <div id="clock" data-tooltip=""></div>
-    </header>
-
-    <!-- Search row -->
-    <div class="search-row">
-      <div class="search-box">
-        <select class="engine" id="engineSelect" aria-label="Search engine">
-          <option value="https://www.google.com/search?q=">Google</option>
-          <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-          <option value="https://www.bing.com/search?q=">Bing</option>
-        </select>
-        <input class="q" id="q" placeholder="Search the web..." aria-label="Search input">
-        <button class="search-btn" id="searchBtn">Search</button>
-      </div>
-
-      <button class="round-btn" id="menuBtn" title="Menu">☰</button>
-      <button class="round-btn" id="diceBtn" title="Random site">🎲</button>
-    </div>
-
-    <!-- shortcuts -->
-    <div class="shortcuts" id="shortcutsRow">
-      <!-- items appended by JS -->
-    </div>
-
-    <!-- news controls -->
-    <div class="news-controls">
-      <label for="newsSourceSelect">News Source:</label>
-      <select id="newsSourceSelect" aria-label="News source">
-        <option value="cnn">CNN</option>
-        <option value="bbc-news">BBC</option>
-        <option value="reuters">Reuters</option>
-      </select>
-    </div>
-
-    <!-- news grid -->
-    <div id="newsGrid" aria-live="polite"></div>
+  <div class="shortcuts">
+    <a href="https://mail.google.com" target="_blank" class="shortcut">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
+    </a>
+    <a href="https://www.youtube.com" target="_blank" class="shortcut">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
+    </a>
+    <a href="https://chat.openai.com" target="_blank" class="shortcut">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
+    </a>
+    <button class="add-shortcut">+ Add Shortcut</button>
   </div>
 
-  <!-- PROFILE DROPDOWN (hidden by default) -->
-  <div id="profileDropdown" style="position:fixed; right:18px; top:68px; background:var(--card); padding:12px; border-radius:10px; display:none; z-index:1500;">
-    <div style="display:flex; gap:8px; align-items:center;">
-      <div id="profilePreview" style="width:48px;height:48px;border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--accent); color:#001022; font-weight:700;"></div>
-      <div style="display:flex; flex-direction:column;">
-        <div id="profileName" style="font-weight:700"></div>
-        <div id="profileEmail" style="font-size:0.9rem; opacity:0.8"></div>
-      </div>
-    </div>
-    <div style="margin-top:8px; display:flex; gap:8px; flex-direction:column;">
-      <input id="pfName" placeholder="Username" style="padding:8px; border-radius:8px; border:none; background:var(--bg); color:var(--text)" />
-      <input id="pfEmail" placeholder="Email" style="padding:8px; border-radius:8px; border:none; background:var(--bg); color:var(--text)" />
-      <input id="pfPass" placeholder="Password" type="password" style="padding:8px; border-radius:8px; border:none; background:var(--bg); color:var(--text)" />
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button id="saveProfileBtn" style="padding:8px; border-radius:8px; border:none; background:var(--accent); color:#fff; cursor:pointer;">Save</button>
-        <button id="logoutBtn" style="padding:8px; border-radius:8px; border:none; background:#444; color:var(--text); cursor:pointer;">Sign Out</button>
-      </div>
-    </div>
+  <!-- Side Menu -->
+  <div id="sideMenu">
+    <button id="signInBtn">Sign In</button>
+    <button id="themesBtn">Themes</button>
+    <button id="toggleNewsBtn">Hide News Feed</button>
+    <button id="cleanDataBtn">Clean Data</button>
+    <a href="https://github.com/12jjiscool-stack/Omni-browser_offfical" target="_blank">Current GitHub</a>
+    <button id="mathSolverBtn">Math Solver</button>
   </div>
 
   <!-- Calculator Modal -->
-  <div id="calcModal" role="dialog" aria-modal="true">
-    <input id="calcDisplay" readonly />
-    <div class="calc-grid" id="calcGrid">
-      <!-- row1 -->
-      <button class="calc-btn">(</button><button class="calc-btn">)</button><button class="calc-btn">%</button><button class="calc-btn">CE</button><button class="calc-btn">C</button>
-      <!-- row2 -->
-      <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button><button class="calc-btn">/</button><button class="calc-btn">^</button>
-      <!-- row3 -->
-      <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button><button class="calc-btn">*</button><button class="calc-btn">√</button>
-      <!-- row4 -->
-      <button class="calc-btn">1</button><button class="calc-btn">2</button><button class="calc-btn">3</button><button class="calc-btn">-</button><button class="calc-btn">π</button>
-      <!-- row5 -->
-      <button class="calc-btn">0</button><button class="calc-btn">.</button><button class="calc-btn">=</button><button class="calc-btn">+</button><button class="calc-btn">e</button>
+  <div id="calculatorModal">
+    <input type="text" id="calculatorDisplay" readonly>
+    <div class="calc-grid">
+      <button class="calc-btn">7</button>
+      <button class="calc-btn">8</button>
+      <button class="calc-btn">9</button>
+      <button class="calc-btn">/</button>
+      <button class="calc-btn">4</button>
+      <button class="calc-btn">5</button>
+      <button class="calc-btn">6</button>
+      <button class="calc-btn">*</button>
+      <button class="calc-btn">1</button>
+      <button class="calc-btn">2</button>
+      <button class="calc-btn">3</button>
+      <button class="calc-btn">-</button>
+      <button class="calc-btn">0</button>
+      <button class="calc-btn">.</button>
+      <button class="calc-btn">=</button>
+      <button class="calc-btn">+</button>
+      <button class="calc-btn">(</button>
+      <button class="calc-btn">)</button>
+      <button class="calc-btn">sin</button>
+      <button class="calc-btn">cos</button>
+      <button class="calc-btn">tan</button>
+      <button class="calc-btn">log</button>
+      <button class="calc-btn">√</button>
+      <button class="calc-btn">C</button>
     </div>
   </div>
 
-<script>
-/* ==========================
-   Config & persistence
-   ========================= */
-const NEWS_API_KEY = "36a3eee041a44596afc2ea9ab195e330"; // provided by you
-const MAX_NEWS = 12;
-const defaultShortcuts = [
-  {name:"Gmail", url:"https://mail.google.com", icon:"https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"},
-  {name:"YouTube", url:"https://www.youtube.com", icon:"https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"},
-  {name:"ChatGPT", url:"https://chat.openai.com", icon:"https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"}
-];
+  <!-- Sign In Modal -->
+  <div id="signInModal">
+    <h2>Sign In</h2>
+    <input type="text" id="usernameInput" placeholder="Username">
+    <input type="email" id="emailInput" placeholder="Email">
+    <input type="password" id="passwordInput" placeholder="Password">
+    <button id="signInSubmit">Sign In</button>
+  </div>
 
-/* utility */
-const $ = id=>document.getElementById(id);
-function setTheme(t){
-  document.body.setAttribute("data-theme", t);
-  localStorage.setItem("omni_theme", t);
-  // update profile dropdown colors if needed
-}
-function formatDateLong(d){ return d.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'}); }
+  <script>
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      const date = now.toDateString();
+      document.getElementById("clock").textContent = time;
+      document.getElementById("clock").title = date;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-/* ==========================
-   Load saved preferences
-   ========================= */
-(function initPreferences(){
-  const savedTheme = localStorage.getItem("omni_theme") || "night";
-  setTheme(savedTheme);
-
-  // saved news source
-  const savedNews = localStorage.getItem("omni_news_source") || "cnn";
-  $("newsSourceSelect").value = savedNews;
-
-  // shortucts
-  const sc = JSON.parse(localStorage.getItem("omni_shortcuts")||"null");
-  window.omniShortcuts = Array.isArray(sc) ? sc : defaultShortcuts.slice();
-  renderShortcuts();
-
-  // profile
-  const profile = JSON.parse(localStorage.getItem("omni_profile")||"null");
-  if(profile) applyProfile(profile);
-
-  // bubble color and avatar
-  const bubbleColor = localStorage.getItem("omni_bubble_color");
-  if(bubbleColor) { $("profileBubble").style.background = bubbleColor; }
-  const avatar = localStorage.getItem("omni_avatar_b64");
-  if(avatar) {
-    $("profileBubble").style.background = "transparent";
-    $("profileBubble").innerHTML = `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover">`;
-    $("profilePreview").innerHTML = `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover">`;
-  }
-})();
-
-/* ==========================
-   Header / Clock
-   ========================= */
-function updateClock(){
-  const now=new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  const ss = String(now.getSeconds()).padStart(2,'0');
-  const display = `${hh}:${mm}:${ss}`;
-  $("clock").textContent = display;
-  $("clock").dataset.tooltip = formatDateLong(now);
-}
-setInterval(updateClock,1000); updateClock();
-
-/* ==========================
-   Menu toggle & actions
-   ========================= */
-const sidebar = $("sidebar");
-$("menuBtn").addEventListener("click", ()=> sidebar.classList.toggle("open"));
-$("menuBtn").addEventListener("keydown", e=>{ if(e.key==='Enter') sidebar.classList.toggle("open"); });
-
-$("menuBtn").title = "Open menu";
-$("menuBtn").ariaLabel = "Open menu";
-$("menuBtn").addEventListener("click", ()=> { /* already handled */ });
-
-/* menu buttons */
-$("themeLight").addEventListener("click", ()=> setTheme("light"));
-$("themeDark").addEventListener("click", ()=> setTheme("dark"));
-$("themeNight").addEventListener("click", ()=> setTheme("night"));
-
-$("openGitBtn").addEventListener("click", ()=> window.open("https://github.com/12jjiscool-stack/Omni-browser_offfical","_blank"));
-$("cleanDataBtn").addEventListener("click", ()=> { if(confirm("Clear stored data (theme, shortcuts, profile)?")){ localStorage.clear(); location.reload(); } });
-
-/* bubble color & avatar upload */
-$("bubbleColor").value = localStorage.getItem("omni_bubble_color") || "#6aa7ff";
-$("bubbleColor").addEventListener("input", e=>{
-  const c = e.target.value;
-  $("profileBubble").style.background = c;
-  localStorage.setItem("omni_bubble_color", c);
-});
-$("uploadAvatarBtn").addEventListener("click", ()=>{
-  const f = document.createElement("input"); f.type="file"; f.accept="image/*";
-  f.onchange = async (ev)=>{
-    const file = ev.target.files[0];
-    if(!file) return;
-    const r = new FileReader();
-    r.onload = ()=> {
-      const data = r.result;
-      localStorage.setItem("omni_avatar_b64", data);
-      $("profileBubble").innerHTML = `<img src="${data}" style="width:100%;height:100%;object-fit:cover">`;
-      $("profilePreview").innerHTML = `<img src="${data}" style="width:100%;height:100%;object-fit:cover">`;
-    };
-    r.readAsDataURL(file);
-  };
-  f.click();
-});
-
-/* ==========================
-   Profile (sign in & edit)
-   ========================= */
-$("signInBtn").addEventListener("click", openProfileDropdown);
-$("profileBubble").addEventListener("click", openProfileDropdown);
-
-function openProfileDropdown(){
-  const dd = $("profileDropdown");
-  dd.style.display = dd.style.display === "flex" ? "none" : "flex";
-  // populate inputs
-  const p = JSON.parse(localStorage.getItem("omni_profile")||"null") || {username:"",email:"",password:""};
-  $("pfName").value = p.username || "";
-  $("pfEmail").value = p.email || "";
-  $("pfPass").value = p.password || "";
-}
-$("saveProfileBtn").addEventListener("click", ()=>{
-  const profile = {username:$("pfName").value||"", email:$("pfEmail").value||"", password:$("pfPass").value||""};
-  localStorage.setItem("omni_profile", JSON.stringify(profile));
-  applyProfile(profile);
-  $("profileDropdown").style.display="none";
-});
-$("logoutBtn").addEventListener("click", ()=>{
-  localStorage.removeItem("omni_profile");
-  applyProfile(null);
-  $("profileDropdown").style.display="none";
-});
-
-/* apply profile data to UI */
-function applyProfile(profile){
-  if(!profile){ $("profileBubble").textContent = "U"; $("profileName").textContent=""; $("profileEmail").textContent=""; return; }
-  const initials = profile.username ? profile.username.trim().split(/\s+/).map(s=>s[0]).slice(0,2).join("").toUpperCase() : "U";
-  // if no avatar set, display initials
-  if(!localStorage.getItem("omni_avatar_b64")){
-    $("profileBubble").textContent = initials;
-    $("profilePreview").textContent = initials;
-  }
-  $("profileName").textContent = profile.username || "";
-  $("profileEmail").textContent = profile.email || "";
-}
-
-/* ==========================
-   Shortcuts (persisted)
-   ========================= */
-function renderShortcuts(){
-  const container = $("shortcutsRow");
-  container.innerHTML = "";
-  (window.omniShortcuts || []).forEach((s, idx)=>{
-    const el = document.createElement("button");
-    el.className = "shortcut";
-    el.innerHTML = `<img src="${s.icon||''}" alt=""><span>${s.name}</span>`;
-    el.addEventListener("click", ()=> window.open(s.url, "_blank"));
-    // right-click remove
-    el.addEventListener("contextmenu", (ev)=>{ ev.preventDefault(); if(confirm("Remove shortcut "+s.name+"?")){ window.omniShortcuts.splice(idx,1); localStorage.setItem("omni_shortcuts", JSON.stringify(window.omniShortcuts)); renderShortcuts(); }});
-    container.appendChild(el);
-  });
-  const addBtn = document.createElement("button");
-  addBtn.className = "add-shortcut";
-  addBtn.textContent = "＋ Add Shortcut";
-  addBtn.addEventListener("click", addShortcut);
-  container.appendChild(addBtn);
-}
-function addShortcut(){
-  const url = prompt("Shortcut URL (include https://):");
-  if(!url) return;
-  const name = prompt("Shortcut name:");
-  if(!name) return;
-  const icon = prompt("(optional) icon URL:");
-  const s = {name, url, icon: icon||""};
-  window.omniShortcuts.push(s);
-  localStorage.setItem("omni_shortcuts", JSON.stringify(window.omniShortcuts));
-  renderShortcuts();
-}
-
-/* ==========================
-   Search & Dice
-   ==========================*/
-$("searchBtn").addEventListener("click", ()=>{
-  const q = $("q").value.trim();
-  if(!q) return;
-  const engine = $("engineSelect").value;
-  window.open(engine + encodeURIComponent(q), "_blank");
-});
-$("q").addEventListener("keydown", e=>{ if(e.key==="Enter") $("searchBtn").click(); });
-
-$("diceBtn").addEventListener("click", ()=>{
-  const list = ["https://pbskids.org","https://www.youtube.com","https://www.coolmathgames.com"];
-  window.open(list[Math.floor(Math.random()*list.length)], "_blank");
-});
-
-/* ==========================
-   News fetching (NewsAPI)
-   ==========================*/
-const NEWS_MAP = { "cnn":"cnn", "bbc-news":"bbc-news", "reuters":"reuters" };
-async function loadNews(source){
-  if(!source) source = "cnn";
-  localStorage.setItem("omni_news_source", source);
-  const grid = $("newsGrid"); grid.innerHTML = `<div style="grid-column:1/-1; padding:14px; text-align:center;">Loading news from ${source.toUpperCase()}...</div>`;
-  try{
-    const res = await fetch(`https://newsapi.org/v2/top-headlines?sources=${encodeURIComponent(source)}&pageSize=${MAX_NEWS}&apiKey=${NEWS_API_KEY}`);
-    if(!res.ok) throw new Error("Network response not OK "+res.status);
-    const data = await res.json();
-    if(!data.articles) throw new Error("No articles");
-    grid.innerHTML = "";
-    data.articles.slice(0,MAX_NEWS).forEach(a=>{
-      const card = document.createElement("article");
-      card.className = "news-card";
-      const img = document.createElement("img"); img.className="news-thumb"; img.src = a.urlToImage || "https://via.placeholder.com/800x450?text=No+Image";
-      const body = document.createElement("div"); body.className = "news-body";
-      const title = document.createElement("div"); title.className="news-title"; title.innerHTML = `<a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.title||"")}</a>`;
-      const desc = document.createElement("div"); desc.className="news-desc"; desc.textContent = a.description || "";
-      body.appendChild(title); body.appendChild(desc);
-      card.appendChild(img); card.appendChild(body);
-      grid.appendChild(card);
+    // Dice random site
+    const diceSites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+    document.getElementById("diceButton").addEventListener("click", () => {
+      const randomSite = diceSites[Math.floor(Math.random() * diceSites.length)];
+      window.open(randomSite, "_blank");
     });
-    // cache last successful
-    localStorage.setItem("omni_news_cache", JSON.stringify({ts:Date.now(), source, articles:data.articles.slice(0,MAX_NEWS)}));
-  }catch(err){
-    console.error("News load error",err);
-    grid.innerHTML = "";
-    const cached = JSON.parse(localStorage.getItem("omni_news_cache")||"null");
-    if(cached && cached.articles){
-      const note = document.createElement("div"); note.style.gridColumn="1/-1"; note.style.padding="12px"; note.style.textAlign="center"; note.style.opacity="0.9";
-      note.textContent = "Showing cached news (offline or API failed).";
-      grid.appendChild(note);
-      cached.articles.forEach(a=>{
-        const card = document.createElement("article");
-        card.className = "news-card";
-        card.innerHTML = `<img class="news-thumb" src="${a.urlToImage||'https://via.placeholder.com/800x450?text=No+Image'}">
-                          <div class="news-body"><div class="news-title"><a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.title||"")}</a></div>
-                          <div class="news-desc">${a.description||""}</div></div>`;
-        grid.appendChild(card);
+
+    // Search
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const query = document.getElementById("searchBar").value;
+      const engine = document.getElementById("engineSelect").value;
+      if(query) window.open(engine + encodeURIComponent(query), "_blank");
+    });
+
+    // Menu toggle
+    document.getElementById("menuButton").addEventListener("click", () => {
+      document.getElementById("sideMenu").classList.toggle("active");
+    });
+
+    // Math Solver
+    const calcModal = document.getElementById("calculatorModal");
+    const calcDisplay = document.getElementById("calculatorDisplay");
+    document.getElementById("mathSolverBtn").addEventListener("click", () => {
+      calcModal.style.display = "block";
+    });
+    document.querySelectorAll(".calc-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = btn.textContent;
+        if(val === "C") {
+          calcDisplay.value = "";
+        } else if(val === "=") {
+          try {
+            calcDisplay.value = eval(calcDisplay.value.replace("√", "Math.sqrt").replace("log", "Math.log").replace("sin", "Math.sin").replace("cos", "Math.cos").replace("tan", "Math.tan"));
+          } catch {
+            calcDisplay.value = "Error";
+          }
+        } else {
+          calcDisplay.value += val;
+        }
       });
-    } else {
-      grid.innerHTML = `<div style="grid-column:1/-1; padding:18px; text-align:center;" class="news-error">Failed to load news — will retry in 10s.</div>`;
-      setTimeout(()=>loadNews(source),10000);
+    });
+
+    // Sign In Modal
+    const signInModal = document.getElementById("signInModal");
+    const signInSubmit = document.getElementById("signInSubmit");
+    const profileBubble = document.getElementById("profileBubble");
+
+    function checkSignIn() {
+      const user = localStorage.getItem("user");
+      if(!user) {
+        signInModal.style.display = "block";
+      } else {
+        const parsed = JSON.parse(user);
+        profileBubble.textContent = parsed.username[0].toUpperCase();
+      }
     }
-  }
-}
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
-$("newsSourceSelect").value = localStorage.getItem("omni_news_source") || "cnn";
-$("newsSourceSelect").addEventListener("change", ()=> loadNews($("newsSourceSelect").value));
-loadNews($("newsSourceSelect").value);
+    checkSignIn();
 
-/* auto refresh every 5 min */
-setInterval(()=> loadNews($("newsSourceSelect").value), 300000);
-
-/* ==========================
-   Calculator: draggable modal + evaluation
-   ==========================*/
-const calcModal = $("calcModal");
-const calcDisplay = $("calcDisplay");
-let drag = {down:false,dx:0,dy:0};
-const snapCenter = ()=>{ calcModal.style.left='50%'; calcModal.style.top='50%'; calcModal.style.transform='translate(-50%,-50%)'; };
-
-$("openCalcBtn").addEventListener("click", ()=> {
-  sidebar.classList.remove("open");
-  openCalc();
-});
-function openCalc(){ calcModal.style.display='block'; snapCenter(); calcDisplay.value=''; lastExpr=''; }
-function closeCalc(){ calcModal.style.display='none'; snapCenter(); }
-
-/* dragging whole modal */
-calcModal.addEventListener("mousedown", (e)=>{
-  drag.down = true;
-  // compute offset relative to modal's top-left
-  const rect = calcModal.getBoundingClientRect();
-  drag.dx = e.clientX - rect.left;
-  drag.dy = e.clientY - rect.top;
-  calcModal.classList.add('dragging');
-});
-document.addEventListener("mouseup", ()=>{ drag.down=false; calcModal.classList.remove('dragging'); });
-document.addEventListener("mousemove", (e)=>{
-  if(!drag.down) return;
-  calcModal.style.left = (e.clientX - drag.dx) + "px";
-  calcModal.style.top = (e.clientY - drag.dy) + "px";
-  calcModal.style.transform = ""; // remove centering transform while dragging
-});
-
-/* buttons wiring */
-let lastExpr = "";
-document.getElementById("calcGrid").addEventListener("click", (ev)=>{
-  if(!ev.target.matches("button")) return;
-  const v = ev.target.textContent.trim();
-  handleCalcInput(v);
-});
-function handleCalcInput(v){
-  if(v === "C"){ lastExpr=''; calcDisplay.value=''; return; }
-  if(v === "CE"){ calcDisplay.value = calcDisplay.value.slice(0,-1); lastExpr = calcDisplay.value; return; }
-  if(v === "="){
-    try{
-      const res = evaluateExpression(calcDisplay.value || lastExpr);
-      calcDisplay.value = String(res);
-      lastExpr = String(res);
-    }catch(e){
-      calcDisplay.value = "Error";
-      lastExpr = '';
-    }
-    return;
-  }
-  // functions and constants
-  if(v === "π") v = "pi";
-  if(v === "e") v = "e";
-  if(v === "√") v = "sqrt(";
-  if(v === "π" || v === "e"){} // handled
-  // append
-  calcDisplay.value = (calcDisplay.value || "") + v;
-  lastExpr = calcDisplay.value;
-}
-
-/* expression evaluator (supports ^, sqrt, sin/cos/tan/log, pi,e, % ) */
-function evaluateExpression(expr){
-  if(!expr) return 0;
-  // replace % -> /100 for trailing percentage uses (x% => (x/100))
-  expr = expr.replace(/([0-9\.]+)\s*%/g, "($1/100)");
-  // replace '^' with '**'
-  expr = expr.replace(/\^/g, "**");
-  // replace common functions with Math equivalents; functions expect radians for sin/cos/tan
-  expr = expr.replace(/\bsqrt\(/g, "Math.sqrt(");
-  expr = expr.replace(/\bpi\b/g, String(Math.PI));
-  expr = expr.replace(/\be\b/g, String(Math.E));
-  expr = expr.replace(/\bsin\(/g, "Math.sin(");
-  expr = expr.replace(/\bcos\(/g, "Math.cos(");
-  expr = expr.replace(/\btan\(/g, "Math.tan(");
-  expr = expr.replace(/\blog\(/g, "Math.log10(");
-  expr = expr.replace(/\ln\(/g, "Math.log(");
-  // allow Math.pow via ** already handled
-  // sanitize: allow only numbers, Math, operators, parentheses, decimals
-  if(/[^0-9+\-*/().% Mathnetsqrtienaxpgloc^e]/i.test(expr)) {
-    // basic sanitization fallback — but still attempt evaluation
-  }
-  // use Function to evaluate in a safe local scope (not full-safe but typical for local app)
-  // Note: This runs user-supplied expressions in the page's JS context.
-  // We limit by replacing dangerous identifiers, but this is meant for local trusted use.
-  const fn = new Function(`return (${expr})`);
-  return fn();
-}
-
-/* ensure calculator snaps to center when closed and reopened */
-document.addEventListener("keydown", (e)=>{ if(e.key === "Escape"){ closeCalc(); } });
-
-/* close modal if clicked outside */
-document.addEventListener("click", (e)=>{
-  if(calcModal.style.display === "block" && !calcModal.contains(e.target) && e.target.id !== "openCalcBtn"){
-    // snap back on close
-    closeCalc();
-  }
-});
-
-/* ==========================
-   News helper: initial load
-   ==========================*/
-$("newsSourceSelect").addEventListener("change", ()=>{
-  const src = $("newsSourceSelect").value;
-  loadNews(src);
-});
-
-/* show/hide news via menu */
-$("toggleNewsBtn").addEventListener("click", ()=>{
-  const grid = $("newsGrid");
-  grid.style.display = grid.style.display === "none" ? "grid" : "none";
-  $("toggleNewsBtn").textContent = grid.style.display === "none" ? "Show News Feed" : "Hide News Feed";
-});
-
-/* Sign-in quick helper for menu */
-$("signInBtn").addEventListener("click", ()=> {
-  sidebar.classList.remove("open");
-  openProfileDropdown();
-});
-
-/* Cleanly close menu when opening profile or calc */
-sidebar.addEventListener("transitionend", ()=>{ /* nothing for now */ });
-
-/* ==========================
-   Accessibility: close menu clicking outside
-   ==========================*/
-document.addEventListener("click", (e)=>{
-  const menuBtn = $("menuBtn");
-  if(!sidebar.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target) && sidebar.classList.contains("open")){
-    sidebar.classList.remove("open");
-  }
-});
-
-/* ==========================
-   Utilities: escape when needed
-   ==========================*/
-/* done earlier: escapeHtml */
-
-/* ==========================
-   Initial render
-   ==========================*/
-renderShortcuts();
-
-/* load initial news source (persisted) */
-const initialNews = localStorage.getItem("omni_news_source") || $("newsSourceSelect").value || "cnn";
-$("newsSourceSelect").value = initialNews;
-loadNews(initialNews);
-
-/* ==========================
-   Small UX enhancements: keyboard to open menu/profile
-   ==========================*/
-document.addEventListener("keydown", (e)=>{
-  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); $("q").focus(); }
-  if(e.key === "m"){ sidebar.classList.toggle("open"); }
-});
-
-/* ==========================
-   END OF SCRIPT
-   ==========================*/
-</script>
+    signInSubmit.addEventListener("click", () => {
+      const username = document.getElementById("usernameInput").value;
+      const email = document.getElementById("emailInput").value;
+      const password = document.getElementById("passwordInput").value;
+      if(username && email && password) {
+        localStorage.setItem("user", JSON.stringify({username,email,password}));
+        profileBubble.textContent = username[0].toUpperCase();
+        signInModal.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
+
