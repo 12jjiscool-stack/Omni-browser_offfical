@@ -1,412 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Omni Browser</title>
   <style>
+    :root {
+      --bg-color: #0f0f0f;
+      --text-color: #fff;
+      --card-bg: #1a1a1a;
+      --accent: #3a82f7;
+      --clock-glow: #3a82f7;
+    }
+    [data-theme="light"] {
+      --bg-color: #ffffff;
+      --text-color: #111;
+      --card-bg: #f1f1f1;
+      --accent: #0078d7;
+      --clock-glow: #0078d7;
+    }
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #eaeaea;
+      --card-bg: #1e1e1e;
+      --accent: #bb86fc;
+      --clock-glow: #bb86fc;
+    }
+    [data-theme="night"] {
+      --bg-color: #0f0f0f;
+      --text-color: #fff;
+      --card-bg: #1a1a1a;
+      --accent: #3a82f7;
+      --clock-glow: #3a82f7;
+    }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
       transition: background 0.3s, color 0.3s;
     }
-
-    /* Header (Omni, description, clock) */
-    .header {
+    header {
       text-align: center;
-      margin-top: 30px;
+      padding: 20px;
     }
-    .title {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 10px;
+    header h1 {
+      font-size: 2.5em;
+      margin: 0;
     }
-    .description {
-      font-size: 1.4rem;
-      font-weight: 500;
-      color: white;
+    header p {
+      font-size: 1.2em;
+      margin: 10px 0;
+      color: var(--text-color);
+    }
+    #clock {
+      font-family: monospace;
+      font-size: 2.5em;
+      margin: 10px 0;
+      text-shadow: 0 0 15px var(--clock-glow);
+      cursor: pointer;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 15px;
     }
-    .clock {
-      font-family: monospace;
-      font-size: 3rem;
-      font-weight: bold;
-      transition: color 0.3s, text-shadow 0.3s;
-    }
-    .clock:hover::after {
-      content: attr(data-date);
-      display: block;
-      font-size: 1rem;
-      margin-top: 8px;
-      color: inherit;
-    }
-
-    /* Search bar row */
     .search-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px auto;
-      max-width: 900px;
+      gap: 5px;
     }
-    select, input[type="text"], button {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
+    .search-container select,
+    .search-container input {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      outline: none;
+      background: var(--card-bg);
+      color: var(--text-color);
     }
-    input[type="text"] {
-      flex: 1;
-    }
-    button {
+    .search-container button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
+      background: var(--accent);
+      color: #fff;
     }
-
-    /* Profile bubble */
-    .profile-bubble {
+    #profile-bubble {
+      margin-left: auto;
+      margin-right: 20px;
       width: 40px;
       height: 40px;
       border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      margin-left: auto;
       cursor: pointer;
-      transition: all 0.3s;
+      overflow: hidden;
     }
-    .profile-dropdown {
-      position: absolute;
-      top: 70px;
-      right: 20px;
-      background: #333;
-      color: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      display: none;
-      flex-direction: column;
-      gap: 10px;
+    #tabs {
+      display: flex;
+      background: var(--card-bg);
+      padding: 5px 10px;
     }
-    .profile-dropdown input {
-      padding: 6px;
-      border-radius: 6px;
-      border: none;
-    }
-    .profile-dropdown button {
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
+    .tab {
+      background: var(--bg-color);
+      border: 1px solid #444;
+      padding: 5px 10px;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
       cursor: pointer;
-      background: #555;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tab.active {
+      background: var(--accent);
       color: #fff;
     }
-
-    /* Shortcuts */
+    .tab span.close {
+      cursor: pointer;
+    }
     .shortcuts {
       display: flex;
       justify-content: center;
       gap: 15px;
-      margin-top: 20px;
-      flex-wrap: wrap;
+      margin: 20px;
     }
     .shortcut {
+      padding: 10px 15px;
+      border-radius: 10px;
+      background: var(--card-bg);
       display: flex;
       align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.05);
-      transition: background 0.3s;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
     .shortcut img {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
     }
     .shortcut:hover {
-      background: rgba(0,0,0,0.1);
+      transform: scale(1.05);
     }
-
-    /* News feed */
     .news-feed {
+      padding: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 15px;
-      margin: 30px auto;
-      max-width: 1200px;
-      padding: 0 20px;
     }
     .news-card {
-      background: rgba(0,0,0,0.05);
+      background: var(--card-bg);
       border-radius: 10px;
       overflow: hidden;
-      text-decoration: none;
-      color: inherit;
       transition: transform 0.2s;
     }
     .news-card:hover {
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
     .news-card img {
       width: 100%;
-      height: 160px;
+      height: 150px;
       object-fit: cover;
     }
-    .news-card h4 {
-      margin: 10px;
-      font-size: 1rem;
-    }
-
-    /* Sidebar menu */
-    .menu-btn {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      background: #555;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.2rem;
-      transition: background 0.3s;
-    }
-    .menu-btn:hover {
-      background: #333;
-    }
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -260px;
-      width: 260px;
-      height: 100%;
-      background: #222;
-      color: #fff;
-      padding: 20px;
-      transition: left 0.3s;
-      overflow-y: auto;
-    }
-    .sidebar.open {
-      left: 0;
-    }
-    .sidebar h3 {
-      margin: 0 0 15px 0;
-      font-size: 1.2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      padding-bottom: 8px;
-    }
-    .sidebar button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
+    .news-card div {
       padding: 10px;
-      background: #444;
+    }
+    .menu {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 15px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 180px;
+    }
+    .menu button {
+      background: var(--accent);
       border: none;
-      border-radius: 6px;
+      padding: 8px;
+      border-radius: 5px;
       color: #fff;
       cursor: pointer;
-      transition: background 0.3s;
     }
-    .sidebar button:hover {
-      background: #666;
+    #menu-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
     }
-
-    /* Themes */
-    body.light { background: #f4f4f4; color: #000; }
-    body.light .description { color: #000; }
-    body.light .clock { color: #000; text-shadow: 0 0 10px rgba(0,0,0,0.4); }
-    body.light .profile-bubble { background: #ddd; color: #000; }
-
-    body.dark { background: #222; color: #fff; }
-    body.dark .clock { color: #fff; text-shadow: 0 0 12px rgba(255,255,255,0.7); }
-    body.dark .profile-bubble { border: 2px solid #fff; color: #fff; background: transparent; }
-
-    body.night { background: #0d1b2a; color: #e0e1dd; }
-    body.night .clock { color: #9cf; text-shadow: 0 0 15px rgba(100,150,255,0.8); }
-    body.night .profile-bubble { background: #1b263b; color: #9cf; box-shadow: 0 0 10px rgba(100,150,255,0.8); }
+    /* Calculator modal */
+    #calc-modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 10px;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    #calc-modal.dragging {
+      opacity: 0.8;
+      cursor: move;
+    }
+    #calc-display {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+      text-align: right;
+      font-size: 1.2em;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+    }
+    .calc-buttons button {
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
   </style>
 </head>
-<body class="light">
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <h3>Menu</h3>
+<body data-theme="night">
+  <header>
+    <h1>Omni</h1>
+    <p>A multi-tool search engine that will be safe for you, and generations to come</p>
+    <div id="clock" title=""></div>
+  </header>
+
+  <div class="top-bar">
+    <button id="menu-btn">☰</button>
+    <div class="search-container">
+      <select id="engine">
+        <option value="https://www.google.com/search?q=">Google</option>
+        <option value="https://www.bing.com/search?q=">Bing</option>
+        <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+      </select>
+      <input type="text" id="search" placeholder="Search the web..."/>
+      <button id="search-btn">Search</button>
+      <button id="dice-btn">🎲</button>
+    </div>
+    <div id="profile-bubble">U</div>
+  </div>
+
+  <div id="tabs">
+    <div class="tab active">New Tab <span class="close">x</span></div>
+  </div>
+
+  <div class="shortcuts">
+    <div class="shortcut" onclick="openInNewTab('https://mail.google.com')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
+    </div>
+    <div class="shortcut" onclick="openInNewTab('https://youtube.com')">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
+    </div>
+    <div class="shortcut" onclick="openInNewTab('https://chat.openai.com')">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
+    </div>
+    <div class="shortcut" onclick="alert('Add Shortcut placeholder')">➕ Add Shortcut</div>
+  </div>
+
+  <div class="news-feed" id="news-feed"></div>
+
+  <div class="menu" id="menu">
     <button onclick="signIn()">Sign In</button>
-    <button onclick="setTheme('light')">Light Mode</button>
-    <button onclick="setTheme('dark')">Dark Mode</button>
-    <button onclick="setTheme('night')">Night Mode</button>
-    <button onclick="toggleNews()">Hide/Show News Feed</button>
-    <button onclick="cleanData()">Clean Data</button>
-    <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical','_blank')">Current GitHub</button>
+    <button onclick="toggleNews()">Hide News Feed</button>
+    <button onclick="clearData()">Clean Data</button>
+    <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical')">Current GitHub</button>
+    <button onclick="openCalc()">Math Solver</button>
+    <button onclick="toggleThemes()">Themes</button>
   </div>
 
-  <div class="header">
-    <div class="title">Omni</div>
-    <div class="description">a multi tool search engine that will be safe for you and generations to come</div>
-    <div id="clock" class="clock" data-date=""></div>
+  <div id="calc-modal">
+    <input type="text" id="calc-display" disabled />
+    <div class="calc-buttons">
+      <button>(</button><button>)</button><button>%</button><button>CE</button><button>C</button>
+      <button>7</button><button>8</button><button>9</button><button>/</button><button>^</button>
+      <button>4</button><button>5</button><button>6</button><button>*</button><button>√</button>
+      <button>1</button><button>2</button><button>3</button><button>-</button><button>π</button>
+      <button>0</button><button>.</button><button>=</button><button>+</button><button>e</button>
+    </div>
   </div>
-
-  <!-- Search row -->
-  <div class="search-container">
-    <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    <select id="engine">
-      <option value="https://www.google.com/search?q=">Google</option>
-      <option value="https://www.bing.com/search?q=">Bing</option>
-      <option value="https://search.yahoo.com/search?p=">Yahoo</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="Search...">
-    <button onclick="search()">Search</button>
-    <button onclick="rollDice()">🎲</button>
-    <div id="profileBubble" class="profile-bubble" onclick="toggleProfileDropdown()" style="display:none;"></div>
-  </div>
-
-  <!-- Profile dropdown -->
-  <div id="profileDropdown" class="profile-dropdown">
-    <input type="text" id="updateUsername" placeholder="Username">
-    <input type="email" id="updateEmail" placeholder="Email">
-    <input type="password" id="updatePassword" placeholder="Password">
-    <button onclick="updateProfile()">Update</button>
-  </div>
-
-  <!-- Shortcuts -->
-  <div class="shortcuts" id="shortcuts">
-    <a href="https://mail.google.com" target="_blank" class="shortcut">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail"> Gmail
-    </a>
-    <a href="https://www.youtube.com" target="_blank" class="shortcut">
-      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube"> YouTube
-    </a>
-    <a href="https://chat.openai.com" target="_blank" class="shortcut">
-      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT"> ChatGPT
-    </a>
-    <button onclick="addShortcut()" class="shortcut">＋ Add Shortcut</button>
-  </div>
-
-  <!-- News feed -->
-  <div id="newsFeed" class="news-feed"></div>
 
   <script>
-    // Sidebar toggle
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("open");
-    }
-
-    // Theme switcher with save
-    function setTheme(theme) {
-      document.body.className = theme;
-      localStorage.setItem("theme", theme);
-    }
-    if(localStorage.getItem("theme")) {
-      setTheme(localStorage.getItem("theme"));
-    }
-
     // Clock
     function updateClock() {
       const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      const clock = document.getElementById("clock");
-      clock.textContent = `${h}:${m}:${s}`;
-      clock.setAttribute("data-date", now.toDateString());
+      const time = now.toLocaleTimeString();
+      const date = now.toDateString();
+      const clock = document.getElementById('clock');
+      clock.textContent = time;
+      clock.title = date;
     }
-    setInterval(updateClock, 1000); updateClock();
+    setInterval(updateClock, 1000);
+    updateClock();
 
     // Search
-    function search() {
-      const engine = document.getElementById("engine").value;
-      const query = document.getElementById("searchInput").value;
-      if(query.trim()) window.open(engine + encodeURIComponent(query), "_blank");
+    document.getElementById('search-btn').onclick = () => {
+      const engine = document.getElementById('engine').value;
+      const query = document.getElementById('search').value;
+      if(query) openInNewTab(engine + encodeURIComponent(query));
+    };
+
+    // Dice
+    document.getElementById('dice-btn').onclick = () => {
+      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+      const choice = sites[Math.floor(Math.random()*sites.length)];
+      openInNewTab(choice);
+    };
+
+    // Tabs
+    function openInNewTab(url) {
+      const tab = document.createElement('div');
+      tab.className = "tab active";
+      tab.innerHTML = url + ' <span class="close">x</span>';
+      document.getElementById('tabs').appendChild(tab);
+      tab.querySelector(".close").onclick = () => tab.remove();
+      window.open(url, '_blank');
     }
 
-    // Dice randomizer
-    function rollDice() {
-      const sites = ["https://pbskids.org", "https://www.youtube.com", "https://www.coolmathgames.com"];
-      const pick = sites[Math.floor(Math.random()*sites.length)];
-      window.open(pick, "_blank");
-    }
+    // Menu toggle
+    document.getElementById('menu-btn').onclick = () => {
+      const menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    };
 
-    // News feed
+    // News feed (dummy CNN preview)
     async function loadNews() {
-      try {
-        const res = await fetch("https://gnews.io/api/v4/top-headlines?token=demo&lang=en&topic=world&q=CNN");
-        const data = await res.json();
-        const feed = document.getElementById("newsFeed");
-        feed.innerHTML = "";
-        data.articles.slice(0,6).forEach(article => {
-          const card = document.createElement("a");
-          card.className = "news-card";
-          card.href = article.url;
-          card.target = "_blank";
-          card.innerHTML = `
-            <img src="${article.image || ''}" alt="">
-            <h4>${article.title}</h4>
-          `;
-          feed.appendChild(card);
-        });
-      } catch(err) {
-        console.error("News load failed", err);
-      }
+      const newsFeed = document.getElementById('news-feed');
+      newsFeed.innerHTML = "";
+      const sample = [
+        {title:"CNN Headline 1", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"},
+        {title:"CNN Headline 2", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"},
+        {title:"CNN Headline 3", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"}
+      ];
+      sample.forEach(n=>{
+        const card = document.createElement('div');
+        card.className="news-card";
+        card.innerHTML=`<img src="${n.img}"><div><a href="${n.url}" target="_blank">${n.title}</a></div>`;
+        newsFeed.appendChild(card);
+      });
     }
-    loadNews(); setInterval(loadNews, 300000);
+    loadNews();
+    setInterval(loadNews, 300000);
 
-    // Toggle news feed
     function toggleNews() {
-      const feed = document.getElementById("newsFeed");
-      feed.style.display = (feed.style.display === "none" ? "grid" : "none");
+      const feed = document.getElementById('news-feed');
+      if(feed.style.display === "none"){ feed.style.display="grid"; }
+      else{ feed.style.display="none"; }
     }
+    function clearData(){ localStorage.clear(); alert("Data cleared!"); }
 
-    // Add shortcut
-    function addShortcut() {
-      const url = prompt("Enter site URL:");
-      const name = prompt("Enter site name:");
-      if(url && name) {
-        const link = document.createElement("a");
-        link.href = url;
-        link.target = "_blank";
-        link.className = "shortcut";
-        link.textContent = name;
-        document.getElementById("shortcuts").appendChild(link);
+    // Calculator
+    function openCalc(){
+      const modal=document.getElementById('calc-modal');
+      modal.style.display="block";
+      modal.style.top="50%"; modal.style.left="50%"; modal.style.transform="translate(-50%,-50%)";
+    }
+    const calcModal=document.getElementById('calc-modal');
+    let isDragging=false,offsetX,offsetY;
+    calcModal.addEventListener('mousedown',e=>{
+      isDragging=true;
+      offsetX=e.clientX-calcModal.offsetLeft;
+      offsetY=e.clientY-calcModal.offsetTop;
+      calcModal.classList.add('dragging');
+    });
+    document.addEventListener('mouseup',()=>{isDragging=false;calcModal.classList.remove('dragging');});
+    document.addEventListener('mousemove',e=>{
+      if(isDragging){
+        calcModal.style.left=(e.clientX-offsetX)+"px";
+        calcModal.style.top=(e.clientY-offsetY)+"px";
+        calcModal.style.transform="";
       }
-    }
-
-    // Sign in + profile bubble
-    function signIn() {
-      const username = prompt("Enter username:");
-      const email = prompt("Enter email:");
-      const password = prompt("Enter password:");
-      if(username && email && password) {
-        localStorage.setItem("profile", JSON.stringify({username,email,password}));
-        showProfileBubble(username);
-      }
-    }
-    function showProfileBubble(username) {
-      const bubble = document.getElementById("profileBubble");
-      bubble.textContent = username.charAt(0).toUpperCase();
-      bubble.style.display = "flex";
-    }
-    function toggleProfileDropdown() {
-      const dropdown = document.getElementById("profileDropdown");
-      dropdown.style.display = dropdown.style.display === "flex" ? "none" : "flex";
-    }
-    function updateProfile() {
-      const username = document.getElementById("updateUsername").value;
-      const email = document.getElementById("updateEmail").value;
-      const password = document.getElementById("updatePassword").value;
-      if(username && email && password) {
-        localStorage.setItem("profile", JSON.stringify({username,email,password}));
-        showProfileBubble(username);
-        toggleProfileDropdown();
-      }
-    }
-    if(localStorage.getItem("profile")) {
-      const profile = JSON.parse(localStorage.getItem("profile"));
-      showProfileBubble(profile.username);
-    }
-
-    // Clean data
-    function cleanData() {
-      localStorage.clear();
-      location.reload();
-    }
+    });
   </script>
 </body>
 </html>
