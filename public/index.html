@@ -1,373 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Omni Browser</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: var(--bg, #f4f4f4);
-      color: var(--text, #333);
+      background: #f4f4f4;
+      color: #000;
+      transition: background 0.3s, color 0.3s;
     }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      background: #d32f2f;
-      color: white;
+
+    /* Centered header area */
+    .header {
+      text-align: center;
+      margin-top: 50px;
     }
-    .search-container {
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 20px;
-    }
-    .search-container select,
-    .search-container input {
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-    }
-    .search-container button {
-      background: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 14px;
-      cursor: pointer;
+
+    .title {
+      font-size: 3rem;
       font-weight: bold;
-      color: #d32f2f;
+      margin-bottom: 10px;
     }
-    .dice {
-      margin-left: 10px;
-      cursor: pointer;
-      font-size: 20px;
-    }
-    .menu-btn, .profile-bubble {
-      background: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-left: 10px;
-    }
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -260px;
-      width: 260px;
-      height: 100%;
-      background: #222;
+
+    .description {
+      font-size: 1.3rem;
+      font-weight: 400;
       color: white;
-      transition: left 0.3s ease;
-      padding: 20px;
-      z-index: 1000;
+      margin-bottom: 15px;
     }
-    .sidebar.active { left: 0; }
-    .sidebar h2 { margin-top: 0; }
-    .sidebar button {
+
+    .clock {
+      font-family: monospace;
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+
+    .clock:hover::after {
+      content: attr(data-date);
       display: block;
-      margin: 10px 0;
+      font-size: 1rem;
+      margin-top: 8px;
+      color: inherit;
+    }
+
+    /* Search container */
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      max-width: 700px;
+      gap: 10px;
+    }
+
+    select, input[type="text"], button {
       padding: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+    }
+
+    button {
       cursor: pointer;
     }
-    /* Tabs */
-    .tabs {
-      display: flex;
-      background: #eee;
-      border-bottom: 1px solid #ccc;
-      overflow-x: auto;
-      align-items: center;
-    }
-    .tab {
-      background: #ddd;
-      padding: 8px 14px;
-      margin-right: 4px;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-    .tab.active { background: white; border-bottom: 2px solid #d32f2f; }
-    .tab .close { font-weight: bold; cursor: pointer; }
-    .new-tab-btn {
-      padding: 8px 14px;
-      background: #ddd;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .tab-content { height: calc(100vh - 200px); }
-    .tab-content iframe { width: 100%; height: 100%; border: none; }
-    /* Homepage content */
-    .homepage {
-      padding: 20px;
-    }
+
+    /* Shortcuts */
     .shortcuts {
       display: flex;
-      gap: 14px;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
     }
+
     .shortcut {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: #fff;
-      padding: 8px 14px;
+      gap: 8px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 8px 12px;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      cursor: pointer;
+      background: rgba(0,0,0,0.05);
+      transition: background 0.3s;
     }
-    .shortcut img { width: 20px; height: 20px; }
-    #news-feed {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+
+    .shortcut img {
+      width: 20px;
+      height: 20px;
     }
-    .news-card {
-      background: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+    .shortcut:hover {
+      background: rgba(0,0,0,0.1);
     }
-    .news-card img {
-      width: 100%;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
+
     /* Themes */
-    body.light { --bg: #f4f4f4; --text: #333; }
-    body.dark { --bg: #121212; --text: #eee; }
-    body.night { --bg: #1a1a2e; --text: #cfcfcf; }
+    body.light {
+      background: #f4f4f4;
+      color: #000;
+    }
+    body.light .clock {
+      color: #000;
+      text-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    body.dark {
+      background: #222;
+      color: #fff;
+    }
+    body.dark .clock {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.7);
+    }
+
+    body.night {
+      background: #0d1b2a;
+      color: #e0e1dd;
+    }
+    body.night .clock {
+      color: #9cf;
+      text-shadow: 0 0 15px rgba(100,150,255,0.8);
+    }
+
+    /* Menu button */
+    .menu-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 50%;
+      background: #555;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background 0.3s;
+    }
+    .menu-btn:hover {
+      background: #333;
+    }
+
+    /* Sidebar menu */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+      transition: left 0.3s;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 8px;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      background: #444;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .sidebar button:hover {
+      background: #666;
+    }
   </style>
 </head>
 <body class="light">
-  <header>
-    <button class="menu-btn">☰</button>
-    <div class="search-container">
-      <select id="engine">
-        <option value="https://www.google.com/search?q=">Google</option>
-        <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-        <option value="https://www.bing.com/search?q=">Bing</option>
-      </select>
-      <input type="text" id="searchBox" placeholder="Search the web..."/>
-      <button onclick="searchWeb()">Search</button>
-      <span class="dice" onclick="rollDice()">🎲</span>
-    </div>
-    <button class="profile-bubble" id="profileBubble">?</button>
-  </header>
+  <!-- Menu button -->
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
 
-  <div class="tabs" id="tabs"></div>
-  <div class="tab-content" id="tabContent"></div>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h3>Menu</h3>
+    <button onclick="setTheme('light')">Light Mode</button>
+    <button onclick="setTheme('dark')">Dark Mode</button>
+    <button onclick="setTheme('night')">Night Mode</button>
+  </div>
 
-  <div class="sidebar" id="sidebar">
-    <h2>Menu</h2>
-    <button onclick="toggleThemeMenu()">Themes</button>
-    <div id="themeMenu" style="display:none;">
-      <button onclick="setTheme('light')">Light</button>
-      <button onclick="setTheme('dark')">Dark</button>
-      <button onclick="setTheme('night')">Night</button>
-      <button onclick="editBackground()">Edit Background</button>
-    </div>
-    <button onclick="toggleNews()">Hide News Feed</button>
-    <button onclick="signIn()">Sign In</button>
+  <div class="header">
+    <div class="title">Omni</div>
+    <div class="description">a multi tool search engine that will be safe for you and generations to come</div>
+    <div id="clock" class="clock" data-date=""></div>
+  </div>
+
+  <!-- Search bar with engine dropdown -->
+  <div class="search-container">
+    <select id="engine">
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.bing.com/search?q=">Bing</option>
+      <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="search()">Search</button>
+  </div>
+
+  <!-- Shortcuts -->
+  <div class="shortcuts">
+    <a href="https://mail.google.com" target="_blank" class="shortcut">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png" alt="Gmail"> Gmail
+    </a>
+    <a href="https://www.youtube.com" target="_blank" class="shortcut">
+      <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png" alt="YouTube"> YouTube
+    </a>
+    <a href="https://chat.openai.com" target="_blank" class="shortcut">
+      <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png" alt="ChatGPT"> ChatGPT
+    </a>
   </div>
 
   <script>
-    const sidebar = document.getElementById('sidebar');
-    document.querySelector('.menu-btn').onclick = () => {
-      sidebar.classList.toggle('active');
-    };
-
-    const tabsDiv = document.getElementById('tabs');
-    const tabContent = document.getElementById('tabContent');
-    let tabs = [];
-    let activeTab = null;
-
-    function createHomepage() {
-      const id = Date.now();
-      tabs.push({id, title: "New Tab", type: "homepage"});
-      setActiveTab(id);
-      renderTabs();
+    // Menu toggle
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("open");
     }
 
-    function searchWeb() {
-      const engine = document.getElementById('engine').value;
-      const query = document.getElementById('searchBox').value;
-      if (!query) return;
-      const url = engine + encodeURIComponent(query);
-      const id = Date.now();
-      tabs.push({id, title: query, type: "web", url});
-      setActiveTab(id);
-      renderTabs();
+    // Theme switcher
+    function setTheme(theme) {
+      document.body.className = theme;
     }
 
-    function setActiveTab(id) {
-      activeTab = id;
-      renderTabs();
-    }
-
-    function closeTab(id) {
-      tabs = tabs.filter(t => t.id !== id);
-      if (activeTab === id && tabs.length) {
-        activeTab = tabs[tabs.length - 1].id;
-      }
-      renderTabs();
-    }
-
-    function renderTabs() {
-      tabsDiv.innerHTML = "";
-      tabContent.innerHTML = "";
-
-      tabs.forEach(tab => {
-        const t = document.createElement("div");
-        t.className = "tab" + (tab.id === activeTab ? " active" : "");
-        t.onclick = () => setActiveTab(tab.id);
-        t.innerHTML = tab.title + ` <span class="close" onclick="event.stopPropagation(); closeTab(${tab.id})">×</span>`;
-        tabsDiv.appendChild(t);
-      });
-
-      const newTabBtn = document.createElement("div");
-      newTabBtn.className = "new-tab-btn";
-      newTabBtn.innerText = "+";
-      newTabBtn.onclick = createHomepage;
-      tabsDiv.appendChild(newTabBtn);
-
-      const tab = tabs.find(t => t.id === activeTab);
-      if (!tab) return;
-
-      if (tab.type === "homepage") {
-        const div = document.createElement("div");
-        div.className = "homepage";
-        div.innerHTML = `
-          <div class="shortcuts">
-            <div class="shortcut" onclick="openSite('https://mail.google.com')">
-              <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"/> Gmail
-            </div>
-            <div class="shortcut" onclick="openSite('https://youtube.com')">
-              <img src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"/> YouTube
-            </div>
-            <div class="shortcut" onclick="openSite('https://chat.openai.com')">
-              <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
-            </div>
-            <div class="shortcut" onclick="addShortcut()">+ Add Shortcut</div>
-          </div>
-          <div id="news-feed"></div>
-        `;
-        tabContent.appendChild(div);
-        loadNews();
-      } else if (tab.type === "web") {
-        const iframe = document.createElement("iframe");
-        iframe.src = tab.url;
-        tabContent.appendChild(iframe);
+    // Search function
+    function search() {
+      const engine = document.getElementById("engine").value;
+      const query = document.getElementById("searchInput").value;
+      if (query.trim()) {
+        window.open(engine + encodeURIComponent(query), "_blank");
       }
     }
 
-    function openSite(url) {
-      const id = Date.now();
-      tabs.push({id, title: url, type: "web", url});
-      setActiveTab(id);
-      renderTabs();
+    // Clock function
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      const clock = document.getElementById("clock");
+      clock.textContent = `${h}:${m}:${s}`;
+      clock.setAttribute("data-date", now.toDateString());
     }
-
-    function rollDice() {
-      const sites = ["https://pbskids.org","https://youtube.com","https://coolmathgames.com"];
-      const site = sites[Math.floor(Math.random()*sites.length)];
-      openSite(site);
-    }
-
-    async function loadNews() {
-      const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://rss.cnn.com/rss/cnn_topstories.rss");
-      const data = await res.json();
-      const feed = document.getElementById("news-feed");
-      if (!feed) return;
-      feed.innerHTML = "";
-      data.items.slice(0,6).forEach(item => {
-        const card = document.createElement("div");
-        card.className = "news-card";
-        card.innerHTML = `<img src="${item.enclosure?.link || ''}"/>
-                          <h4><a href="${item.link}" target="_blank">${item.title}</a></h4>
-                          <p>${item.description}</p>`;
-        feed.appendChild(card);
-      });
-    }
-    setInterval(loadNews, 300000);
-
-    function toggleThemeMenu() {
-      const menu = document.getElementById('themeMenu');
-      menu.style.display = menu.style.display === "none" ? "block" : "none";
-    }
-    function setTheme(mode) {
-      document.body.className = mode;
-    }
-    function editBackground() {
-      const input = document.createElement('input');
-      input.type = "file";
-      input.accept = "image/*";
-      input.onchange = e => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = ev => {
-            document.body.style.backgroundImage = `url(${ev.target.result})`;
-            document.body.style.backgroundSize = "cover";
-          };
-          reader.readAsDataURL(file);
-        }
-      };
-      input.click();
-    }
-
-    let newsVisible = true;
-    function toggleNews() {
-      const feed = document.getElementById("news-feed");
-      if (!feed) return;
-      newsVisible = !newsVisible;
-      feed.style.display = newsVisible ? "grid" : "none";
-      event.target.innerText = newsVisible ? "Hide News Feed" : "Show News Feed";
-    }
-
-    const profileBubble = document.getElementById("profileBubble");
-    function signIn() {
-      const username = prompt("Enter username:");
-      const email = prompt("Enter email:");
-      const pass = prompt("Enter password:");
-      if(username && email && pass) {
-        localStorage.setItem("user", JSON.stringify({username,email,pass}));
-        profileBubble.innerText = username[0].toUpperCase();
-        profileBubble.onclick = editProfile;
-      }
-    }
-    function editProfile() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const username = prompt("Update username:", user.username);
-      const email = prompt("Update email:", user.email);
-      const pass = prompt("Update password:", user.pass);
-      if(username && email && pass) {
-        localStorage.setItem("user", JSON.stringify({username,email,pass}));
-        profileBubble.innerText = username[0].toUpperCase();
-      }
-    }
-    if(localStorage.getItem("user")) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      profileBubble.innerText = user.username[0].toUpperCase();
-      profileBubble.onclick = editProfile;
-    }
-
-    // Load default homepage on startup
-    createHomepage();
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
