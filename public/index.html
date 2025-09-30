@@ -39,6 +39,7 @@
       background: var(--bg-color);
       color: var(--text-color);
       transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
     }
     header {
       text-align: center;
@@ -49,7 +50,7 @@
       margin: 0;
     }
     header p {
-      font-size: 1.2em;
+      font-size: 1.3em;
       margin: 10px 0;
       color: var(--text-color);
     }
@@ -60,49 +61,58 @@
       text-shadow: 0 0 15px var(--clock-glow);
       cursor: pointer;
     }
-    .top-bar {
+    .search-row {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 12px;
+      margin: 20px auto;
+      width: 80%;
     }
     .search-container {
+      flex-grow: 1;
       display: flex;
       align-items: center;
       gap: 5px;
     }
     .search-container select,
     .search-container input {
-      padding: 8px;
+      padding: 12px;
       border-radius: 5px;
       border: 1px solid #444;
       outline: none;
       background: var(--card-bg);
       color: var(--text-color);
     }
+    .search-container input {
+      flex-grow: 1;
+      font-size: 1.1em;
+    }
     .search-container button {
-      padding: 8px 12px;
+      padding: 12px 16px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background: var(--accent);
       color: #fff;
+      font-size: 1em;
     }
-    #profile-bubble {
-      margin-left: auto;
-      margin-right: 20px;
-      width: 40px;
-      height: 40px;
+    #menu-btn, #dice-btn, #profile-bubble {
+      padding: 12px;
+      border: none;
       border-radius: 50%;
       background: var(--accent);
       color: #fff;
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+    #profile-bubble {
+      width: 45px;
+      height: 45px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      cursor: pointer;
-      overflow: hidden;
     }
     #tabs {
       display: flex;
@@ -150,6 +160,18 @@
     .shortcut:hover {
       transform: scale(1.05);
     }
+    .news-controls {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    .news-controls select {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
     .news-feed {
       padding: 20px;
       display: grid;
@@ -173,85 +195,24 @@
     .news-card div {
       padding: 10px;
     }
-    .menu {
-      position: absolute;
-      top: 60px;
-      left: 20px;
-      background: var(--card-bg);
-      border-radius: 10px;
+    .news-error {
+      background: #ff4444;
+      color: #fff;
       padding: 15px;
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      min-width: 180px;
-    }
-    .menu button {
-      background: var(--accent);
-      border: none;
-      padding: 8px;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-    }
-    #menu-btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
-    }
-    /* Calculator modal */
-    #calc-modal {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--card-bg);
-      padding: 15px;
-      border-radius: 10px;
-      z-index: 1000;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-    #calc-modal.dragging {
-      opacity: 0.8;
-      cursor: move;
-    }
-    #calc-display {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 5px;
-      text-align: right;
-      font-size: 1.2em;
-      background: var(--bg-color);
-      color: var(--text-color);
-    }
-    .calc-buttons {
-      display: grid;
-      grid-template-columns: repeat(5, 50px);
-      gap: 5px;
-    }
-    .calc-buttons button {
-      padding: 10px;
-      font-size: 1em;
-      border: none;
-      border-radius: 5px;
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
     }
   </style>
 </head>
 <body data-theme="night">
   <header>
     <h1>Omni</h1>
-    <p>A multi-tool search engine that will be safe for you, and generations to come</p>
+    <p>A multi-tool search engine that will be safe for you and generations to come</p>
     <div id="clock" title=""></div>
   </header>
 
-  <div class="top-bar">
+  <div class="search-row">
     <button id="menu-btn">☰</button>
     <div class="search-container">
       <select id="engine">
@@ -261,8 +222,8 @@
       </select>
       <input type="text" id="search" placeholder="Search the web..."/>
       <button id="search-btn">Search</button>
-      <button id="dice-btn">🎲</button>
     </div>
+    <button id="dice-btn">🎲</button>
     <div id="profile-bubble">U</div>
   </div>
 
@@ -280,30 +241,18 @@
     <div class="shortcut" onclick="openInNewTab('https://chat.openai.com')">
       <img src="https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"/> ChatGPT
     </div>
-    <div class="shortcut" onclick="alert('Add Shortcut placeholder')">➕ Add Shortcut</div>
+    <div class="shortcut" onclick="addShortcut()">➕ Add Shortcut</div>
+  </div>
+
+  <div class="news-controls">
+    <select id="news-source">
+      <option value="cnn">CNN</option>
+      <option value="bbc">BBC</option>
+      <option value="reuters">Reuters</option>
+    </select>
   </div>
 
   <div class="news-feed" id="news-feed"></div>
-
-  <div class="menu" id="menu">
-    <button onclick="signIn()">Sign In</button>
-    <button onclick="toggleNews()">Hide News Feed</button>
-    <button onclick="clearData()">Clean Data</button>
-    <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical')">Current GitHub</button>
-    <button onclick="openCalc()">Math Solver</button>
-    <button onclick="toggleThemes()">Themes</button>
-  </div>
-
-  <div id="calc-modal">
-    <input type="text" id="calc-display" disabled />
-    <div class="calc-buttons">
-      <button>(</button><button>)</button><button>%</button><button>CE</button><button>C</button>
-      <button>7</button><button>8</button><button>9</button><button>/</button><button>^</button>
-      <button>4</button><button>5</button><button>6</button><button>*</button><button>√</button>
-      <button>1</button><button>2</button><button>3</button><button>-</button><button>π</button>
-      <button>0</button><button>.</button><button>=</button><button>+</button><button>e</button>
-    </div>
-  </div>
 
   <script>
     // Clock
@@ -322,7 +271,7 @@
     document.getElementById('search-btn').onclick = () => {
       const engine = document.getElementById('engine').value;
       const query = document.getElementById('search').value;
-      if(query) openInNewTab(engine + encodeURIComponent(query));
+      if (query) openInNewTab(engine + encodeURIComponent(query));
     };
 
     // Dice
@@ -332,70 +281,74 @@
       openInNewTab(choice);
     };
 
-    // Tabs
     function openInNewTab(url) {
-      const tab = document.createElement('div');
-      tab.className = "tab active";
-      tab.innerHTML = url + ' <span class="close">x</span>';
-      document.getElementById('tabs').appendChild(tab);
-      tab.querySelector(".close").onclick = () => tab.remove();
       window.open(url, '_blank');
     }
 
-    // Menu toggle
-    document.getElementById('menu-btn').onclick = () => {
-      const menu = document.getElementById('menu');
-      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-    };
+    // Load live news using RSS → JSON (via rss2json.com)
+    let page = 1;
+    async function loadNews(source = 'cnn') {
+      const feedUrl = {
+        cnn: 'https://rss.cnn.com/rss/edition.rss',
+        bbc: 'http://feeds.bbci.co.uk/news/rss.xml',
+        reuters: 'http://feeds.reuters.com/reuters/topNews'
+      }[source];
 
-    // News feed (dummy CNN preview)
-    async function loadNews() {
-      const newsFeed = document.getElementById('news-feed');
-      newsFeed.innerHTML = "";
-      const sample = [
-        {title:"CNN Headline 1", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"},
-        {title:"CNN Headline 2", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"},
-        {title:"CNN Headline 3", img:"https://via.placeholder.com/400x200", url:"https://cnn.com"}
-      ];
-      sample.forEach(n=>{
-        const card = document.createElement('div');
-        card.className="news-card";
-        card.innerHTML=`<img src="${n.img}"><div><a href="${n.url}" target="_blank">${n.title}</a></div>`;
-        newsFeed.appendChild(card);
-      });
-    }
-    loadNews();
-    setInterval(loadNews, 300000);
+      const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=YOUR_API_KEY&page=${page}`;
+      try {
+        const resp = await fetch(api);
+        if (!resp.ok) throw new Error(`HTTP error! ${resp.status}`);
+        const data = await resp.json();
 
-    function toggleNews() {
-      const feed = document.getElementById('news-feed');
-      if(feed.style.display === "none"){ feed.style.display="grid"; }
-      else{ feed.style.display="none"; }
-    }
-    function clearData(){ localStorage.clear(); alert("Data cleared!"); }
+        if (!data.items || data.items.length === 0) {
+          throw new Error("No news items available.");
+        }
 
-    // Calculator
-    function openCalc(){
-      const modal=document.getElementById('calc-modal');
-      modal.style.display="block";
-      modal.style.top="50%"; modal.style.left="50%"; modal.style.transform="translate(-50%,-50%)";
+        const container = document.getElementById('news-feed');
+        data.items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'news-card';
+          card.innerHTML = `
+            <img src="${item.enclosure?.link || 'https://via.placeholder.com/300x150'}" alt="">
+            <div>
+              <a href="${item.link}" target="_blank">${item.title}</a>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading news:', err);
+        showNewsError("⚠️ Failed to load news. Retrying...");
+        // Retry after 10s
+        setTimeout(() => loadNews(source), 10000);
+      }
     }
-    const calcModal=document.getElementById('calc-modal');
-    let isDragging=false,offsetX,offsetY;
-    calcModal.addEventListener('mousedown',e=>{
-      isDragging=true;
-      offsetX=e.clientX-calcModal.offsetLeft;
-      offsetY=e.clientY-calcModal.offsetTop;
-      calcModal.classList.add('dragging');
-    });
-    document.addEventListener('mouseup',()=>{isDragging=false;calcModal.classList.remove('dragging');});
-    document.addEventListener('mousemove',e=>{
-      if(isDragging){
-        calcModal.style.left=(e.clientX-offsetX)+"px";
-        calcModal.style.top=(e.clientY-offsetY)+"px";
-        calcModal.style.transform="";
+
+    function showNewsError(msg) {
+      const container = document.getElementById('news-feed');
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'news-error';
+      errorDiv.textContent = msg;
+      container.appendChild(errorDiv);
+    }
+
+    // Infinite scroll
+    window.addEventListener('scroll', () => {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+        const src = document.getElementById('news-source').value;
+        page++;
+        loadNews(src);
       }
     });
+
+    document.getElementById('news-source').onchange = () => {
+      page = 1;
+      document.getElementById('news-feed').innerHTML = '';
+      loadNews(document.getElementById('news-source').value);
+    };
+
+    // First load
+    loadNews(document.getElementById('news-source').value);
   </script>
 </body>
 </html>
