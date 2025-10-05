@@ -3,348 +3,385 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Omni Browser</title>
+  <title>Omni</title>
   <style>
-    /* ---------- Base Theme Variables ---------- */
     :root {
-      --bg-color: #121212;
-      --text-color: #fff;
-      --accent-color: #00bcd4;
-      --button-bg: #1f1f1f;
-      --button-hover: #333;
-      --clock-glow: #00bcd4;
+      --bg: #0d0d0d;
+      --text: #fff;
+      --accent: #00bfff;
+      --glow: #00bfff;
+      --button-bg: #1c1c1c;
     }
 
     body.light {
-      --bg-color: #f5f5f5;
-      --text-color: #000;
-      --accent-color: #2196f3;
-      --button-bg: #ddd;
-      --button-hover: #ccc;
-      --clock-glow: #2196f3;
+      --bg: #f2f2f2;
+      --text: #000;
+      --accent: #0078ff;
+      --glow: #0078ff;
+      --button-bg: #e4e4e4;
+    }
+
+    body.dark {
+      --bg: #121212;
+      --text: #fff;
+      --accent: #bb86fc;
+      --glow: #bb86fc;
+      --button-bg: #1e1e1e;
     }
 
     body.night {
-      --bg-color: #0b0b1a;
-      --text-color: #dce2f0;
-      --accent-color: #4169e1;
-      --button-bg: #151525;
-      --button-hover: #2a2a45;
-      --clock-glow: #4169e1;
+      --bg: #00111a;
+      --text: #e0ffff;
+      --accent: #0099cc;
+      --glow: #0099cc;
+      --button-bg: #00222f;
     }
 
     body.astro {
-      background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
-      background-size: cover;
-      --text-color: #ffffff;
-      --accent-color: #bb86fc;
-      --button-bg: rgba(30, 30, 60, 0.7);
-      --button-hover: rgba(60, 60, 90, 0.9);
-      --clock-glow: #bb86fc;
+      background: url('https://cdn.pixabay.com/photo/2013/07/18/20/26/stars-164550_1280.jpg') no-repeat center center/cover;
+      --text: #ffffff;
+      --accent: #89cff0;
+      --glow: #89cff0;
+      --button-bg: rgba(0, 0, 0, 0.5);
     }
 
     body.modern {
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      --text-color: #e0e0e0;
-      --accent-color: #00ffe0;
-      --button-bg: #1f1f2e;
-      --button-hover: #2c2c40;
-      --clock-glow: #00ffe0;
+      background: linear-gradient(135deg, #00f5a0, #00d9f5, #0061f5);
+      --text: #ffffff;
+      --accent: #ffffff;
+      --glow: #ffffff;
+      --button-bg: rgba(255, 255, 255, 0.2);
     }
 
-    /* ---------- Layout ---------- */
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    /* ---------- Header ---------- */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 90%;
-      padding: 10px 0;
-    }
-
-    .search-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-grow: 1;
       justify-content: center;
+      height: 100vh;
+      transition: background 0.5s, color 0.5s;
     }
 
-    #search-input {
-      width: 60%;
-      padding: 10px 14px;
-      border-radius: 25px;
-      border: none;
-      font-size: 16px;
-      background-color: var(--button-bg);
-      color: var(--text-color);
-      outline: none;
-      transition: 0.3s;
-    }
-
-    #search-input:focus {
-      box-shadow: 0 0 10px var(--accent-color);
-    }
-
-    button {
-      background-color: var(--button-bg);
-      border: none;
-      color: var(--text-color);
-      border-radius: 8px;
-      cursor: pointer;
-      padding: 8px 14px;
-      transition: 0.3s;
-      font-size: 14px;
-    }
-
-    button:hover {
-      background-color: var(--button-hover);
-    }
-
-    /* ---------- Profile ---------- */
-    .profile-bubble {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: var(--accent-color);
-      color: var(--bg-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* ---------- Centered Content ---------- */
-    .center-content {
-      text-align: center;
-      margin-top: 100px;
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 15px var(--glow);
     }
 
     .description {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      color: var(--text-color);
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 20px;
     }
 
-    #clock {
-      font-family: monospace;
-      font-size: 3rem;
-      text-shadow: 0 0 15px var(--clock-glow);
-      cursor: default;
+    .clock {
+      font-family: 'Courier New', monospace;
+      font-size: 2.5rem;
+      text-shadow: 0 0 15px var(--glow);
+      margin-bottom: 40px;
+      transition: text-shadow 0.5s;
     }
 
-    #clock:hover::after {
-      content: attr(data-date);
-      display: block;
-      font-size: 0.9rem;
-      color: var(--accent-color);
-      margin-top: 5px;
-    }
-
-    /* ---------- Floating Bubble ---------- */
-    #official-bubble {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--button-bg);
-      border: 2px solid var(--accent-color);
-      border-radius: 20px;
-      padding: 8px 12px;
-      color: var(--text-color);
-      font-size: 13px;
-      opacity: 0.8;
-      z-index: 1000;
-    }
-
-    /* ---------- Menu & Modal ---------- */
-    #menu {
-      position: fixed;
-      left: 20px;
-      top: 70px;
-      background-color: var(--button-bg);
-      border-radius: 10px;
-      padding: 15px;
-      display: none;
-      flex-direction: column;
+    .top-bar {
+      display: flex;
+      align-items: center;
       gap: 10px;
-      width: 220px;
-      box-shadow: 0 0 10px var(--accent-color);
-      z-index: 999;
-    }
-
-    #mathsolver-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: var(--button-bg);
-      border: 2px solid var(--accent-color);
-      border-radius: 10px;
-      padding: 20px;
-      display: none;
-      box-shadow: 0 0 20px var(--accent-color);
-      z-index: 1000;
-      transition: opacity 0.3s;
-    }
-
-    #mathsolver-modal button {
-      background-color: var(--button-bg);
-      color: var(--text-color);
-      border: 1px solid var(--accent-color);
-    }
-
-    #close-calculator {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      background: var(--accent-color);
-      color: var(--bg-color);
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    input {
+      padding: 12px;
+      width: 500px;
+      border-radius: 25px;
       border: none;
+      outline: none;
+      background-color: var(--button-bg);
+      color: var(--text);
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    .menu, .dice {
+      background-color: var(--button-bg);
+      color: var(--text);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.3s;
+    }
+
+    .menu:hover, .dice:hover {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
+    .profile {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: var(--button-bg);
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: bold;
       cursor: pointer;
+      color: var(--text);
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    .official-bubble {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 0 15px var(--glow);
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 20;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--button-bg);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      color: var(--text);
+      box-shadow: 0 0 20px var(--glow);
+      min-width: 300px;
+    }
+
+    .modal input {
+      width: 80%;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 10px;
+      border: none;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .modal button {
+      margin-top: 10px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .mathsolver {
+      display: none;
+      position: fixed;
+      z-index: 25;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--button-bg);
+      border-radius: 15px;
+      box-shadow: 0 0 25px var(--glow);
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .mathsolver input {
+      width: 90%;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1.2rem;
+      text-align: right;
+      margin-bottom: 10px;
+    }
+
+    .mathsolver .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mathsolver button {
+      background: var(--button-bg);
+      border: none;
+      color: var(--text);
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1rem;
+    }
+
+    .mathsolver button:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: bold;
     }
   </style>
 </head>
 <body class="night">
-  <header>
-    <div class="search-container">
-      <button id="menu-btn">☰</button>
-      <input id="search-input" type="text" placeholder="Search the web..." />
-      <button id="dice-btn">🎲</button>
-    </div>
-    <div class="profile-bubble" id="profile-bubble">U</div>
-  </header>
+  <div class="profile" id="profileBubble">?</div>
 
-  <div class="center-content">
-    <h1 class="description">Omni Browser — Explore Smarter</h1>
-    <div id="clock"></div>
+  <div class="top-bar">
+    <button class="menu" id="menuBtn">☰</button>
+    <input type="text" id="searchBar" placeholder="Search the web..." />
+    <button class="dice" id="diceBtn">🎲</button>
   </div>
 
-  <div id="menu">
-    <button onclick="toggleTheme('light')">Light Mode</button>
-    <button onclick="toggleTheme('dark')">Dark Mode</button>
-    <button onclick="toggleTheme('night')">Night Mode</button>
-    <button onclick="toggleTheme('astro')">Astro Theme</button>
-    <button onclick="toggleTheme('modern')">Modern Theme</button>
-    <button onclick="openMathSolver()">Math Solver</button>
-    <button onclick="signInPopup()">Sign In</button>
-    <button onclick="cleanData()">Clean Data</button>
-    <button onclick="window.open('https://github.com/12jjiscool-stack/Omni-browser_offfical')">Current GitHub</button>
-  </div>
+  <h1>Omni</h1>
+  <div class="description">The world’s all-in-one search engine.</div>
+  <div class="clock" id="clock" title=""></div>
 
-  <div id="mathsolver-modal">
-    <button id="close-calculator" onclick="closeMathSolver()">×</button>
-    <input type="text" id="calc-display" style="width:100%;font-size:1.2rem;text-align:right;padding:10px;background:var(--button-bg);color:var(--text-color);border:none;margin-bottom:10px;" readonly />
-    <div id="calc-buttons" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-      <button>(</button><button>)</button><button>^</button><button>AC</button>
-      <button>7</button><button>8</button><button>9</button><button>/</button>
-      <button>4</button><button>5</button><button>6</button><button>*</button>
-      <button>1</button><button>2</button><button>3</button><button>-</button>
-      <button>0</button><button>.</button><button>=</button><button>+</button>
+  <div class="official-bubble">Official OmniEngine</div>
+
+  <!-- Sign In Modal -->
+  <div class="modal" id="signInModal">
+    <div class="modal-content">
+      <h2>Sign In</h2>
+      <input type="text" id="username" placeholder="Username" /><br />
+      <input type="email" id="email" placeholder="Email" /><br />
+      <input type="password" id="password" placeholder="Password" /><br />
+      <button id="saveSignIn">Save</button>
     </div>
   </div>
 
-  <div id="official-bubble">Official Site ✅</div>
+  <!-- Math Solver Modal -->
+  <div class="mathsolver" id="mathSolver">
+    <span class="close-btn" id="closeSolver">✖</span>
+    <input type="text" id="solverInput" readonly />
+    <div class="buttons" id="solverButtons"></div>
+  </div>
 
   <script>
-    // Redirect if not on official domain
+    // --- Official Site Check ---
     if (window.location.hostname !== "omniengines.netlify.app") {
-      window.location.replace("https://google.com");
+      window.location.href = "https://google.com";
     }
 
-    // Clock
-    const clock = document.getElementById("clock");
-    function updateClock() {
+    // --- Clock ---
+    const clock = document.getElementById('clock');
+    setInterval(() => {
       const now = new Date();
-      clock.textContent = now.toLocaleTimeString();
-      clock.setAttribute("data-date", now.toDateString());
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+      const time = now.toLocaleTimeString();
+      clock.textContent = time;
+      clock.title = now.toDateString();
+    }, 1000);
 
-    // Menu
-    document.getElementById("menu-btn").onclick = () => {
-      const menu = document.getElementById("menu");
-      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-    };
-
-    // Dice button
-    document.getElementById("dice-btn").onclick = () => {
-      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
-      window.open(sites[Math.floor(Math.random() * sites.length)], "_blank");
-    };
-
-    // Theme switcher
-    function toggleTheme(theme) {
-      document.body.className = theme;
-      localStorage.setItem("theme", theme);
-    }
-    if (localStorage.getItem("theme")) toggleTheme(localStorage.getItem("theme"));
-
-    // Math Solver
-    const modal = document.getElementById("mathsolver-modal");
-    const display = document.getElementById("calc-display");
-    const buttons = document.querySelectorAll("#calc-buttons button");
-    buttons.forEach(btn => {
-      btn.onclick = () => {
-        if (btn.textContent === "AC") display.value = "";
-        else if (btn.textContent === "=") {
-          try {
-            display.value = eval(display.value.replace("^", "**"));
-          } catch { display.value = "Error"; }
-        } else display.value += btn.textContent;
-      };
-    });
-    function openMathSolver() {
-      modal.style.display = "block";
-    }
-    function closeMathSolver() {
-      modal.style.display = "none";
-    }
-
-    // Sign In popup (simple)
-    function signInPopup() {
-      const username = prompt("Enter username:");
-      const email = prompt("Enter email:");
-      const password = prompt("Enter password:");
-      if (username && email && password) {
-        localStorage.setItem("user", JSON.stringify({ username, email, password }));
-        document.getElementById("profile-bubble").textContent = username[0].toUpperCase();
+    // --- Search ---
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchBar.value.trim();
+        if (query) {
+          window.open(`https://duckduckgo.com/?q=${encodeURIComponent(query)}`, '_blank');
+        }
       }
-    }
-
-    // Check for sign-in
-    window.addEventListener("load", () => {
-      const user = localStorage.getItem("user");
-      if (!user) alert("Please sign in to continue!");
     });
 
-    // Clean Data
-    function cleanData() {
-      localStorage.clear();
-      alert("All data cleared.");
-      location.reload();
+    // --- Dice Button ---
+    document.getElementById('diceBtn').onclick = () => {
+      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
+      const random = sites[Math.floor(Math.random() * sites.length)];
+      window.open(random, '_blank');
+    };
+
+    // --- Sign In Modal ---
+    const modal = document.getElementById('signInModal');
+    const savedUser = localStorage.getItem('username');
+    if (!savedUser) modal.style.display = 'flex';
+
+    document.getElementById('saveSignIn').onclick = () => {
+      const user = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      if (user && email && pass) {
+        localStorage.setItem('username', user);
+        localStorage.setItem('email', email);
+        localStorage.setItem('password', pass);
+        document.getElementById('profileBubble').textContent = user[0].toUpperCase();
+        modal.style.display = 'none';
+      }
+    };
+
+    if (savedUser) {
+      document.getElementById('profileBubble').textContent = savedUser[0].toUpperCase();
     }
+
+    // --- Math Solver ---
+    const solverModal = document.getElementById('mathSolver');
+    const solverButtons = document.getElementById('solverButtons');
+    const solverInput = document.getElementById('solverInput');
+
+    const buttons = [
+      '7','8','9','/','4','5','6','*',
+      '1','2','3','-','0','.','=','+',
+      'sin','cos','tan','(',')','C','√'
+    ];
+    buttons.forEach(b => {
+      const btn = document.createElement('button');
+      btn.textContent = b;
+      btn.onclick = () => {
+        if (b === 'C') solverInput.value = '';
+        else if (b === '=') {
+          try {
+            solverInput.value = eval(solverInput.value
+              .replace('sin', 'Math.sin')
+              .replace('cos', 'Math.cos')
+              .replace('tan', 'Math.tan')
+              .replace('√', 'Math.sqrt'));
+          } catch {
+            solverInput.value = 'Error';
+          }
+        } else {
+          solverInput.value += b;
+        }
+      };
+      solverButtons.appendChild(btn);
+    });
+
+    document.getElementById('menuBtn').onclick = () => solverModal.style.display = 'block';
+    document.getElementById('closeSolver').onclick = () => solverModal.style.display = 'none';
   </script>
 </body>
 </html>
-
-
-
