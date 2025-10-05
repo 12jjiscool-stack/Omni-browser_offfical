@@ -1,387 +1,636 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Omni</title>
-  <style>
-    :root {
-      --bg: #0d0d0d;
-      --text: #fff;
-      --accent: #00bfff;
-      --glow: #00bfff;
-      --button-bg: #1c1c1c;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Omni — Home</title>
+<style>
+  /* -------------------------
+     Theme variables & base
+     ------------------------- */
+  :root{
+    --bg: #071126;
+    --card: rgba(10,14,22,0.85);
+    --text: #e6eef8;
+    --muted: rgba(230,238,248,0.75);
+    --accent: #6aa7ff;
+    --accent-2: #9a7cff;
+    --glass: rgba(255,255,255,0.04);
+    --btn-bg: rgba(255,255,255,0.03);
+    --shadow: 0 8px 30px rgba(0,0,0,0.5);
+    --clock-glow: var(--accent);
+  }
 
-    body.light {
-      --bg: #f2f2f2;
-      --text: #000;
-      --accent: #0078ff;
-      --glow: #0078ff;
-      --button-bg: #e4e4e4;
-    }
+  /* Light */
+  body[data-theme="light"]{
+    --bg:#f5f7fb; --card: rgba(255,255,255,0.9); --text:#0b1220; --muted:rgba(11,18,32,0.75);
+    --accent:#0078d7; --accent-2:#0b7bd8; --glass: rgba(0,0,0,0.04); --btn-bg:#ffffff; --clock-glow:var(--accent);
+  }
+  /* Dark */
+  body[data-theme="dark"]{
+    --bg:#0f1720; --card: rgba(20,26,32,0.65); --text:#eaf2ff; --muted:rgba(234,242,255,0.75);
+    --accent:#8be5d9; --accent-2:#6be2cf; --btn-bg:rgba(255,255,255,0.02); --clock-glow:var(--accent);
+  }
+  /* Night (default) */
+  body[data-theme="night"]{
+    --bg:#071126; --card: rgba(5,12,22,0.72); --text:#e6eef8; --muted:rgba(230,238,248,0.78);
+    --accent:#3a82f7; --accent-2:#9a7cff; --btn-bg: rgba(255,255,255,0.02); --clock-glow:var(--accent);
+  }
+  /* Astro (star field background) */
+  body[data-theme="astro"]{
+    --bg: #00000000; --card: rgba(6,10,20,0.55); --text:#eef6ff; --muted:rgba(238,246,255,0.85);
+    --accent:#bb86fc; --accent-2:#7f5cfb; --btn-bg: rgba(255,255,255,0.03); --clock-glow:var(--accent);
+    background-size:cover; background-position:center;
+  }
+  /* Modern (futuristic gradient) */
+  body[data-theme="modern"]{
+    --bg: linear-gradient(135deg,#07103a 0%,#052a5b 50%,#001f4d 100%);
+    --card: rgba(255,255,255,0.04);
+    --text:#e6f6ff; --muted:rgba(230,246,255,0.8);
+    --accent:#00f5d4; --accent-2:#00b0ff; --btn-bg: rgba(255,255,255,0.03); --clock-glow:var(--accent);
+  }
 
-    body.dark {
-      --bg: #121212;
-      --text: #fff;
-      --accent: #bb86fc;
-      --glow: #bb86fc;
-      --button-bg: #1e1e1e;
-    }
+  /* base */
+  html,body{height:100%; margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;}
+  :where(img){max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
 
-    body.night {
-      --bg: #00111a;
-      --text: #e0ffff;
-      --accent: #0099cc;
-      --glow: #0099cc;
-      --button-bg: #00222f;
-    }
+  .app{max-width:1200px; margin:0 auto; padding:22px; display:flex; flex-direction:column; align-items:center; gap:14px;}
 
-    body.astro {
-      background: url('https://cdn.pixabay.com/photo/2013/07/18/20/26/stars-164550_1280.jpg') no-repeat center center/cover;
-      --text: #ffffff;
-      --accent: #89cff0;
-      --glow: #89cff0;
-      --button-bg: rgba(0, 0, 0, 0.5);
-    }
+  /* header stack */
+  .title-wrap{display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:12px;}
+  h1{font-size:2.6rem;margin:0; letter-spacing:0.6px;}
+  .desc{font-size:1.05rem;color:var(--muted); max-width:880px; text-align:center; font-weight:600;}
 
-    body.modern {
-      background: linear-gradient(135deg, #00f5a0, #00d9f5, #0061f5);
-      --text: #ffffff;
-      --accent: #ffffff;
-      --glow: #ffffff;
-      --button-bg: rgba(255, 255, 255, 0.2);
-    }
+  /* clock */
+  #clock{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace; font-size:2.2rem; margin-top:2px; text-shadow:0 0 18px var(--clock-glow);}
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      transition: background 0.5s, color 0.5s;
-    }
+  /* search row */
+  .search-row{display:flex; align-items:center; gap:10px; width:100%; justify-content:center; margin-top:6px;}
+  .search-box{display:flex; align-items:center; gap:8px; width:78%; max-width:960px; background:var(--card); padding:10px; border-radius:14px; box-shadow:var(--shadow);}
+  .engine-select{padding:10px 12px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.03); color:var(--text);}
+  .search-input{flex:1; padding:12px 14px; border-radius:10px; border:none; outline:none; background:transparent; color:var(--text); font-size:1.05rem;}
+  .search-btn{padding:10px 14px; border-radius:10px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border:none; color:#021028; font-weight:700; cursor:pointer;}
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      text-shadow: 0 0 15px var(--glow);
-    }
+  .icon-btn{background:var(--btn-bg); border-radius:10px; border:none; padding:10px; cursor:pointer; color:var(--text); display:inline-flex; align-items:center; justify-content:center;}
+  .icon-btn:hover{box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-2px);}
 
-    .description {
-      font-size: 1.2rem;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
+  /* profile bubble top right */
+  #profileWrap{position:fixed; right:18px; top:14px; z-index:1400;}
+  #profileBubble{width:48px;height:48px;border-radius:50%; background:var(--accent); color:#051225; display:flex; align-items:center; justify-content:center; font-weight:800; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.45);}
 
-    .clock {
-      font-family: 'Courier New', monospace;
-      font-size: 2.5rem;
-      text-shadow: 0 0 15px var(--glow);
-      margin-bottom: 40px;
-      transition: text-shadow 0.5s;
-    }
+  /* shortcuts */
+  .shortcuts{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:12px;}
+  .shortcut{display:flex; gap:8px; align-items:center; background:var(--card); padding:10px 14px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.02);}
+  .shortcut img{width:20px;height:20px;border-radius:4px;}
+  .add-shortcut{padding:10px 12px; border-radius:12px; background:transparent; border:1px dashed rgba(255,255,255,0.06); cursor:pointer;}
 
-    .top-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+  /* FUTURISTIC LEFT SLIDING MENU */
+  #leftMenu{
+    position:fixed; left:-360px; top:0; bottom:0; width:340px; background:linear-gradient(180deg,rgba(10,12,20,0.96),rgba(12,14,24,0.86)); box-shadow:8px 0 40px rgba(0,0,0,0.6); padding:18px; z-index:1500; display:flex; flex-direction:column; gap:12px; border-top-right-radius:12px; border-bottom-right-radius:12px; backdrop-filter: blur(8px);
+    transition:left .28s cubic-bezier(.16,.8,.3,1);
+  }
+  #leftMenu.open{left:18px;}
+  #leftMenu h3{margin:0; font-size:1.1rem;}
+  .menu-section{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+  .menu-btn{padding:10px 12px; border-radius:10px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021028; font-weight:700; border:none; cursor:pointer;}
+  .menu-link{padding:10px 12px; border-radius:10px; background:var(--btn-bg); border:1px solid rgba(255,255,255,0.03); color:var(--text); cursor:pointer;}
+  .theme-row{display:flex; gap:8px; flex-wrap:wrap;}
 
-    input {
-      padding: 12px;
-      width: 500px;
-      border-radius: 25px;
-      border: none;
-      outline: none;
-      background-color: var(--button-bg);
-      color: var(--text);
-      font-size: 1rem;
-      transition: 0.3s;
-    }
+  /* edit background input hidden; style button */
+  #chooseBg{display:none;}
+  .bg-btn{padding:10px 12px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#021028;cursor:pointer;}
 
-    input:focus {
-      box-shadow: 0 0 10px var(--glow);
-    }
+  /* modals */
+  .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:1600;}
+  .modal{background:var(--card); padding:18px; border-radius:12px; width:360px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px;}
+  .modal h4{margin:0;}
+  .modal input, .modal select{padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text);}
 
-    .menu, .dice {
-      background-color: var(--button-bg);
-      color: var(--text);
-      border: none;
-      padding: 10px 14px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: background 0.3s;
-    }
+  /* math solver (draggable) */
+  #calc{position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:360px; background:var(--card); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.6); z-index:1700; display:none; transition:opacity .18s;}
+  #calc.dragging{opacity:.9}
+  #calcHeader{display:flex; justify-content:space-between; align-items:center; padding:10px;}
+  #calcDisplay{width:100%; padding:12px; background:transparent; border:none; font-family:ui-monospace,monospace; font-size:1.1rem; color:var(--text); text-align:right;}
+  .calc-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:12px;}
+  .calc-btn{padding:12px;border-radius:8px;border:none;background:var(--btn-bg); color:var(--text); cursor:pointer; font-weight:700;}
+  .calc-btn:hover{box-shadow:0 8px 20px rgba(0,0,0,0.45); transform:translateY(-4px);}
 
-    .menu:hover, .dice:hover {
-      background-color: var(--accent);
-      color: #fff;
-    }
+  /* official bubble bottom-right */
+  #official{position:fixed; right:18px; bottom:18px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021028; padding:10px 14px; border-radius:999px; font-weight:700; z-index:1450; box-shadow:0 10px 30px rgba(0,0,0,0.5);}
 
-    .profile {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background-color: var(--button-bg);
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      cursor: pointer;
-      color: var(--text);
-      box-shadow: 0 0 10px var(--glow);
-    }
-
-    .official-bubble {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: var(--accent);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      box-shadow: 0 0 15px var(--glow);
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 20;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: var(--button-bg);
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-      color: var(--text);
-      box-shadow: 0 0 20px var(--glow);
-      min-width: 300px;
-    }
-
-    .modal input {
-      width: 80%;
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 10px;
-      border: none;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .modal button {
-      margin-top: 10px;
-      background: var(--accent);
-      border: none;
-      color: white;
-      padding: 8px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .mathsolver {
-      display: none;
-      position: fixed;
-      z-index: 25;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--button-bg);
-      border-radius: 15px;
-      box-shadow: 0 0 25px var(--glow);
-      padding: 20px;
-      width: 300px;
-      text-align: center;
-    }
-
-    .mathsolver input {
-      width: 90%;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 1.2rem;
-      text-align: right;
-      margin-bottom: 10px;
-    }
-
-    .mathsolver .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .mathsolver button {
-      background: var(--button-bg);
-      border: none;
-      color: var(--text);
-      padding: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 1.1rem;
-    }
-
-    .mathsolver button:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 5px;
-      right: 10px;
-      cursor: pointer;
-      color: var(--text);
-      font-weight: bold;
-    }
-  </style>
+  /* small helpers */
+  .row{display:flex; gap:8px; align-items:center;}
+  .muted{color:var(--muted); font-size:0.95rem;}
+  @media (max-width:880px){ .search-box{width:94%} .calc-grid{grid-template-columns:repeat(4,1fr)} #leftMenu{width:300px} }
+</style>
 </head>
-<body class="night">
-  <div class="profile" id="profileBubble">?</div>
+<body data-theme="night" class="">
+<div class="app">
 
-  <div class="top-bar">
-    <button class="menu" id="menuBtn">☰</button>
-    <input type="text" id="searchBar" placeholder="Search the web..." />
-    <button class="dice" id="diceBtn">🎲</button>
+  <!-- Official site protection: redirect if not official (will also run below in script) -->
+  <!-- MAIN UI -->
+  <div id="profileWrap"><div id="profileBubble" title="Profile">U</div></div>
+
+  <div class="title-wrap">
+    <h1>Omni</h1>
+    <div class="desc">a multi-tool search engine that will be safe for you and generations to come</div>
+    <div id="clock" title=""></div>
   </div>
 
-  <h1>Omni</h1>
-  <div class="description">The world’s all-in-one search engine.</div>
-  <div class="clock" id="clock" title=""></div>
+  <!-- Search Row -->
+  <div class="search-row" role="search">
+    <div class="search-box" aria-label="Search">
+      <select class="engine-select" id="engineSelect" title="Search engine">
+        <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+        <option value="https://www.google.com/search?q=">Google</option>
+        <option value="https://www.bing.com/search?q=">Bing</option>
+      </select>
 
-  <div class="official-bubble">Official OmniEngine</div>
+      <input class="search-input" id="searchInput" placeholder="Search the web..." aria-label="Search input" />
 
-  <!-- Sign In Modal -->
-  <div class="modal" id="signInModal">
-    <div class="modal-content">
-      <h2>Sign In</h2>
-      <input type="text" id="username" placeholder="Username" /><br />
-      <input type="email" id="email" placeholder="Email" /><br />
-      <input type="password" id="password" placeholder="Password" /><br />
-      <button id="saveSignIn">Save</button>
+      <button class="search-btn" id="searchBtn" title="Open search">Search</button>
+    </div>
+
+    <button class="icon-btn" id="menuBtn" title="Open menu">☰</button>
+    <button class="icon-btn" id="diceBtn" title="Random site">🎲</button>
+  </div>
+
+  <!-- Shortcuts -->
+  <div class="shortcuts" id="shortcutsRow" aria-label="Shortcuts"></div>
+
+  <!-- Left futuristic menu -->
+  <aside id="leftMenu" aria-hidden="true" role="navigation">
+    <h3>Omni — Menu</h3>
+
+    <div class="menu-section">
+      <button class="menu-link" id="menuSignIn">Sign In / Profile</button>
+
+      <div style="margin-top:6px;">
+        <div class="muted">Themes</div>
+        <div class="theme-row" style="margin-top:6px;">
+          <button class="menu-link" data-theme="light">Light</button>
+          <button class="menu-link" data-theme="dark">Dark</button>
+          <button class="menu-link" data-theme="night">Night</button>
+          <button class="menu-link" data-theme="astro">Astro</button>
+          <button class="menu-link" data-theme="modern">Modern</button>
+        </div>
+      </div>
+
+      <button class="menu-link" id="openCalcBtn">Math Solver</button>
+      <button class="menu-link" id="editBgBtn">Edit Background</button>
+      <input type="file" id="bgFile" accept="image/*" style="display:none" />
+      <button class="menu-link" id="cleanBtn">Clean Data</button>
+      <button class="menu-link" id="openGitBtn">Current GitHub</button>
+    </div>
+  </aside>
+
+  <!-- Left menu overlay click area -->
+  <div id="menuOverlay" style="display:none; position:fixed; inset:0; z-index:1400;"></div>
+
+  <!-- Sign-in modal (centered, not draggable) -->
+  <div id="signModalOverlay" class="modal-overlay" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signinTitle">
+      <h4 id="signinTitle">Sign in to Omni</h4>
+      <input id="siName" placeholder="Username" />
+      <input id="siEmail" placeholder="Email" type="email" />
+      <input id="siPass" placeholder="Password" type="password" />
+      <div class="row" style="justify-content:flex-end;">
+        <button id="siSave" class="menu-btn">Sign In</button>
+      </div>
     </div>
   </div>
 
-  <!-- Math Solver Modal -->
-  <div class="mathsolver" id="mathSolver">
-    <span class="close-btn" id="closeSolver">✖</span>
-    <input type="text" id="solverInput" readonly />
-    <div class="buttons" id="solverButtons"></div>
+  <!-- Profile modal (edit account) -->
+  <div id="profileModalOverlay" class="modal-overlay" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <h4 id="profileTitle">Account</h4>
+      <input id="prName" placeholder="Username" />
+      <input id="prEmail" placeholder="Email" type="email" />
+      <input id="prPass" placeholder="Password" type="password" />
+      <label style="font-size:0.9rem; color:var(--muted); margin-top:6px;">Upload avatar (optional)</label>
+      <input id="prAvatar" type="file" accept="image/*" />
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
+        <button id="prSave" class="menu-btn">Save</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // --- Official Site Check ---
-    if (window.location.hostname !== "omniengines.netlify.app") {
-      window.location.href = "https://google.com";
-    }
+  <!-- Math solver (draggable) -->
+  <div id="calc" role="dialog" aria-modal="true" style="display:none;">
+    <div id="calcHeader">
+      <div style="font-weight:700">Math Solver</div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="snapBtn" class="menu-link" style="padding:6px 8px; background:transparent;">⤒</button>
+        <button id="closeCalc" class="menu-link" style="padding:6px 8px;">✖</button>
+      </div>
+    </div>
+    <textarea id="calcDisplay" rows="1" style="width:100%; resize:none; border:none; background:transparent; color:var(--text); font-family:ui-monospace,monospace; font-size:1.05rem; padding:10px;"></textarea>
+    <div class="calc-grid" id="calcGrid">
+      <!-- Buttons will be inserted by JS -->
+    </div>
+  </div>
 
-    // --- Clock ---
-    const clock = document.getElementById('clock');
-    setInterval(() => {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      clock.textContent = time;
-      clock.title = now.toDateString();
-    }, 1000);
+  <!-- Official bubble -->
+  <div id="official" title="Official site">Official Site ✅</div>
+</div>
 
-    // --- Search ---
-    const searchBar = document.getElementById('searchBar');
-    searchBar.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const query = searchBar.value.trim();
-        if (query) {
-          window.open(`https://duckduckgo.com/?q=${encodeURIComponent(query)}`, '_blank');
-        }
+<script>
+/* =========================
+   Official site protection
+   ========================= */
+(function(){
+  const OFFICIAL = "omniengines.netlify.app";
+  if(location.hostname !== OFFICIAL){
+    // Immediate redirect to google for non-official hosts
+    location.replace("https://google.com");
+    return;
+  }
+  // show official bubble (already present) - no further action needed
+})();
+
+/* =========================
+   Theme & prefs
+   ========================= */
+const body = document.documentElement; // we'll set data-theme on <html> or <body> attributes
+const appBody = document.body;
+function applyTheme(t){
+  // set data-theme attribute for css selectors
+  document.body.setAttribute("data-theme", t);
+  localStorage.setItem("omni_theme", t);
+  // adjust clock glow via inline var if needed (already via css var)
+}
+const savedTheme = localStorage.getItem("omni_theme") || "night";
+applyTheme(savedTheme);
+
+/* =========================
+   Clock
+   ========================= */
+const clockEl = document.getElementById("clock");
+function updateClock(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  clockEl.textContent = `${hh}:${mm}:${ss}`;
+  clockEl.setAttribute("title", now.toDateString());
+}
+setInterval(updateClock,1000); updateClock();
+
+/* =========================
+   Shortcuts (persisted)
+   ========================= */
+const defaultShortcuts = [
+  {name:"Gmail", url:"https://mail.google.com/", icon:"https://cdn4.iconfinder.com/data/icons/logos-brands-in-colors/48/google-gmail-256.png"},
+  {name:"YouTube", url:"https://youtube.com/", icon:"https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-256.png"},
+  {name:"ChatGPT", url:"https://chat.openai.com/", icon:"https://cdn3.iconfinder.com/data/icons/social-media-brands-1/128/chat-gpt-256.png"}
+];
+let shortcuts = JSON.parse(localStorage.getItem("omni_shortcuts")||"null") || defaultShortcuts.slice();
+const shortcutsRow = document.getElementById("shortcutsRow");
+function renderShortcuts(){
+  shortcutsRow.innerHTML = "";
+  shortcuts.forEach((s,i)=>{
+    const el = document.createElement("button");
+    el.className = "shortcut";
+    el.innerHTML = `<img src="${s.icon||''}" alt=""><span>${s.name}</span>`;
+    el.onclick = ()=> window.open(s.url,"_blank");
+    el.oncontextmenu = (e)=>{ e.preventDefault(); if(confirm("Remove shortcut "+s.name+"?")){ shortcuts.splice(i,1); localStorage.setItem("omni_shortcuts", JSON.stringify(shortcuts)); renderShortcuts(); } };
+    shortcutsRow.appendChild(el);
+  });
+  const add = document.createElement("button");
+  add.className = "add-shortcut";
+  add.innerText = "+ Add Shortcut";
+  add.onclick = addShortcut;
+  shortcutsRow.appendChild(add);
+}
+function addShortcut(){
+  const url = prompt("Shortcut URL (include https://):");
+  if(!url) return;
+  const name = prompt("Shortcut name:");
+  if(!name) return;
+  const icon = prompt("Optional icon URL:");
+  shortcuts.push({name,url,icon:icon||""});
+  localStorage.setItem("omni_shortcuts", JSON.stringify(shortcuts));
+  renderShortcuts();
+}
+renderShortcuts();
+
+/* =========================
+   Search behavior
+   ========================= */
+const searchInput = document.getElementById("searchInput");
+const engineSelect = document.getElementById("engineSelect");
+document.getElementById("searchBtn").addEventListener("click", runSearch);
+searchInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") runSearch(); });
+function runSearch(){
+  const q = searchInput.value.trim();
+  if(!q) return;
+  const engine = engineSelect.value;
+  window.open(engine + encodeURIComponent(q), "_blank");
+}
+
+/* =========================
+   Dice (random) button
+   ========================= */
+document.getElementById("diceBtn").addEventListener("click", ()=>{
+  const list = ["https://pbskids.org","https://youtube.com","https://coolmathgames.com"];
+  window.open(list[Math.floor(Math.random()*list.length)], "_blank");
+});
+
+/* =========================
+   LEFT MENU: interactions
+   ========================= */
+const leftMenu = document.getElementById("leftMenu");
+const menuBtn = document.getElementById("menuBtn");
+const menuOverlay = document.getElementById("menuOverlay");
+menuBtn.addEventListener("click", ()=> openLeftMenu());
+menuOverlay.addEventListener("click", ()=> closeLeftMenu());
+function openLeftMenu(){ leftMenu.classList.add("open"); menuOverlay.style.display = "block"; }
+function closeLeftMenu(){ leftMenu.classList.remove("open"); menuOverlay.style.display = "none"; }
+
+/* menu theme buttons */
+[...leftMenu.querySelectorAll('[data-theme]')].forEach(btn=>{
+  btn.addEventListener("click", (e)=>{
+    const t = e.currentTarget.getAttribute("data-theme");
+    applyTheme(t);
+  });
+});
+/* other menu links */
+document.getElementById("openGitBtn").addEventListener("click", ()=> window.open("https://github.com/12jjiscool-stack/Omni-browser_offfical","_blank"));
+document.getElementById("cleanBtn").addEventListener("click", ()=>{
+  if(confirm("Clear local stored data (theme, profile, shortcuts, bg)?")){
+    localStorage.clear(); location.reload();
+  }
+});
+
+/* Edit background */
+const editBgBtn = document.getElementById("editBgBtn");
+const bgFile = document.getElementById("bgFile");
+editBgBtn.addEventListener("click", ()=> bgFile.click());
+bgFile.addEventListener("change", (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=> {
+    localStorage.setItem("omni_bg", r.result);
+    applySavedBackground();
+  };
+  r.readAsDataURL(f);
+});
+function applySavedBackground(){
+  const b = localStorage.getItem("omni_bg");
+  if(b){
+    document.body.style.backgroundImage = `url(${b})`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+  } else {
+    // remove custom background for themes that control backgrounds
+    document.body.style.backgroundImage = "";
+  }
+}
+applySavedBackground();
+
+/* =========================
+   Sign-in modal (centered, not draggable)
+   ========================= */
+const signOverlay = document.getElementById("signModalOverlay");
+const siName = document.getElementById("siName");
+const siEmail = document.getElementById("siEmail");
+const siPass = document.getElementById("siPass");
+const siSave = document.getElementById("siSave");
+
+function showSignModal(){ signOverlay.style.display = "flex"; }
+function hideSignModal(){ signOverlay.style.display = "none"; }
+
+document.getElementById("menuSignIn").addEventListener("click", ()=>{
+  closeLeftMenu(); showSignModal();
+});
+siSave.addEventListener("click", ()=>{
+  const name = siName.value.trim();
+  const email = siEmail.value.trim();
+  const pass = siPass.value;
+  if(!name||!email||!pass){ alert("Please fill all fields."); return; }
+  localStorage.setItem("omni_user", JSON.stringify({name,email,pass}));
+  hideSignModal();
+  applyProfile();
+});
+
+/* auto-show sign-in if not signed */
+(function autoSignCheck(){
+  const u = localStorage.getItem("omni_user");
+  if(!u) showSignModal();
+  else applyProfile();
+})();
+
+/* =========================
+   Profile modal (edit)
+   ========================= */
+const profileOverlay = document.getElementById("profileModalOverlay");
+const prName = document.getElementById("prName"), prEmail = document.getElementById("prEmail"), prPass = document.getElementById("prPass"), prAvatar = document.getElementById("prAvatar"), prSave = document.getElementById("prSave");
+const profileBubble = document.getElementById("profileBubble");
+profileBubble.addEventListener("click", ()=>{
+  // open profile modal
+  const u = JSON.parse(localStorage.getItem("omni_user")||"null") || {name:"", email:"", pass:""};
+  prName.value = u.name||""; prEmail.value = u.email||""; prPass.value = u.pass||"";
+  profileOverlay.style.display = "flex";
+});
+prSave.addEventListener("click", ()=>{
+  const u = {name:prName.value.trim(), email:prEmail.value.trim(), pass:prPass.value};
+  if(!u.name || !u.email || !u.pass){ alert("Please fill all fields."); return; }
+  localStorage.setItem("omni_user", JSON.stringify(u));
+  // avatar handled below
+  profileOverlay.style.display = "none";
+  applyProfile();
+});
+prAvatar.addEventListener("change", (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=> {
+    localStorage.setItem("omni_avatar", r.result);
+    applyProfile();
+  };
+  r.readAsDataURL(f);
+});
+
+/* apply profile display */
+function applyProfile(){
+  const u = JSON.parse(localStorage.getItem("omni_user")||"null");
+  const avatar = localStorage.getItem("omni_avatar");
+  if(avatar){
+    profileBubble.style.background = "transparent";
+    profileBubble.innerHTML = `<img src="${avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else if(u && u.name){
+    profileBubble.textContent = u.name.trim().slice(0,2).toUpperCase()[0] || "U";
+  } else {
+    profileBubble.textContent = "U";
+  }
+}
+
+/* =========================
+   Math Solver: draggable modal
+   ========================= */
+const calcEl = document.getElementById("calc");
+const calcGrid = document.getElementById("calcGrid");
+const calcDisplay = document.getElementById("calcDisplay");
+const openCalcBtn = document.getElementById("openCalcBtn");
+const closeCalcBtn = document.getElementById("closeCalc");
+const snapBtn = document.getElementById("snapBtn");
+
+const calcButtons = [
+  "(",")","%","CE","C",
+  "7","8","9","/","^",
+  "4","5","6","*","√",
+  "1","2","3","-","π",
+  "0",".","=","+","e"
+];
+function buildCalc(){
+  calcGrid.innerHTML = "";
+  calcButtons.forEach(t=>{
+    const b = document.createElement("button");
+    b.className = "calc-btn";
+    b.textContent = t;
+    b.addEventListener("click", ()=> handleCalc(t));
+    calcGrid.appendChild(b);
+  });
+}
+buildCalc();
+
+openCalcBtn.addEventListener("click", ()=> {
+  closeLeftMenu();
+  openCalc();
+});
+closeCalcBtn.addEventListener("click", ()=> { closeCalc(); snapToCenter(); });
+
+function openCalc(){
+  calcEl.style.display = "block";
+  snapToCenter();
+}
+function closeCalc(){
+  calcEl.style.display = "none";
+}
+
+function snapToCenter(){
+  calcEl.style.left = "50%"; calcEl.style.top = "50%"; calcEl.style.transform = "translate(-50%,-50%)";
+}
+
+/* dragging */
+let dragging=false, offsetX=0, offsetY=0;
+calcEl.addEventListener("pointerdown", (e)=>{
+  // only start dragging if target is header or calcEl itself (not inputs)
+  const isHeader = e.target.closest("#calcHeader") !== null;
+  if(!isHeader) return;
+  dragging = true;
+  calcEl.classList.add("dragging");
+  const rect = calcEl.getBoundingClientRect();
+  offsetX = e.clientX - rect.left;
+  offsetY = e.clientY - rect.top;
+  calcEl.setPointerCapture(e.pointerId);
+});
+document.addEventListener("pointermove", (e)=>{
+  if(!dragging) return;
+  calcEl.style.left = (e.clientX - offsetX) + "px";
+  calcEl.style.top = (e.clientY - offsetY) + "px";
+  calcEl.style.transform = "";
+});
+document.addEventListener("pointerup", (e)=>{
+  if(!dragging) return;
+  dragging = false;
+  calcEl.classList.remove("dragging");
+});
+snapBtn.addEventListener("click", snapToCenter);
+
+/* calculator logic */
+let calcExpr = "";
+function handleCalc(token){
+  if(token === "C"){ calcExpr = ""; calcDisplay.value = ""; return; }
+  if(token === "CE"){ calcExpr = calcExpr.slice(0,-1); calcDisplay.value = calcExpr; return; }
+  if(token === "π"){ calcExpr += Math.PI; calcDisplay.value = calcExpr; return; }
+  if(token === "e"){ calcExpr += Math.E; calcDisplay.value = calcExpr; return; }
+  if(token === "√"){ calcExpr += "Math.sqrt("; calcDisplay.value = calcExpr; return; }
+  if(token === "^"){ calcExpr += "**"; calcDisplay.value = calcExpr; return; }
+  if(token === "="){
+    try{
+      // small sanitization: allow digits, operators, Math, parentheses, decimal
+      const res = Function('"use strict";return ('+calcExpr+')')();
+      calcDisplay.value = String(res);
+      calcExpr = String(res);
+    }catch(err){ calcDisplay.value = "Error"; calcExpr = ""; }
+    return;
+  }
+  // append others
+  calcExpr += token;
+  calcDisplay.value = calcExpr;
+}
+
+/* when calc closed, snap to center next open */
+window.addEventListener("keydown", (e)=> { if(e.key === "Escape") { if(calcEl.style.display === "block") closeCalc(); if(document.getElementById("menuOverlay").style.display === "block") closeLeftMenu(); } });
+
+/* =========================
+   Official bubble (already shown)
+   ========================= */
+/* nothing else required, it's already visible */
+
+/* =========================
+   Initial UI setup
+   ========================= */
+// set initial theme class for body tag
+document.documentElement.setAttribute("data-theme", localStorage.getItem("omni_theme") || "night");
+// apply saved custom bg if exists
+(function(){
+  const bg = localStorage.getItem("omni_bg");
+  if(bg){ document.body.style.backgroundImage = `url(${bg})`; document.body.style.backgroundSize = "cover"; }
+  // profile
+  applyProfile();
+})();
+
+/* =========================
+   Menu close when clicking outside
+   ========================= */
+document.addEventListener("click", (e)=>{
+  if(!leftMenu.classList.contains("open")) return;
+  const inside = leftMenu.contains(e.target) || menuBtn.contains(e.target);
+  if(!inside) closeLeftMenu();
+});
+
+/* =========================
+   Apply theme buttons in menu (listeners already attached via data-theme)
+   ========================= */
+leftMenu.querySelectorAll('[data-theme]').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    const t = e.currentTarget.getAttribute('data-theme');
+    document.documentElement.setAttribute("data-theme", t);
+    localStorage.setItem("omni_theme", t);
+    // if custom background exists, keep it; otherwise clear if theme has own bg
+    if(!localStorage.getItem("omni_bg")){
+      if(t === 'astro'){
+        document.body.style.backgroundImage = "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=2000&q=80')";
+        document.body.style.backgroundSize = "cover";
+      } else if(t === 'modern'){
+        document.body.style.backgroundImage = "";
+        document.body.style.background = "linear-gradient(135deg,#07103a 0%,#052a5b 50%,#001f4d 100%)";
+      } else {
+        document.body.style.backgroundImage = "";
+        document.body.style.background = "";
       }
-    });
-
-    // --- Dice Button ---
-    document.getElementById('diceBtn').onclick = () => {
-      const sites = ["https://pbskids.org", "https://youtube.com", "https://coolmathgames.com"];
-      const random = sites[Math.floor(Math.random() * sites.length)];
-      window.open(random, '_blank');
-    };
-
-    // --- Sign In Modal ---
-    const modal = document.getElementById('signInModal');
-    const savedUser = localStorage.getItem('username');
-    if (!savedUser) modal.style.display = 'flex';
-
-    document.getElementById('saveSignIn').onclick = () => {
-      const user = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
-      if (user && email && pass) {
-        localStorage.setItem('username', user);
-        localStorage.setItem('email', email);
-        localStorage.setItem('password', pass);
-        document.getElementById('profileBubble').textContent = user[0].toUpperCase();
-        modal.style.display = 'none';
-      }
-    };
-
-    if (savedUser) {
-      document.getElementById('profileBubble').textContent = savedUser[0].toUpperCase();
     }
+  });
+});
 
-    // --- Math Solver ---
-    const solverModal = document.getElementById('mathSolver');
-    const solverButtons = document.getElementById('solverButtons');
-    const solverInput = document.getElementById('solverInput');
+/* =========================
+   Open calc & sign-in via menu
+   ========================= */
+document.getElementById("openCalcBtn").addEventListener("click", ()=> { openCalc(); closeLeftMenu(); });
+document.getElementById("menuSignIn").addEventListener("click", ()=> { showSignModal(); });
 
-    const buttons = [
-      '7','8','9','/','4','5','6','*',
-      '1','2','3','-','0','.','=','+',
-      'sin','cos','tan','(',')','C','√'
-    ];
-    buttons.forEach(b => {
-      const btn = document.createElement('button');
-      btn.textContent = b;
-      btn.onclick = () => {
-        if (b === 'C') solverInput.value = '';
-        else if (b === '=') {
-          try {
-            solverInput.value = eval(solverInput.value
-              .replace('sin', 'Math.sin')
-              .replace('cos', 'Math.cos')
-              .replace('tan', 'Math.tan')
-              .replace('√', 'Math.sqrt'));
-          } catch {
-            solverInput.value = 'Error';
-          }
-        } else {
-          solverInput.value += b;
-        }
-      };
-      solverButtons.appendChild(btn);
-    });
+/* Save sign-in from sign modal (SI Save) already handled above */
+siSave.addEventListener("click", ()=> { /* already handled earlier, left for readability */ });
 
-    document.getElementById('menuBtn').onclick = () => solverModal.style.display = 'block';
-    document.getElementById('closeSolver').onclick = () => solverModal.style.display = 'none';
-  </script>
+/* =========================
+   Misc: initial placement & snap
+   ========================= */
+snapToCenter();
+
+/* End of script */
+</script>
 </body>
 </html>
