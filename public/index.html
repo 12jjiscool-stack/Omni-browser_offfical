@@ -20,7 +20,10 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s, backdrop-filter 0.3s;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
 
     /* ===== Header ===== */
@@ -42,6 +45,7 @@
       margin: 20px 0;
       text-shadow: 0 0 10px #9f7aea;
       cursor: pointer;
+      transition: text-shadow 0.3s;
     }
 
     /* ===== Search Bar Area ===== */
@@ -57,6 +61,7 @@
       border: none;
       border-radius: 6px;
       outline: none;
+      font-size: 1rem;
     }
 
     select, input {
@@ -87,15 +92,17 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      background: #161b22;
-      padding: 8px 14px;
-      border-radius: 8px;
+      background: rgba(22, 27, 34, 0.8);
+      padding: 10px 16px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.2s;
+      backdrop-filter: blur(6px);
     }
 
     .shortcut:hover {
-      background: #21262d;
+      background: rgba(33, 38, 45, 0.9);
+      transform: translateY(-2px);
     }
 
     .shortcut img {
@@ -133,9 +140,10 @@
       top: 0;
       width: 260px;
       height: 100%;
-      background: #161b22;
+      background: rgba(22, 27, 34, 0.95);
       padding: 20px;
       transition: left 0.3s ease;
+      backdrop-filter: blur(8px);
     }
 
     #sideMenu.active {
@@ -152,18 +160,19 @@
       background: #21262d;
     }
 
-    /* ===== Math solver modal.v2 needs a self solving calc bar ===== */
+    /* ===== Math Solver Modal ===== */
     #mathModal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #161b22;
+      background: rgba(22, 27, 34, 0.95);
       padding: 20px;
       border-radius: 12px;
       width: 320px;
       z-index: 1000;
+      backdrop-filter: blur(10px);
     }
 
     #mathModal.active {
@@ -208,20 +217,27 @@
     .calc-buttons button {
       padding: 12px;
       background: #21262d;
+      transition: background 0.3s, transform 0.1s;
     }
 
-    /* ===== Sign In popup (funct:obj=sign in ===== */
+    .calc-buttons button:hover {
+      background: #9f7aea;
+      transform: scale(1.05);
+    }
+
+    /* ===== Sign In Modal ===== */
     #signInModal {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #161b22;
+      background: rgba(22, 27, 34, 0.95);
       padding: 20px;
       border-radius: 12px;
       width: 300px;
       z-index: 2000;
+      backdrop-filter: blur(8px);
     }
 
     #signInModal.active {
@@ -233,7 +249,7 @@
       margin: 6px 0;
     }
 
-    /* ===== Theme Colors + more in feautre ===== */
+    /* ===== Theme Colors ===== */
     body.light {
       background: #f5f5f5;
       color: #222;
@@ -248,9 +264,22 @@
       background: #001f3f;
       color: #ddd;
     }
+
+    /* === Astro Theme === */
+    body.astro {
+      background-image: url('https://cdn.pixabay.com/photo/2017/01/31/20/52/space-2027065_1280.jpg');
+      color: #fff;
+    }
+
+    /* === Modern Theme === */
+    body.modern {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
-<body class="dark">
+<body class="night">
   <!-- Profile Bubble -->
   <div id="profileBubble">?</div>
 
@@ -269,7 +298,7 @@
     <input type="text" id="searchInput" placeholder="Search...">
     <button onclick="doSearch()">Search</button>
     <button onclick="toggleMenu()">☰</button>
-    <button onclick="randomSite()">random site</button>
+    <button onclick="randomSite()">🎲</button>
   </div>
 
   <!-- Shortcuts -->
@@ -293,6 +322,8 @@
     <button onclick="setTheme('light')">Light</button>
     <button onclick="setTheme('dark')">Dark</button>
     <button onclick="setTheme('night')">Night</button>
+    <button onclick="setTheme('astro')">Astro</button>
+    <button onclick="setTheme('modern')">Modern</button>
     <button onclick="localStorage.clear(); location.reload();">Clean Data</button>
     <button onclick="openInNewTab('https://github.com/12jjiscool-stack/Omni-browser_offfical')">Current GitHub</button>
     <button onclick="openMathSolver()">Math Solver</button>
@@ -466,4 +497,5 @@
   </script>
 </body>
 </html>
+
 
